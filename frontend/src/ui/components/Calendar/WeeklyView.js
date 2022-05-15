@@ -1,5 +1,5 @@
 /* This example requires Tailwind CSS v2.0+ */
-import { Fragment, useEffect, useRef } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, DotsHorizontalIcon } from '@heroicons/react/solid'
 import { Menu, Transition } from '@headlessui/react'
 import { classNames } from '../../utils'
@@ -10,6 +10,30 @@ function WeeklyView() {
   const containerNav = useRef(null)
   const containerOffset = useRef(null)
 
+  const [state, setState ]= useState(
+    {
+      selectedView:"weekly",
+      selectedDate : new Date('2022-01-12T00:00'),
+      events: [
+        {
+          startDate: new Date('2022-01-12T06:00'),
+          endDate : new Date('2022-01-12T07:00'),
+          title: "Breakfast"
+        },
+        {
+          startDate: new Date('2022-01-12T08:00'),
+          endDate : new Date('2022-01-12T10:00'),
+          title: "Flight to Paris"
+        },
+        {
+          startDate: new Date('2022-01-13T01:00'),
+          endDate : new Date('2022-01-13T05:00'),
+          title: "Hard Work"
+        }
+      ]
+    }
+  );
+
   useEffect(() => {
     // Set the container scroll position based on the current time.
     const currentMinute = new Date().getHours() * 60
@@ -19,11 +43,34 @@ function WeeklyView() {
       1440
   }, [])
 
+
+  const dateToMonthlyDate = (date) =>{
+    const monthMap = {
+      0 : "January",
+      1 : "Febrero",
+      2 : "Marzo",
+      3 : "Abril",
+      4 : "Mayo",
+      5 : "Junio",
+      6 : "Julio",
+      7 : "Agosto",
+      8 : "Septiembre",
+      9 : "Octubre",
+      10 : "Noviembre",
+      11 : "Diciembre"
+    }
+    return `${monthMap[date.getMonth()]} ${date.getDate()}`
+  }
+
+  const get30MinIntervals = (date1, date2) =>{
+    return 2 * (Math.abs(date2  - date1)/ 36e5) ;
+  }
+
   return (
     <div className="flex h-full flex-col">
       <header className="relative z-40 flex flex-none items-center justify-between border-b border-gray-200 py-4 px-6">
         <h1 className="text-lg font-semibold text-gray-900">
-          <time dateTime="2022-01">January 2022</time>
+          <time dateTime="  2022-01">{dateToMonthlyDate(state.selectedDate)}</time>
         </h1>
         <div className="flex items-center">
           <div className="flex items-center rounded-md shadow-sm md:items-stretch">
@@ -271,7 +318,7 @@ function WeeklyView() {
                 S <span className="mt-1 flex h-8 w-8 items-center justify-center font-semibold text-gray-900">16</span>
               </button>
             </div>
-
+            {/* WE CAN ADD HERE THE HEADER  AND ITERATE THE VALUES FROM SELECTED DATE TO CREATE AN ARRAY WITH MONTH - DAY */}
             <div className="-mr-px hidden grid-cols-7 divide-x divide-gray-100 border-r border-gray-100 text-sm leading-6 text-gray-500 sm:grid">
               <div className="col-end-1 w-14" />
               <div className="flex items-center justify-center py-3">
@@ -486,39 +533,26 @@ function WeeklyView() {
                 className="col-start-1 col-end-2 row-start-1 grid grid-cols-1 sm:grid-cols-7 sm:pr-8"
                 style={{ gridTemplateRows: '1.75rem repeat(288, minmax(0, 1fr)) auto' }}
               >
-                <li className="relative mt-px flex sm:col-start-3" style={{ gridRow: '74 / span 12' }}>
-                  <a
-                    href=" "
-                    className="group absolute inset-1 flex flex-col overflow-y-auto rounded-lg bg-blue-50 p-2 text-xs leading-5 hover:bg-blue-100"
-                  >
-                    <p className="order-1 font-semibold text-blue-700">Breakfast</p>
-                    <p className="text-blue-500 group-hover:text-blue-700">
-                      <time dateTime="2022-01-12T06:00">6:00 AM</time>
-                    </p>
-                  </a>
-                </li>
-                <li className="relative mt-px flex sm:col-start-3" style={{ gridRow: '92 / span 30' }}>
-                  <a
-                    href=" "
-                    className="group absolute inset-1 flex flex-col overflow-y-auto rounded-lg bg-pink-50 p-2 text-xs leading-5 hover:bg-pink-100"
-                  >
-                    <p className="order-1 font-semibold text-pink-700">Flight to Paris</p>
-                    <p className="text-pink-500 group-hover:text-pink-700">
-                      <time dateTime="2022-01-12T07:30">7:30 AM</time>
-                    </p>
-                  </a>
-                </li>
-                <li className="relative mt-px hidden sm:col-start-6 sm:flex" style={{ gridRow: '122 / span 24' }}>
-                  <a
-                    href=" "
-                    className="group absolute inset-1 flex flex-col overflow-y-auto rounded-lg bg-gray-100 p-2 text-xs leading-5 hover:bg-gray-200"
-                  >
-                    <p className="order-1 font-semibold text-gray-700">Meeting with design team at Disney</p>
-                    <p className="text-gray-500 group-hover:text-gray-700">
-                      <time dateTime="2022-01-15T10:00">10:00 AM</time>
-                    </p>
-                  </a>
-                </li>
+                {/* 
+                    - col-start-x represents the index for the day of the event 
+                    - span x represents the duration of the event with 30 min gap
+                    - first x represent the position on y axes, where th x is the result of (6*x)+2
+                  */}
+                {state.events.map(({startDate, endDate, title})=>{
+                  return(
+                    <li className={"relative mt-px flex "+ `sm:col-start-${startDate.getDay()}` } style={{ gridRow: `${(startDate.getHours()*12)+2} / span ${get30MinIntervals(endDate,startDate)*6}` }}>
+                    <a
+                      href=" "
+                      className="group absolute inset-1 flex flex-col overflow-y-auto rounded-lg bg-blue-50 p-2 text-xs leading-5 hover:bg-blue-100"
+                    >
+                      <p className="order-1 font-semibold text-blue-700">{title}</p>
+                      <p className="text-blue-500 group-hover:text-blue-700">
+                        <time dateTime="2022-01-12T06:00">6:00 AM</time>
+                      </p>
+                    </a>
+                  </li> 
+                  )
+                })}
               </ol>
             </div>
           </div>
