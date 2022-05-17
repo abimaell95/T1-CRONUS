@@ -55,9 +55,9 @@ class Task(models.Model):
     start_datetime = models.DateTimeField()
     end_datetime = models.DateTimeField()
     duration = models.PositiveSmallIntegerField()
-    state = models.ForeignKey('TaskState', on_delete=models.CASCADE)
-    id_machine = models.ForeignKey("Machine", on_delete=models.CASCADE)
-    id_kind = models.ForeignKey("TaskKind", on_delete=models.CASCADE)
+    state = models.ForeignKey('TaskState', related_name="state" ,on_delete=models.CASCADE)
+    id_machine = models.ForeignKey("Machine", related_name="machine", on_delete=models.CASCADE)
+    id_kind = models.ForeignKey("TaskKind", related_name="kind" , on_delete=models.CASCADE)
 
     def __str__(self):
         return self.description

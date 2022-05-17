@@ -14,7 +14,7 @@ class TaskSerializer(ModelSerializer):
         model = Task
         fields = (
             'id', 'description', 'start_datetime', 'end_datetime', 'duration',
-            'state', 'id_machine'
+            'state', 'id_machine', 'id_kind'
         )
 
 class TaskTypeSerializer(ModelSerializer):
