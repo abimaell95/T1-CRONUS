@@ -19,7 +19,7 @@ from rest_framework import routers
 from core import views
 
 router = routers.DefaultRouter()
-router.register(r'machine', views.MachineViewSet)
+router.register(r'machine', views.MachineView)
 router.register(r'task_type', views.TaskTypeViewSet)
 router.register(r'maintenance_period', views.MaintenancePeriodViewSet)
 router.register(r'task', views.TaskViewSet)

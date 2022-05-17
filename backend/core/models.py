@@ -1,4 +1,5 @@
 from datetime import date
+from pyexpat import model
 from django.db import models
 
 class MachineState(models.Model):
@@ -56,9 +57,17 @@ class Task(models.Model):
     duration = models.PositiveSmallIntegerField()
     state = models.ForeignKey('TaskState', on_delete=models.CASCADE)
     id_machine = models.ForeignKey("Machine", on_delete=models.CASCADE)
+    id_kind = models.ForeignKey("TaskKind", on_delete=models.CASCADE)
 
     def __str__(self):
         return self.description
+
+class TaskKind(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    label =  models.CharField(max_length=20)
+
+    def __str__(self):
+        return self.label
 
 class TaskType(models.Model):
     id = models.BigAutoField(primary_key=True)
