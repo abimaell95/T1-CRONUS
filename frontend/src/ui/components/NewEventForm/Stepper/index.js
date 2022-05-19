@@ -3,6 +3,8 @@ import { useState } from 'react';
 import AssignTask from '../AssignTask';
 import TimesInput from '../TimesInput';
 import Description from '../Description';
+import MaintenanceInput from '../MaintenanceInput';
+import Repair from '../Repair';
 
 import { CheckIcon } from '@heroicons/react/solid'
 
@@ -10,26 +12,31 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 const steps_ = [
-  { name: 'Create account', description: 'Vitae sed mi luctus laoreet.', href: '#', status: 'complete', component: TimesInput},
-  { name: 'Business information', description: 'Penatibus eu quis ante.', href: '#', status: 'upcoming', component: AssignTask },
-  { name: 'Preview', description: 'Iusto et officia maiores porro ad non quas.', href: '#', status: 'upcoming', component: Description},
+  { name: 0, status: 'complete', component: TimesInput, type:'event'},
+  { name: 1, status: 'upcoming', component: AssignTask, type:'event' },
+  { name: 2, status: 'upcoming', component: MaintenanceInput, type:'maintenance'},
+  { name: 3, status: 'upcoming', component: Repair, type:'repair'},
+  { name: 4, status: 'upcoming', component: Description, type:'event'},
 ];
 
- function Stepper () {
+ function Stepper (props) {
+     const { eventType } = props;
      const [steps, setSteps] = useState(steps_);
+
   return (
     <nav aria-label="Progress">
       <ol role="list" className="overflow-hidden">
         {steps.map((step, stepIdx) => (
+          (step.type === eventType || step.type ==='event') &&
           <li key={step.name} className={classNames(stepIdx !== steps.length - 1 ? 'pb-10' : '', 'relative')} onClick={()=>{
             setSteps(
-              steps.map((s,sIdx)=>{
+              steps.map((_step,sIdx)=>{
                 if(sIdx<stepIdx)
-                  return {...s, status:'complete'}
-                else if(sIdx==stepIdx)
-                  return {...s, status:'current'}
+                  return {..._step, status:'complete'}
+                else if(sIdx === stepIdx)
+                  return {..._step, status:'current'}
                 else
-                  return {...s, status:'upcoming'}
+                  return {..._step, status:'upcoming'}
               })
             )
           }}>

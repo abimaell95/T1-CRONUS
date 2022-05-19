@@ -1,34 +1,35 @@
 import { useState } from 'react';
 
+const machines = [
+    {   
+        "id": 0,
+        "label":"Maquina 1" 
+    },
+    {
+        "id":1,
+        "label": "Maquina 2"
+    },
+    {
+        "id":2,
+        "label": "Maquina 3"
+    }
+]
+const operators = [
+    {   
+        "id": 0,
+        "label":"operator 1" 
+    },
+    {
+        "id":1,
+        "label": "operator 2"
+    },
+    {
+        "id":2,
+        "label": "operator 3"
+    }
+]
+
 function AssignTask(){
-    const machines = [
-        {   
-            "id": 0,
-            "label":"Maquina 1" 
-        },
-        {
-            "id":1,
-            "label": "Maquina 2"
-        },
-        {
-            "id":2,
-            "label": "Maquina 3"
-        }
-    ]
-    const operators = [
-        {   
-            "id": 0,
-            "label":"operator 1" 
-        },
-        {
-            "id":1,
-            "label": "operator 2"
-        },
-        {
-            "id":2,
-            "label": "operator 3"
-        }
-    ]
     const [operatorId, setOperatorId] = useState(2);
     const [machineId, setMachineId] = useState(0);
 
@@ -43,7 +44,6 @@ function AssignTask(){
                 <select
                     id="machines"
                     name="machines"
-                    autoComplete="machines-name"
                     value={machineId}
                     className="w-1/2 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
                     onChange={(e)=>setMachineId(e.target.value)}
@@ -54,7 +54,6 @@ function AssignTask(){
                 <select
                     id="operators"
                     name="operators"
-                    autoComplete="operators-name"
                     value={operatorId}
                     className="w-1/2 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
                     onChange={(e) => setOperatorId(e.target.value)}

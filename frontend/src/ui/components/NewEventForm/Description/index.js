@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 function Description(){
     const [description, setDescription] = useState("");
+    
     return(
         <div className="shadow p-6 rounded-lg mb-4">
             <div className="rounded-md p-3 bg-white border border-gray-300">
