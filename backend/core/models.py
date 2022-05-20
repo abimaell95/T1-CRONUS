@@ -1,5 +1,4 @@
 from datetime import date
-from pyexpat import model
 from django.db import models
 
 class MachineState(models.Model):
@@ -49,50 +48,3 @@ class Customer(models.Model):
 
     def __str__(self):
         return self.id
-
-class TaskDetails(models.Model):
-    id = models.BigAutoField(primary_key=True)
-    invoice_num = models.CharField(max_length=30)
-    espec_file_url = models.CharField(max_length=300)
-    cuts = models.PositiveSmallIntegerField()
-    type = models.ForeignKey('TaskType', on_delete=models.CASCADE)
-    id_task = models.ForeignKey("Task", on_delete=models.CASCADE)
-    id_client = models.ForeignKey("Customer", on_delete=models.CASCADE)
-    id_employee = models.ForeignKey("Employee", on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.invoice_num
-
-class MaintenancePeriod(models.Model):
-    id = models.BigAutoField(primary_key=True)
-    label =  models.CharField(max_length=20)
-
-    def __str__(self):
-        return self.label
-
-class MaintenanceDetails(models.Model):
-    id = models.BigAutoField(primary_key=True)
-    repetitions = models.PositiveSmallIntegerField()
-    frecuency = models.PositiveSmallIntegerField()
-    period = models.ForeignKey("MaintenancePeriod", on_delete=models.CASCADE)
-    id_task = models.ForeignKey("Task", on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.id
-
-class Priority(models.Model):
-    id = models.BigAutoField(primary_key=True)
-    label =  models.CharField(max_length=10)
-
-    def __str__(self):
-        return self.label
-
-class ReparationDetails(models.Model):
-    id = models.BigAutoField(primary_key=True)
-    reason = models.CharField(max_length=150)
-    priority = models.ForeignKey("Priority", on_delete=models.CASCADE)
-    id_task = models.ForeignKey("Task", on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.id
-

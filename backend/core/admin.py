@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Machine, Task, TaskType, MaintenancePeriod
+from .models import Machine
+from .task.models import Task, TaskType, MaintenancePeriod
 
 admin.site.register(Machine)
 admin.site.register(Task)

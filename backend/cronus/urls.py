@@ -17,15 +17,16 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
 from core import views
+from core.task import views as taskviews
 
 router = routers.DefaultRouter()
-router.register(r'machine', views.MachineView)
-router.register(r'task_type', views.TaskTypeViewSet)
-router.register(r'maintenance_period', views.MaintenancePeriodViewSet)
-router.register(r'task', views.TaskViewSet)
+router.register(r'task_type', taskviews.TaskTypeViewSet)
+router.register(r'maintenance_period', taskviews.MaintenancePeriodViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include(router.urls)),
+    path('machine/', views.MachineView.as_view()),
+    path('task/', taskviews.TaskView.as_view()),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]
