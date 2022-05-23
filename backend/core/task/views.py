@@ -17,11 +17,4 @@ class TaskView(generics.ListAPIView):
     def get_queryset(self):
         queryset = Task.objects.all()
         id_task = self.request.query_params.get('id')
-        queryset.filter(id=id_task)
-        if len(queryset) != 0:
-            if queryset[0].kind == 0:
-                MaintenanceDetails.details_maintenance(queryset, id_task)
-            elif queryset[0].kind == 1:
-                ReparationDetails.details_reparation(queryset, id_task)
-            elif  queryset[0].kind == 2:
-                TaskDetails.details_task(queryset, id_task)
+        print( queryset )
