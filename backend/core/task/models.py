@@ -1,61 +1,42 @@
 from django.db import models
 
-class StrategyInterface:
-    def details(self, data):
-        pass
-
-class Task(models.Model):
+class EventType(models.Model):
     id = models.BigAutoField(primary_key=True)
+    label =  models.CharField(max_length=20)
+
+    def __str__(self):
+        return self.label
+
+class EventState(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    label =  models.CharField(max_length=20)
+
+    def __str__(self):
+        return self.label
+
+class Event(models.Model):
+    event_id = models.BigAutoField(primary_key=True)
     description = models.CharField(max_length=300)
     start_datetime = models.DateTimeField()
     end_datetime = models.DateTimeField()
     duration = models.PositiveSmallIntegerField()
-    state = models.ForeignKey('TaskState' ,on_delete=models.CASCADE)
-    id_machine = models.ForeignKey("Machine", on_delete=models.CASCADE)
-    id_kind = models.ForeignKey("TaskKind", on_delete=models.CASCADE)
+    state = models.ForeignKey('EventState' ,on_delete=models.CASCADE)
+    branch = models.ForeignKey("BranchOffice", on_delete=models.CASCADE)
+    type = models.ForeignKey("EventType", on_delete=models.CASCADE)
 
     def __str__(self):
         return self.description
 
-class TaskKind(models.Model):
-    id = models.BigAutoField(primary_key=True)
-    label =  models.CharField(max_length=20)
-
-    def __str__(self):
-        return self.label
-
-class TaskState(models.Model):
-    id = models.BigAutoField(primary_key=True)
-    label =  models.CharField(max_length=20)
-
-    def __str__(self):
-        return self.label
-
-class TaskDetails(models.Model, StrategyInterface):
-    id = models.BigAutoField(primary_key=True)
+class OrderDetails(models.Model):
+    order_id = models.BigAutoField(primary_key=True)
+    client_name = models.CharField(max_length=60)
     invoice_num = models.CharField(max_length=30)
     espec_file_url = models.CharField(max_length=300)
-    cuts = models.PositiveSmallIntegerField()
-    type = models.ForeignKey('TaskType', on_delete=models.CASCADE)
-    id_task = models.ForeignKey("Task", on_delete=models.CASCADE)
-    id_client = models.ForeignKey("Customer", on_delete=models.CASCADE)
-    id_employee = models.ForeignKey("Employee", on_delete=models.CASCADE)
+    num_pieces = models.PositiveSmallIntegerField()
+    event = models.ForeignKey("Event", on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.invoice_num
-
-    def details(self, data, event_id):
-        queryset = TaskDetails.objects.all()
-        if event_id is not None:
-            queryset = queryset.filter(id_task=event_id)
-        return queryset + data
-
-class TaskType(models.Model):
-    id = models.BigAutoField(primary_key=True)
-    label =  models.CharField(max_length=20)
-
-    def __str__(self):
-        return self.label
+        return self.order_id
 
 class MaintenancePeriod(models.Model):
     id = models.BigAutoField(primary_key=True)
@@ -64,36 +45,15 @@ class MaintenancePeriod(models.Model):
     def __str__(self):
         return self.label
 
-class MaintenanceDetails(models.Model, StrategyInterface):
-    id = models.BigAutoField(primary_key=True)
+class MaintenanceDetails(models.Model):
+    maintenance_id = models.BigAutoField(primary_key=True)
     repetitions = models.PositiveSmallIntegerField()
     frecuency = models.PositiveSmallIntegerField()
     period = models.ForeignKey("MaintenancePeriod", on_delete=models.CASCADE)
-    id_task = models.ForeignKey("Task", on_delete=models.CASCADE)
+    event = models.ForeignKey("Event", on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.id
-
-    def details(self, data, event_id):
-        queryset = MaintenanceDetails.objects.all()
-        if event_id is not None:
-            queryset = queryset.filter(id_task=event_id)
-        return queryset + data
-
-class ReparationDetails(models.Model, StrategyInterface):
-    id = models.BigAutoField(primary_key=True)
-    reason = models.CharField(max_length=150)
-    priority = models.ForeignKey("Priority", on_delete=models.CASCADE)
-    id_task = models.ForeignKey("Task", on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.id
-    
-    def details(self, data, event_id):
-        queryset = ReparationDetails.objects.all()
-        if event_id is not None:
-            queryset = queryset.filter(id_task=event_id)
-        return queryset + data
+        return self.maintenance_id
 
 class Priority(models.Model):
     id = models.BigAutoField(primary_key=True)
@@ -102,3 +62,54 @@ class Priority(models.Model):
     def __str__(self):
         return self.label
 
+class ReparationDetails(models.Model):
+    reparation_id = models.BigAutoField(primary_key=True)
+    reason = models.CharField(max_length=150)
+    priority = models.ForeignKey("Priority", on_delete=models.CASCADE)
+    event = models.ForeignKey("Event", on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.reparation_id
+
+#JOIN TABLES MODELS
+class EventJoinOrder(models.Model):
+    event_id = models.IntegerField(primary_key=True)
+    order_id = models.IntegerField()
+    description = models.CharField(max_length=300)
+    start_datetime = models.DateTimeField()
+    end_datetime = models.DateTimeField()
+    duration = models.PositiveSmallIntegerField()
+    state = models.IntegerField()
+    branch = models.IntegerField()
+    type = models.IntegerField()
+    client_name = models.CharField(max_length=60)
+    invoice_num = models.CharField(max_length=30)
+    espec_file_url = models.CharField(max_length=300)
+    num_pieces = models.PositiveSmallIntegerField()
+
+class EventJoinReparation(models.Model):
+    event_id = models.IntegerField(primary_key=True)
+    reparation_id = models.IntegerField()
+    description = models.CharField(max_length=300)
+    start_datetime = models.DateTimeField()
+    end_datetime = models.DateTimeField()
+    duration = models.PositiveSmallIntegerField()
+    state = models.IntegerField()
+    branch = models.IntegerField()
+    type = models.IntegerField()
+    reason = models.CharField(max_length=150)
+    priority = models.IntegerField()
+
+class EventJoinMaintenance(models.Model):
+    event_id = models.IntegerField(primary_key=True)
+    maintenance_id = models.IntegerField()
+    description = models.CharField(max_length=300)
+    start_datetime = models.DateTimeField()
+    end_datetime = models.DateTimeField()
+    duration = models.PositiveSmallIntegerField()
+    state = models.IntegerField()
+    branch = models.IntegerField()
+    type = models.IntegerField()
+    repetitions = models.PositiveSmallIntegerField()
+    frecuency = models.PositiveSmallIntegerField()
+    period = models.IntegerField()

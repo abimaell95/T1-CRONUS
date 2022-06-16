@@ -13,50 +13,35 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 from django.contrib import admin
 from django.urls import path, include
+from django.contrib.auth import login,logout
+from rest_framework import routers
 from core import views
-from core.task import views as taskviews
-from django.contrib.auth.models import User
-from core.models import Customer
-from rest_framework import routers, serializers, viewsets
-from core.serializers import UserSerializer
-
+from core.task import views as eventviews
+from core.workflow import views as workflowviews
 
 router = routers.DefaultRouter()
-router.register(r'task_type', taskviews.TaskTypeViewSet)
-router.register(r'maintenance_period', taskviews.MaintenancePeriodViewSet)
-
-class CustomerSerializer(serializers.ModelSerializer):
-
-    def create(self, validated_data):
-        return Customer.objects.create(**validated_data)
-
-    class Meta:
-        model = Customer
-        fields = ['id', 'name', 'surname', 'email']
-
-class CustomerViewSet(viewsets.ModelViewSet):
-    queryset = Customer.objects.all()
-    serializer_class = CustomerSerializer
-
-
-# ViewSets define the view behavior.
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-
-# Routers provide an easy way of automatically determining the URL conf.
-router = routers.DefaultRouter()
-router.register(r'users', UserViewSet)
-router.register(r'customers', CustomerViewSet)
+router.register(r'event_type', eventviews.EventTypeViewSet)
+router.register(r'maintenance_period', eventviews.MaintenancePeriodViewSet)
+router.register(r'reparation_priorities', eventviews.PriorityViewSet)
 
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('user',views.create_user),
     path('admin/', admin.site.urls),
-    path('machine/', views.MachineView.as_view()),
-    path('task/', taskviews.TaskView.as_view()),
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
+    path('events/orders/',eventviews.OrdersView.as_view()),
+    path('workflows/', workflowviews.WorkflowsView.as_view() ),
+    path('event/order/<int:id>',eventviews.OrderView.as_view()),
+    path('event/order/workflow/<int:id>',workflowviews.MachineWorkflowStepView.as_view()),  
+
+    path('accounts/login/', login, name='login'),
+    path('logout/', logout, name='logout'),
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+
+    path('event/reparation/<int:id>',eventviews.ReparationView.as_view()),
+    path('event/maintenance/<int:id>',eventviews.MaintenanceView.as_view()),
+    path('events/reparations/',eventviews.ReparationsView.as_view()),
+    path('events/maintenances/',eventviews.MaintenancesView.as_view())
 ]
