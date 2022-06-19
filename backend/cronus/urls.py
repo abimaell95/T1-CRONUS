@@ -15,8 +15,23 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from core import views
+from core.task import views as taskviews
+from django.contrib.auth.models import User
+from rest_framework import routers, serializers, viewsets
+
+
+router = routers.DefaultRouter()
+router.register(r'task_type', taskviews.EventTypeViewSet)
+router.register(r'maintenance_period', taskviews.MaintenancePeriodViewSet)
+
+
 
 urlpatterns = [
+    path('', include(router.urls)),
     path('admin/', admin.site.urls),
-    path('', include('core.urls'))
+    path('machine/', views.MachineView.as_view()),
+    path('order/', taskviews.OrderView.as_view()),
+    path('branchoffice/',views.BranchOfficeView.as_view()),
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]
