@@ -1,29 +1,32 @@
 from rest_framework.serializers import ModelSerializer
-from .models import Machine
-from rest_framework import routers, serializers, viewsets
-from django.contrib.auth.models import User
+from .models import *
+
+class MachineStateSerializer(ModelSerializer):
+    class Meta:
+        model = MachineState
+        fields = (
+            'id', 'label'
+        )
+
+class BranchOfficeSerializer(ModelSerializer):
+    class Meta:
+        model = Employee
+        fields = (
+            'branch_id', 'name', 'address', 'city'
+        )
+
+
+class EmployeeSerializer(ModelSerializer):
+    class Meta:
+        model = Employee
+        fields = (
+            'employee_id', 'name', 'surname', 'address', 'email', 'branch'
+        )
 
 class MachineSerializer(ModelSerializer):
     class Meta:
         model = Machine
         fields = (
-            'serial_number', 'model', 'brand', 'purchase_date', 'created_date', 'state',
-            'branch'
+            'serial_number', 'model', 'brand', 'purchase_date', 'state',
+            'branch', 'employee_id'
         )
-
-# Serializers define the API representation.
-class UserSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = User
-        fields = ['url', 'username', 'email', 'is_staff']
-
-    def create(self, validated_data):
-        user = User.objects.create(
-            username=validated_data['username'],
-            email=validated_data['email'],
-            first_name=validated_data['first_name'],
-            last_name=validated_data['last_name']
-        )
-
-        user.set_password(validated_data['password'])
-        user.save()
