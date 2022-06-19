@@ -1,50 +1,34 @@
 from rest_framework.serializers import ModelSerializer
-from .models import Task, TaskType, TaskKind, TaskState, TaskDetails, MaintenancePeriod, MaintenanceDetails, ReparationDetails, Priority
+from .models import *
 
-class TaskSerializer(ModelSerializer):
+class EventTypeSerializer(ModelSerializer):
     class Meta:
-        model = Task
-        fields = (
-            'id', 'description', 'start_datetime', 'end_datetime', 'duration',
-            'state', 'id_machine', 'id_kind'
-        )
-
-class TaskKindSerializer(ModelSerializer):
-    class Meta:
-        model = TaskKind
-        field = (
-            'id', 'label'
-        )
-
-class TaskStateSerializer(ModelSerializer):
-    class Meta:
-        model = TaskState
-        field = (
-            'id', 'label'
-        )
-
-class TaskDetailsSerializer(ModelSerializer):
-    class Meta:
-        model = TaskDetails
-        field = (
-            'id', 'invoice_num', 'espec_file_url', 'cuts', 'type', 'id_task',
-             'id_client', 'id_employee'
-        )
-
-class TaskTypeSerializer(ModelSerializer):
-    class Meta:
-        model = TaskType
+        model = EventType
         fields = (
             'id', 'label'
         )
 
-class MaintenancePeriodSerializer(ModelSerializer):
+class EventStateSerializer(ModelSerializer):
     class Meta:
-        model = MaintenancePeriod
+        model = EventState
         fields = (
             'id', 'label'
         )
 
+class EventSerializer(ModelSerializer):
+    class Meta:
+        model = Event
+        fields = (
+            'event_id', 'description', 'start_datetime', 'end_datetime', 'duration',
+            'state', 'branch', 'type'
+        )
+
+class OrderDetailsSerializer(ModelSerializer):
+    class Meta:
+        model = OrderDetails
+        field = (
+            'order_id', 'client_name', 'invoice_num', 'espec_file_url', 'num_pieces', 'event_id'
+        )
 
 class MaintenancePeriodSerializer(ModelSerializer):
     class Meta:
@@ -57,14 +41,7 @@ class MaintenanceDetailsSerializer(ModelSerializer):
     class Meta:
         model = MaintenanceDetails
         fields = (
-            'id', 'repetitions', 'frecuency', 'period', 'id_task'
-        )
-
-class ReparationDetailsSerializer(ModelSerializer):
-    class Meta:
-        model = ReparationDetails
-        fields = (
-            'id', 'reason', 'priority', 'id_task'
+            'maintenance_id', 'repetitions', 'frecuency', 'period', 'event_id'
         )
 
 class PrioritySerializer(ModelSerializer):
@@ -72,4 +49,36 @@ class PrioritySerializer(ModelSerializer):
         model = Priority
         fields = (
             'id', 'label'
+        )
+
+class ReparationDetailsSerializer(ModelSerializer):
+    class Meta:
+        model = ReparationDetails
+        fields = (
+            'reparation_id', 'reason', 'priority', 'event_id'
+        )
+
+#JOIN TABLES SERIALIZER
+class EventJoinOrderSerializer(ModelSerializer):
+    class Meta:
+        model = EventJoinOrder
+        fields = (
+            'event_id', 'order_id', 'description', 'start_datetime', 'end_datetime', 'duration', 'state',
+            'branch', 'type', 'client_name', 'invoice_num', 'espec_file_url', 'num_pieces'
+        )
+
+class EventJoinReparationSerializer(ModelSerializer):
+    class Meta:
+        model = EventJoinReparation
+        fields = (
+            'event_id', 'reparation_id', 'description', 'start_datetime', 'end_datetime', 'duration', 'state',
+            'branch', 'type', 'reason', 'priority'
+        )
+
+class EventJoinMaintenanceSerializer(ModelSerializer):
+    class Meta:
+        model = EventJoinMaintenance
+        fields = (
+            'event_id', 'maintenance_id', 'description', 'start_datetime', 'end_datetime', 'duration', 'state',
+            'branch', 'type', 'repetitions', 'frecuency', 'period'
         )
