@@ -75,10 +75,15 @@ class ReparationDetails(models.Model):
 #JOIN TABLES MODELS
 class EventJoinOrder(models.Model):
     id = models.IntegerField(primary_key=True)
-    start_date = models.DateTimeField()
-    end_date = models.DateTimeField()
     state = models.IntegerField()
-    state_label = models.CharField(max_length=20)
+    label = models.CharField(max_length=20)
+    description = models.CharField(max_length=300, default="Descripcion")
+    num_pieces = models.PositiveSmallIntegerField(default=10)
+    employee_id = models.CharField(max_length=10, default='employee00')
+    end_datetime = models.DateTimeField()
+    client_name = models.CharField(max_length=60, default="Cliente")
+    invoice_num = models.CharField(max_length=30, default="0001")
+    file_url = models.CharField(max_length=300, default="archivo")
 
 class EventJoinOrders(models.Model):
     id = models.IntegerField(primary_key=True)

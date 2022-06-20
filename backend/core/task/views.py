@@ -23,9 +23,9 @@ class PriorityViewSet(viewsets.ModelViewSet):
 #JOIN TABLES VIEWS
 class OrderView(generics.ListAPIView):
     serializer_class = EventJoinOrderSerializer
-    def get_queryset(self, id=0):
-        print(id)
-        queryset=EventJoinOrder.objects.raw("select core_orderdetails.id, core_event.state_id, core_eventstate.label, core_event.description, core_orderdetails.num_pieces, core_event.employee_id, core_event.end_datetime, core_orderdetails.client_name, core_orderdetails.invoice_num, core_orderdetails.file_url from core_event inner join core_orderdetails on core_event.id = core_orderdetails.event_id inner join core_eventstate on core_eventstate.id = core_event.state_id where core_orderdetails.id = {}".format(id))
+    def get_queryset(self):
+        id=self.request.GET.get('id','')
+        queryset=EventJoinOrder.objects.raw("select core_orderdetails.id, core_event.state_id as state, core_eventstate.label, core_event.description, core_orderdetails.num_pieces, core_event.employee_id, core_event.end_datetime, core_orderdetails.client_name, core_orderdetails.invoice_num, core_orderdetails.file_url from core_event inner join core_orderdetails on core_event.id = core_orderdetails.event_id inner join core_eventstate on core_eventstate.id = core_event.state_id where core_orderdetails.id = {}".format(id))
         return queryset
     
     @transaction.atomic

@@ -33,9 +33,9 @@ class WorkflowStepsSerializer(ModelSerializer):
 class MachineWorkflowStepJoinMachineSerializer(ModelSerializer):
     class Meta:
         model = MachineWorkflowStepJoinMachine
-        fields = {
-            'step_id', 'order_id', 'step_order', 'end_time', 'state_id', 'step_activity'
-        }
+        fields = '__all__'
+            #'step_id', 'order_id', 'step_order', 'end_time', 'state_id', 'step_activity'
+
 
 class WorkflowJoinWStepsSerializer(ModelSerializer):
     class Meta:

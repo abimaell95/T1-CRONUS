@@ -4,8 +4,9 @@ from .models import *
 
 class MachineWorkflowStepView(generics.ListAPIView):
     serializer_class = MachineWorkflowStepJoinMachineSerializer
-    def get_queryset(self, id=0):
-        queryset=MachineWorkflowStep.objects.raw("select core_machineworkflowstep.id, core_machineworkflowstep.order_id, core_machineworkflowstep.step_order, core_machineworkflowstep.end_datetime, core_machineworkflowstep.state_id, core_machinetype.label from core_machineworkflowstep inner join core_machine on core_machineworkflowstep.machine_id=core_machine.serial_number inner join core_machinetype on core_machine.type_id=core_machinetype.id where core_machineworkflowstep.order_id = {}".format(id))
+    def get_queryset(self):
+        id=self.request.GET.get('id','')
+        queryset=MachineWorkflowStep.objects.raw("select core_machineworkflowstep.id, core_machineworkflowstep.order_id, core_machineworkflowstep.step_order, core_machineworkflowstep.end_datetime, core_machineworkflowstep.state_id, core_machinetype.label as step_activity from core_machineworkflowstep inner join core_machine on core_machineworkflowstep.machine_id=core_machine.serial_number inner join core_machinetype on core_machine.type_id=core_machinetype.id where core_machineworkflowstep.order_id = {}".format(id))
         return queryset
 
 class WorkflowsView(generics.ListAPIView):

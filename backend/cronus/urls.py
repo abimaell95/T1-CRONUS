@@ -36,9 +36,7 @@ urlpatterns = [
     path('orders/',eventviews.OrdersView.as_view()),
 
     path('order/',eventviews.OrderView.as_view()),
-    
-    path('order/<int:id>/',eventviews.OrderView.as_view()),
-    path('workflow/<int:id>/',workflowviews.MachineWorkflowStepView.as_view()),
+    path('workflow/',workflowviews.MachineWorkflowStepView.as_view()),
         
     path('accounts/login/', login, name='login'),
     path('logout/', logout, name='logout'),
