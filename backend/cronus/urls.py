@@ -26,7 +26,7 @@ router = routers.DefaultRouter()
 router.register(r'event_type', eventviews.EventTypeViewSet)
 router.register(r'maintenance_period', eventviews.MaintenancePeriodViewSet)
 router.register(r'reparation_priorities', eventviews.PriorityViewSet)
-
+router.register(r'branchoffice',views.BranchOfficeViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
@@ -34,7 +34,6 @@ urlpatterns = [
     path('events/',eventviews.EventsView.as_view()),
     path('workflows/', workflowviews.WorkflowsView.as_view()),
     path('orders/',eventviews.OrdersView.as_view()),
-    path('branchoffice/',views.BranchOfficeView.as_view()),
 
     path('order/',eventviews.OrderView.as_view()),
     

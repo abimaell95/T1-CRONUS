@@ -1,20 +1,16 @@
 import json
 from .serializers import *
 from .models import *
-from rest_framework import generics
+from rest_framework import viewsets
 from django.contrib.auth import authenticate, login
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 
-
-class BranchOfficeView(generics.ListAPIView):
+class BranchOfficeViewSet(viewsets.ModelViewSet):
+    queryset = BranchOffice.objects.all().order_by('id')
     serializer_class = BranchOfficeSerializer
-    
-    def get_queryset(self):
-        queryset = BranchOffice.objects.all()
-        return queryset
 
 # esto desactiva los cors @csrf_exempt
 @csrf_exempt

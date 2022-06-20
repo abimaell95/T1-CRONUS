@@ -10,9 +10,9 @@ class MachineStateSerializer(ModelSerializer):
 
 class BranchOfficeSerializer(ModelSerializer):
     class Meta:
-        model = Employee
+        model = BranchOffice
         fields = (
-            'branch_id', 'name', 'address', 'city'
+            'id', 'name', 'address', 'city'
         )
 
 class EmployeeSerializer(ModelSerializer):
