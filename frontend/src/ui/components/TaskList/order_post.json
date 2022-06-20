@@ -1,0 +1,37 @@
+{
+    "type" : "order",
+    "description" : "Una descripción",
+    "pieces_number" : 100,
+    "start_date" : "2022-06-12",
+    "end_date" : "2022-06-12",
+    "start_time":10,
+    "end_time" :11,
+    "workflow": {
+        "id":"workflow-1",
+        "steps" : [ 
+            {
+                "machine":{
+                    "id" : "001",
+                    "name":"Maquina de corte"
+                },
+                "order" : 1 
+            },
+            {
+                "machine":{
+                    "id" : "002",
+                    "name":"Maquina de pegado"
+                },
+                "order" : 2
+            },
+            {
+                "machine":{
+                    "id" : "003",
+                    "name":"Maquina de enchape"
+                },
+                "order" : 3
+            }
+        ]
+    },
+    "plan_file" : "Aquí va un Objeto JS"
+
+}

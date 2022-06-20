@@ -1,12 +1,23 @@
-import { WeeklyView } from "../Calendar/WeeklyView";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+} from "react-router-dom";
+import{
+  Home,
+  Tasks
+} from '../../pages'
 
 function App() {
   return(
-    <div className="">
-      <WeeklyView>
-      </WeeklyView>
-    </div>
-  )
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />}>
+        </Route>
+        <Route path="tasks" element={<Tasks />}>
+        </Route>
+      </Routes>
+  </BrowserRouter>)
 }
 
 export default App;
