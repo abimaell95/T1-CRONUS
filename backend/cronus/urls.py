@@ -35,7 +35,9 @@ urlpatterns = [
     path('workflows/', workflowviews.WorkflowsView.as_view()),
     path('orders/',eventviews.OrdersView.as_view()),
     path('branchoffice/',views.BranchOfficeView.as_view()),
+
     path('order/',eventviews.OrderView.as_view()),
+    
     path('order/<int:id>/',eventviews.OrderView.as_view()),
     path('workflow/<int:id>/',workflowviews.MachineWorkflowStepView.as_view()),
         

@@ -19,7 +19,7 @@ class MachineWorkflowStep(models.Model):
         return str(self.id)
 
 class Workflow(models.Model):
-    workflow_id = models.BigAutoField(primary_key=True)
+    id = models.BigAutoField(primary_key=True)
     label =  models.CharField(max_length=20)
 
     def __str__(self):

@@ -65,13 +65,6 @@ class Priority(models.Model):
 
 class ReparationDetails(models.Model):
     id = models.BigAutoField(primary_key=True)
-    label =  models.CharField(max_length=10)
-
-    def __str__(self):
-        return self.label
-
-class ReparationDetails(models.Model):
-    id = models.BigAutoField(primary_key=True)
     reason = models.CharField(max_length=150)
     priority = models.ForeignKey("Priority", on_delete=models.CASCADE)
     event = models.ForeignKey("Event", on_delete=models.CASCADE)
