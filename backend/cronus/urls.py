@@ -31,17 +31,14 @@ router.register(r'reparation_priorities', eventviews.PriorityViewSet)
 urlpatterns = [
     path('', include(router.urls)),
     path('admin/', admin.site.urls),
-    path('events/orders/',eventviews.OrdersView.as_view()),
-    path('workflows/', workflowviews.WorkflowsView.as_view() ),
-    path('event/order/<int:id>',eventviews.OrderView.as_view()),
-    path('event/order/workflow/<int:id>',workflowviews.MachineWorkflowStepView.as_view()),  
-
+    path('events/',eventviews.EventsView.as_view()),
+    path('workflows/', workflowviews.WorkflowsView.as_view()),
+    path('orders/',eventviews.OrdersView.as_view()),
+    
+    path('order/<int:id>/',eventviews.OrderView.as_view()),
+    path('workflow/<int:id>/',workflowviews.MachineWorkflowStepView.as_view()),
+    
     path('accounts/login/', login, name='login'),
     path('logout/', logout, name='logout'),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-
-    path('event/reparation/<int:id>',eventviews.ReparationView.as_view()),
-    path('event/maintenance/<int:id>',eventviews.MaintenanceView.as_view()),
-    path('events/reparations/',eventviews.ReparationsView.as_view()),
-    path('events/maintenances/',eventviews.MaintenancesView.as_view())
 ]

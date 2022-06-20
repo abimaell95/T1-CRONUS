@@ -19,7 +19,7 @@ class EventSerializer(ModelSerializer):
     class Meta:
         model = Event
         fields = (
-            'event_id', 'description', 'start_datetime', 'end_datetime', 'duration',
+            'event_id', 'description', 'start_datetime', 'end_datetime', 'employee'
             'state', 'branch', 'type'
         )
 
@@ -62,23 +62,44 @@ class ReparationDetailsSerializer(ModelSerializer):
 class EventJoinOrderSerializer(ModelSerializer):
     class Meta:
         model = EventJoinOrder
-        fields = (
-            'event_id', 'order_id', 'description', 'start_datetime', 'end_datetime', 'duration', 'state',
-            'branch', 'type', 'client_name', 'invoice_num', 'espec_file_url', 'num_pieces'
-        )
+        fields = '__all__'
+            #'id_order', 'state_id', 'state_label', 'description', 'pieces', 'employee', 'end_date', 'client_name', 'invoice_num', 'file_url'
+"""{
+    id_order: id,
+    state_id: state,
+    state_label: state_label,
+    description: description,
+    pieces: pieces,
+    employee: employee,
+    end_date: end_date, yyyy-mm-dd
+    client_name: client_name,
+    invoice_num: invoice_num,
+    file_url: file_url
+}"""
 
-class EventJoinReparationSerializer(ModelSerializer):
-    class Meta:
-        model = EventJoinReparation
-        fields = (
-            'event_id', 'reparation_id', 'description', 'start_datetime', 'end_datetime', 'duration', 'state',
-            'branch', 'type', 'reason', 'priority'
-        )
 
-class EventJoinMaintenanceSerializer(ModelSerializer):
+class EventJoinOrdersSerializer(ModelSerializer):
     class Meta:
-        model = EventJoinMaintenance
-        fields = (
-            'event_id', 'maintenance_id', 'description', 'start_datetime', 'end_datetime', 'duration', 'state',
-            'branch', 'type', 'repetitions', 'frecuency', 'period'
-        )
+        model = EventJoinOrders
+        fields = '__all__'
+            #'id_order', 'invoice_id', 'client_name', 'start_date', 'end_date', 'state_id','state_label', 'employee', 'current_step'
+
+"""
+{
+    invoice_id:"001-001-0000000011",
+    client_name: "Juanito Pereza",
+    start_date : "13 de Junio del 2022",
+    end_date : "Entregado",
+    state_id: 4,
+    state_label: "Finalizado",
+    scheduler : "Juanito Perez",
+    current_step : "Finalizado",
+}"""
+
+
+class EventJoinEventStateSerializer(ModelSerializer):
+    class Meta:
+        model=EventJoinEventState
+        fields = '__all__'
+            #'order_id', 'start_datetime', 'end_datetime', 'state_id', 'state_label'
+            
