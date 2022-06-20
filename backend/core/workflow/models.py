@@ -10,16 +10,16 @@ class StepState(models.Model):
 class MachineWorkflowStep(models.Model):
     id = models.BigAutoField(primary_key=True)
     step_order = models.SmallIntegerField()
-    end_datetime = models.DateTimeField()
+    end_datetime = models.DateTimeField(null=True)
     state = models.ForeignKey('StepState' ,on_delete=models.CASCADE)
     machine = models.ForeignKey('Machine' ,on_delete=models.CASCADE)
     order = models.ForeignKey("OrderDetails", on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.id
+        return str(self.id)
 
 class Workflow(models.Model):
-    id = models.BigAutoField(primary_key=True)
+    workflow_id = models.BigAutoField(primary_key=True)
     label =  models.CharField(max_length=20)
 
     def __str__(self):

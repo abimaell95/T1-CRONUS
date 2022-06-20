@@ -37,7 +37,7 @@ class OrderDetails(models.Model):
     event = models.ForeignKey("Event", on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.id
+        return str(self.id)
 
 class MaintenancePeriod(models.Model):
     id = models.BigAutoField(primary_key=True)
@@ -57,6 +57,13 @@ class MaintenanceDetails(models.Model):
         return self.id
 
 class Priority(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    label =  models.CharField(max_length=10)
+
+    def __str__(self):
+        return self.label
+
+class ReparationDetails(models.Model):
     id = models.BigAutoField(primary_key=True)
     label =  models.CharField(max_length=10)
 

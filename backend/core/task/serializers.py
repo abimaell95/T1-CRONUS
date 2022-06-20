@@ -27,7 +27,14 @@ class OrderDetailsSerializer(ModelSerializer):
     class Meta:
         model = OrderDetails
         field = (
-            'order_id', 'client_name', 'invoice_num', 'espec_file_url', 'num_pieces', 'event_id'
+            'order_id', 'client_name', 'invoice_num', 'file_url', 'num_pieces', 'event_id'
+        )
+
+class MaintenanceDetailsSerializer(ModelSerializer):
+    class Meta:
+        model = MaintenanceDetails
+        fields = (
+            'maintenance_id', 'repetitions', 'frecuency', 'period', 'event_id'
         )
 
 class MaintenancePeriodSerializer(ModelSerializer):
@@ -51,9 +58,10 @@ class PrioritySerializer(ModelSerializer):
             'id', 'label'
         )
 
-class ReparationDetailsSerializer(ModelSerializer):
+#JOIN TABLES SERIALIZER
+class EventJoinOrderSerializer(ModelSerializer):
     class Meta:
-        model = ReparationDetails
+        model = EventJoinOrder
         fields = (
             'reparation_id', 'reason', 'priority', 'event_id'
         )
