@@ -1,5 +1,5 @@
 from django.test import TestCase
-from backend.core.models import Employee, Task, TaskState, TaskType, Machine, MachineState, BranchOffice
+from backend.core.models import Machine, MachineState, BranchOffice
 import datetime
 
 # Create your tests here.

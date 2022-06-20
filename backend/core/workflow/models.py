@@ -26,7 +26,7 @@ class Workflow(models.Model):
         return self.label
 
 class WorkflowSteps(models.Model):
-    workflowsteps_id = models.BigAutoField(primary_key=True)
+    id = models.BigAutoField(primary_key=True)
     step_order = models.SmallIntegerField()
     workflow = models.ForeignKey('Workflow' ,on_delete=models.CASCADE)
     machine = models.ForeignKey('Machine' ,on_delete=models.CASCADE)
@@ -35,9 +35,17 @@ class WorkflowSteps(models.Model):
         return self.id
 
 #JOIN TABLES MODELS
+class MachineWorkflowStepJoinMachine(models.Model):
+    id = models.IntegerField(primary_key=True)
+    order_id = models.IntegerField()
+    step_order = models.IntegerField()
+    end_datetime = models.DateTimeField()
+    state_id = models.IntegerField()
+    step_activity = models.CharField(max_length=20)
+
 class WorkflowJoinWSteps(models.Model):
-    workflow_id = models.IntegerField(primary_key=True)
-    workflow_label = models.CharField(max_length=20)
-    workflowstep_id = models.IntegerField()
+    id = models.IntegerField(primary_key=True)
+    label = models.CharField(max_length=20)
+    step_id = models.IntegerField()
     step_order = models.SmallIntegerField()
-    machine = models.CharField(max_length=10)
+    type_label = models.CharField(max_length=20)

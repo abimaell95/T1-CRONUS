@@ -15,7 +15,6 @@ class BranchOfficeSerializer(ModelSerializer):
             'branch_id', 'name', 'address', 'city'
         )
 
-
 class EmployeeSerializer(ModelSerializer):
     class Meta:
         model = Employee
@@ -23,10 +22,17 @@ class EmployeeSerializer(ModelSerializer):
             'employee_id', 'name', 'surname', 'address', 'email', 'branch'
         )
 
+class MachineTypeSerializer(ModelSerializer):
+    class Meta:
+        model = MachineType
+        fields = (
+            'id', 'label'
+        )
+
 class MachineSerializer(ModelSerializer):
     class Meta:
         model = Machine
         fields = (
-            'serial_number', 'model', 'brand', 'purchase_date', 'state',
+            'serial_number', 'model', 'brand', 'purchase_date', 'type', 'state',
             'branch', 'employee_id'
         )

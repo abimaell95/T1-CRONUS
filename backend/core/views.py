@@ -1,16 +1,20 @@
 import json
 from .serializers import *
 from .models import *
-from rest_framework import status, generics
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
+from rest_framework import generics
 from django.contrib.auth import authenticate, login
-from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 
+
+class BranchOfficeView(generics.ListAPIView):
+    serializer_class = BranchOfficeSerializer
+    
+    def get_queryset(self):
+        queryset = BranchOffice.objects.all()
+        return queryset
 
 # esto desactiva los cors @csrf_exempt
 @csrf_exempt
@@ -44,23 +48,3 @@ class LoginView(View):
 
     def get(self, request):
         return JsonResponse({"error": True, "status": 200, "message": "Invalid method"})
-
-class MachineView(generics.ListAPIView):
-    serializer_class = MachineSerializer
-    def get_queryset(self):
-        queryset = Machine.objects.all()
-        branch_number = self.request.query_params.get('branch')
-        if branch_number is not None:
-            queryset = queryset.filter(branch=branch_number)
-        return queryset
-
-class BranchOfficeView(generics.ListAPIView):
-    serializer_class = BranchOfficeSerializer
-    def get_queryset(self):
-        queryset = BranchOffice.objects.all()
-        return queryset
-    
-    def post(self,request):
-        queryset = BranchOffice.objects.all()
-        return queryset
-        

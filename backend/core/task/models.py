@@ -1,5 +1,4 @@
 from django.db import models
-from ..models import BranchOffice, Employee
 
 class EventType(models.Model):
     id = models.BigAutoField(primary_key=True)
@@ -14,21 +13,20 @@ class EventState(models.Model):
 
     def __str__(self):
         return self.label
-#Modelo 1
+
 class Event(models.Model):
     id = models.BigAutoField(primary_key=True)
     description = models.CharField(max_length=300)
     start_datetime = models.DateTimeField()
     end_datetime = models.DateTimeField()
-    employee = models.ForeignKey(Employee,on_delete=models.CASCADE)
-    state = models.ForeignKey(EventState ,on_delete=models.CASCADE)
-    branch = models.ForeignKey(BranchOffice, on_delete=models.CASCADE)
-    type = models.ForeignKey(EventType, on_delete=models.CASCADE)
+    employee = models.ForeignKey('Employee' ,on_delete=models.CASCADE)
+    state = models.ForeignKey('EventState' ,on_delete=models.CASCADE)
+    branch = models.ForeignKey("BranchOffice", on_delete=models.CASCADE)
+    type = models.ForeignKey('EventType' ,on_delete=models.CASCADE)
 
     def __str__(self):
         return self.description
 
-#Modelo 2
 class OrderDetails(models.Model):
     id = models.BigAutoField(primary_key=True)
     client_name = models.CharField(max_length=60)
@@ -49,14 +47,14 @@ class MaintenancePeriod(models.Model):
         return self.label
 
 class MaintenanceDetails(models.Model):
-    maintenance_id = models.BigAutoField(primary_key=True)
+    id = models.BigAutoField(primary_key=True)
     repetitions = models.PositiveSmallIntegerField()
     frecuency = models.PositiveSmallIntegerField()
     period = models.ForeignKey("MaintenancePeriod", on_delete=models.CASCADE)
     event = models.ForeignKey("Event", on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.maintenance_id
+        return self.id
 
 class Priority(models.Model):
     id = models.BigAutoField(primary_key=True)
@@ -66,53 +64,43 @@ class Priority(models.Model):
         return self.label
 
 class ReparationDetails(models.Model):
-    reparation_id = models.BigAutoField(primary_key=True)
+    id = models.BigAutoField(primary_key=True)
+    label =  models.CharField(max_length=10)
+
+    def __str__(self):
+        return self.label
+
+class ReparationDetails(models.Model):
+    id = models.BigAutoField(primary_key=True)
     reason = models.CharField(max_length=150)
     priority = models.ForeignKey("Priority", on_delete=models.CASCADE)
     event = models.ForeignKey("Event", on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.reparation_id
+        return self.id
 
 #JOIN TABLES MODELS
 class EventJoinOrder(models.Model):
-    event_id = models.IntegerField(primary_key=True)
-    order_id = models.IntegerField()
-    description = models.CharField(max_length=300)
-    start_datetime = models.DateTimeField()
-    end_datetime = models.DateTimeField()
-    duration = models.PositiveSmallIntegerField()
+    id = models.IntegerField(primary_key=True)
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField()
     state = models.IntegerField()
-    branch = models.IntegerField()
-    type = models.IntegerField()
-    client_name = models.CharField(max_length=60)
+    state_label = models.CharField(max_length=20)
+
+class EventJoinOrders(models.Model):
+    id = models.IntegerField(primary_key=True)
     invoice_num = models.CharField(max_length=30)
-    espec_file_url = models.CharField(max_length=300)
-    num_pieces = models.PositiveSmallIntegerField()
-
-class EventJoinReparation(models.Model):
-    event_id = models.IntegerField(primary_key=True)
-    reparation_id = models.IntegerField()
-    description = models.CharField(max_length=300)
+    client_name = models.CharField(max_length=60)
     start_datetime = models.DateTimeField()
     end_datetime = models.DateTimeField()
-    duration = models.PositiveSmallIntegerField()
     state = models.IntegerField()
-    branch = models.IntegerField()
-    type = models.IntegerField()
-    reason = models.CharField(max_length=150)
-    priority = models.IntegerField()
+    state_label = models.CharField(max_length=20)
+    employee = models.CharField(max_length=10)
+    type_label = models.CharField(max_length=20)
 
-class EventJoinMaintenance(models.Model):
-    event_id = models.IntegerField(primary_key=True)
-    maintenance_id = models.IntegerField()
-    description = models.CharField(max_length=300)
+class EventJoinEventState(models.Model):
+    id = models.IntegerField(primary_key=True)
     start_datetime = models.DateTimeField()
     end_datetime = models.DateTimeField()
-    duration = models.PositiveSmallIntegerField()
-    state = models.IntegerField()
-    branch = models.IntegerField()
-    type = models.IntegerField()
-    repetitions = models.PositiveSmallIntegerField()
-    frecuency = models.PositiveSmallIntegerField()
-    period = models.IntegerField()
+    state_id = models.IntegerField()
+    label =  models.CharField(max_length=20)
