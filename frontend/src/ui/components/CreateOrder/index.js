@@ -1,4 +1,4 @@
-import { useState, Fragment } from 'react'
+import { useState, Fragment, useEffect } from 'react'
 import { XIcon, CheckIcon } from '@heroicons/react/solid'
 import MyListbox from '../MyListBox'
 
@@ -17,71 +17,44 @@ const schedule = [
   }
 ]
 
-const workflowSteps = [
+const workflowSteps_ = [
     {
-        workflow_id: 1,
-        workflow_label: "Workflow 1",
-        workflowstep_id: 1,
+        id: 1,
+        label: "Workflow 1",
+        step_id: 1,
         step_order: 1,
-        step_activity: "corte"
+        type_label: "corte"
     },
     {
-        workflow_id: 2,
-        workflow_label: "Workflow 2",
-        workflowstep_id: 4,
+        id: 2,
+        label: "Workflow 2",
+        step_id: 4,
         step_order: 2,
-        step_activity: "abisagrado"
+        type_label: "abisagrado"
     },
     {
-        workflow_id: 2,
-        workflow_label: "Workflow 2",
-        workflowstep_id: 3,
+        id: 2,
+        label: "Workflow 2",
+        step_id: 3,
         step_order: 1,
-        step_activity: "corte"
+        type_label: "corte"
     },
     {
-        workflow_id: 1,
-        workflow_label: "Workflow 1",
-        workflowstep_id: 2,
+        id: 1,
+        label: "Workflow 1",
+        step_id: 2,
         step_order: 2,
-        step_activity: "abisagrado"
+        type_label: "abisagrado"
     },
     {
-        workflow_id: 2,
-        workflow_label: "Workflow 2",
-        workflowstep_id: 5,
+        id: 2,
+        label: "Workflow 2",
+        step_id: 5,
         step_order: 3,
-        step_activity: "enchapado"
+        type_label: "enchapado"
     },
 ]
-  
- function getAvalibleSchedule() {
-    return schedule.map((time, idx) => {
-        return {
-            label: time.start_time + ":00-" + time.end_time + ":00",
-            id: idx
-        }
-    })
-  }
 
-  function getWorkflowOrdered(){
-    return workflowSteps.reduce((acc, workflow) =>{
-        const step = {
-            id: workflow.workflowstep_id,
-            order: workflow.step_order,
-            activity: workflow.step_activity
-        }
-        let steps = acc[workflow.workflow_id]?.steps || []
-        steps = [...steps, step]
-        return{
-            ...acc,
-            [workflow.workflow_id] : {
-                label: workflow.workflow_label,
-                steps: steps.sort((s1,s2) => s1.order - s2.order)
-            }
-        }
-    },{})
-  }
 
   function getEndDate(pieces, date){
     let totalDays;
@@ -122,41 +95,121 @@ function CreateOrder(props) {
             file: null,
             isLoading: false,
             workflowSelected: 1,
-            timeSelected: 1
+            timeSelected: 1,
+            schedules: {}
 
     });
-    const orderedWorflow = getWorkflowOrdered();
 
+    const [schedules, setSchedules] = useState({
+        data: schedule,
+        dataToString: null,
+        isLoading: true
+    })
+
+    const [workflowSteps, setWorkflowSteps] = useState({
+        data: workflowSteps_,
+        orderedData: getWorkflowOrdered(workflowSteps_),
+        isLoading: true
+    })
+
+    function getSchedules(date){
+        fetch("http://localhost:8000/available_hours/")
+        .then((response) => response.json())
+        .then((response) => {
+            updateState({
+                isLoading: false,
+                startDate: date,
+                isStartDateSelected: true,
+                endDate: getEndDate(state.pieces, date),
+                schedules: {
+                    data: [...response.message],
+                    dataToString: getAvalibleSchedule(response.message)
+                }
+            })
+
+        })
+        .catch(() => {
+            setSchedules({
+                ...schedules,
+                isLoading: false,
+                data: [...schedule],
+                setErrorMsg: 'Ha ocurrido un problema cargando los horarios disponibles'
+            });
+        })
+    }
+
+    function getWorkFlowSteps (){
+        fetch("http://localhost:8000/workflows/")
+        .then((response) => response.json())
+        .then((response) => {
+            setWorkflowSteps({
+                ...workflowSteps,
+                isLoading: false,
+                data: [...response],
+                orderedData: getWorkflowOrdered(response)
+                
+            });
+        })
+        .catch(() => {
+            setWorkflowSteps({
+                ...workflowSteps,
+                isLoading: false,
+                data: [...workflowSteps_],
+                setErrorMsg: 'Ha ocurrido un problema cargando los horarios disponibles'
+            });
+        })
+    }
+    
     function createEvent(){
         updateState({isLoading: true})
-        fetch('https://createEventCronus', {
+        console.log({
+            description: state.description,
+            start_date: getFormatStringDate(state.startDate),
+            end_date: getFormatStringDate(state.endDate),
+            start_time: state.schedules.data[state.timeSelected].start,
+            end_time: state.schedules.data[state.timeSelected].end,
+            type: 1,
+            client_name: state.client_name,
+            invoice_num: state.invoice_num,
+            pieces_number: state.pieces,
+            plan_file: '',//state.file,
+            workflow: {
+                id: state.workflowSelected,
+                steps: workflowSteps.orderedData[state.workflowSelected].steps.map((step) => {
+                    return {
+                        workflowstep_id: step.id,
+                        order: step.order
+                    }
+                })
+            }
+        })
+        fetch('http://localhost:8000/order/', {
             method: 'POST',
-            body: {
+            body: JSON.stringify({
                 description: state.description,
                 start_date: getFormatStringDate(state.startDate),
                 end_date: getFormatStringDate(state.endDate),
-                start_time: schedule[state.timeSelected].start_time,
-                end_time: schedule[state.timeSelected].end_time,
+                start_time: state.schedules.data[state.timeSelected].start,
+                end_time: state.schedules.data[state.timeSelected].end,
                 type: 1,
                 client_name: state.client_name,
                 invoice_num: state.invoice_num,
                 pieces_number: state.pieces,
-                plan_file: state.file,
+                plan_file: '',
                 workflow: {
                     id: state.workflowSelected,
-                    steps: orderedWorflow[state.workflowSelected].map((step) => {
+                    steps: workflowSteps.orderedData[state.workflowSelected].steps.map((step) => {
                         return {
                             workflowstep_id: step.id,
                             order: step.order
                         }
                     })
                 }
-            }
+            })
         })
         .then((response) => response.json())
         .then((response) => {
            updateState({isLoading: false})
-           console.log("creado");
         })
         .catch(() => {
             updateState({
@@ -174,6 +227,37 @@ function CreateOrder(props) {
             }
         )
     }
+
+    function getAvalibleSchedule(schedules) {
+        return schedules.map((time, idx) => {
+            return {
+                label: time.start + ":00-" + time.end + ":00",
+                id: idx
+            }
+        })
+    }
+
+    function getWorkflowOrdered(workflowSteps){
+        return workflowSteps.reduce((acc, workflow) =>{
+            const step = {
+                id: workflow.step_id,
+                order: workflow.step_order,
+                activity: workflow.type_label
+            }
+            let steps = acc[workflow.id]?.steps || []
+            steps = [...steps, step]
+            return{
+                ...acc,
+                [workflow.id] : {
+                    label: workflow.label,
+                    steps: steps.sort((s1,s2) => s1.order - s2.order)
+                }
+            }
+        },{})
+    }
+    useEffect(() => {
+        getWorkFlowSteps();
+    },[])
     if (state.isLoading)
         return <div className='flex justify-center items-center h-screen'>
             <svg className="animate-spin -ml-1 mr-3 h-12 w-12 text-gray-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -233,7 +317,7 @@ function CreateOrder(props) {
                             id="pieces"
                             className="text-gray-500 mt-1 focus:ring-gray-500 focus:border-gray-500 block shadow-sm sm:text-sm border-gray-300 rounded-md w-48"
                             onChange={(e) => {
-                                updateState({pieces: e.target.value, endDate: getEndDate(e.target.value,state.startDate)});
+                                updateState({pieces: parseInt(e.target.value), endDate: getEndDate(e.target.value,state.startDate)});
                             }}
                           />
                     </div>
@@ -268,21 +352,19 @@ function CreateOrder(props) {
                             type='date' 
                             onChange={(e) => {
                                 const date = new Date(e.target.value+"T00:00:00");
-                                updateState({
-                                    startDate: date,
-                                    isStartDateSelected: true,
-                                    endDate: getEndDate(state.pieces, date)
-                                })
+                                getSchedules(date);
+                                
                             
                             }}
                         />
                     </div>
                     {
                         state.isStartDateSelected && 
+                       
                         <Fragment>
                             <div className='flex justify-between mb-2 items-center'>
                                 <label className='font-bold'>Horario</label>
-                                <MyListbox options={getAvalibleSchedule()}
+                                <MyListbox options={state.schedules.dataToString}
                                 setSelectedId = {(id) => updateState({timeSelected: id})}
                                 />
                             </div>
@@ -293,10 +375,10 @@ function CreateOrder(props) {
                             <div className='flex justify-between mb-2 items-center'>
                                 <label className='font-bold'>Flujo de trabajo</label>
                                 <MyListbox options={
-                                    Object.keys(orderedWorflow).map((key)=>{
+                                    Object.keys(workflowSteps.orderedData).map((key)=>{
                                         return {
                                             id: key,
-                                            label: orderedWorflow[key].label
+                                            label: workflowSteps.orderedData[key].label
                                         }
                                     })
                                 }
@@ -307,7 +389,7 @@ function CreateOrder(props) {
                                 state.workflowSelected &&
                                 <div className='flex justify-between mt-6 ml-4'>
                                     {
-                                        orderedWorflow[state.workflowSelected].steps.map((step) => {
+                                        workflowSteps.orderedData[state.workflowSelected].steps.map((step) => {
                                             return <div className='relative h-9' key={step.order}>
                                                 <span className="absolute -left-3 -top-3 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-gray-100 bg-gray-700 rounded-full">
                                                 {step.order}
