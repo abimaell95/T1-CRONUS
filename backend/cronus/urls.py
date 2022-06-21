@@ -34,6 +34,7 @@ urlpatterns = [
     path('events/',eventviews.EventsView.as_view()),
     path('workflows/', workflowviews.WorkflowsView.as_view()),
     path('orders/',eventviews.OrdersView.as_view()),
+    path('available_hours/',eventviews.available_hours),
 
     path('order/',eventviews.OrderView.as_view()),
     path('workflow/',workflowviews.MachineWorkflowStepView.as_view()),

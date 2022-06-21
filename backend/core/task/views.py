@@ -3,6 +3,7 @@ from .serializers import *
 from .models import *
 from django.db import transaction
 from django.http import JsonResponse
+from django.utils.dateparse import parse_datetime
 import json
 from ..workflow import models as workflowModels
 import datetime
@@ -115,6 +116,8 @@ class OrdersView(generics.ListAPIView):
         queryset=EventJoinOrders.objects.raw(query)
         return queryset
 
+
+
 #endpoint de eventos
 #id, descrip, fecha de entrega, fecha de agendar, hora inicio, hora fin, estado del evento, id_estado
 class EventsView(generics.ListAPIView):
@@ -146,3 +149,31 @@ class EventsView(generics.ListAPIView):
         query="select core_event.id, core_event.start_datetime, core_event.end_datetime, core_event.state_id, core_eventstate.label from core_event inner join core_eventstate on core_event.state_id=core_eventstate.id where core_event.branch_id={} and {}".format(branch_number,query_date)
         queryset=EventJoinEventState.objects.raw(query)
         return queryset
+
+def available_hours(request):
+    
+    if request.method == 'GET':
+
+        branch = request.GET.get("branch") or 1
+        date = request.GET.get("date") or "2022-02-22"
+        data = Event.objects.filter(branch__id= branch, start_datetime__range=[date+" 00:00:00",date+" 23:59:59"]).extra(order_by=["start_datetime"])
+        eventos = list(data)
+        o = len(list(data))
+        c = 0
+
+        availablesList = []
+        for i in range(6,18):
+            if(c<o):
+                e = eventos[c]
+                d = e.start_datetime
+                h = int(d.hour)
+                if(h == i):
+                    c+=1
+                else:
+                    availableDic = {"start":i,"end":i+1}
+                    availablesList.append(availableDic)
+            else:
+                availableDic = {"start":i,"end":i+1}
+                availablesList.append(availableDic)
+
+        return JsonResponse({"message":availablesList})
