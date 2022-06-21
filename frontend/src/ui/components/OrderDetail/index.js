@@ -35,7 +35,7 @@ const data_workflow = [
     }
 ]
 
-function OrderDetail({selectedEvent}) {
+function OrderDetail({selectedEvent, closeOrderDetails}) {
     const [ dataOrder, setDataOrder ] = useState({
         isLoading: true,
         data: {},
@@ -162,7 +162,7 @@ function OrderDetail({selectedEvent}) {
                             <div className='p-2 rounded bg-gray-100'>
                                 <TrashIcon className="h-5 w-5 text-gray-500"/>
                             </div>
-                            <div className='p-2 rounded bg-gray-100'>
+                            <div className='p-2 rounded bg-gray-100 cursor-pointer' onClick={()=>{closeOrderDetails()}}>
                                 <XIcon className="h-5 w-5 text-gray-500"/>
                             </div>
                         </div>
