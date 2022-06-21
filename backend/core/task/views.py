@@ -47,12 +47,11 @@ class OrderView(generics.ListAPIView):
             e = Event.objects.create(description=jd["description"],
             start_datetime=jd["start_date"]+"-"+start,
             end_datetime=jd["end_date"]+"-"+end,
-            employee_id=jd["employee"],
-            state_id=jd["state"],
-            branch_id=jd["branch"],
+            employee_id="0927643825",
+            state_id=1,
+            branch_id=1,
             type_id=jd["type"])
             e.save()
-            print(e)
         except Exception as ex:
             print(ex)
             datos={'message': "Error en Evento"}
@@ -62,7 +61,7 @@ class OrderView(generics.ListAPIView):
             o = OrderDetails.objects.create(client_name=jd["client_name"],
             invoice_num=jd["invoice_num"],
             file_url=jd["plan_file"],
-            current_step_id=jd["current_step"],
+            current_step_id=1,
             num_pieces=jd["pieces_number"],
             event=e)
             o.save()
@@ -74,13 +73,16 @@ class OrderView(generics.ListAPIView):
 
         try:
             workflowlist = jd["workflow"]
+            l = len(workflowlist["steps"])
+            c=1
             for step in workflowlist["steps"]:
                 workflowModels.MachineWorkflowStep.objects.create(
                     step_order = step["order"],
                     state_id = 1,
                     end_datetime = datetime.datetime(2019, 1, 1, 0, 0, 0),
-                    machine_id = step["machine"]["id"],
+                    machine_id = "000"+str(c),
                     order = o)
+                c+=1
             datos={'message': "success"}
 
         except Exception as ex:

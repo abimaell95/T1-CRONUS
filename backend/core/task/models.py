@@ -31,7 +31,7 @@ class OrderDetails(models.Model):
     id = models.BigAutoField(primary_key=True)
     client_name = models.CharField(max_length=60)
     invoice_num = models.CharField(max_length=30)
-    file_url = models.CharField(max_length=300)
+    file_url = models.CharField(max_length=300,null=True)
     num_pieces = models.PositiveSmallIntegerField()
     current_step = models.ForeignKey("MachineWorkflowStep", on_delete=models.CASCADE)
     event = models.ForeignKey("Event", on_delete=models.CASCADE)
