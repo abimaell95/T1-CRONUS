@@ -1,1 +1,1 @@
-export * from 'WeeklyView'
+export * from './WeeklyView'

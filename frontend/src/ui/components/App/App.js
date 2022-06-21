@@ -5,7 +5,8 @@ import {
 } from "react-router-dom";
 import{
   Home,
-  Tasks
+  Tasks,
+  Calendar
 } from '../../pages'
 
 function App() {
@@ -15,6 +16,8 @@ function App() {
         <Route path="/" element={<Home />}>
         </Route>
         <Route path="tasks" element={<Tasks />}>
+        </Route>
+        <Route path="calendar" element={<Calendar />}>
         </Route>
       </Routes>
   </BrowserRouter>)

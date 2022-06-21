@@ -10,10 +10,11 @@ function BurgerButton(){
     );
 }
 
-function Tasks (){
+
+function TasksHeader(){
     return(
-        <div className="">
-            <header className="">
+        <>
+         <header className="">
                 <div className="flex flex-row px-4 pt-4 justify-center border-b border-gray-200">
                     <nav class="-mb-px flex space-x-8" aria-label="Tabs">
                         <a href="#" class="border-indigo-500 text-indigo-600 group inline-flex items-center pb-2 px-1 border-b-2 font-medium text-sm">
@@ -45,6 +46,14 @@ function Tasks (){
                     Agendar
                 </div>
             </div>
+        </>
+    )
+}
+
+function Tasks (){
+    return(
+        <div className="">
+            <TasksHeader/>
             <TaskList></TaskList>
         </div>
     );

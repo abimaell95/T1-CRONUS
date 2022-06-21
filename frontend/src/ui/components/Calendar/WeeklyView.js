@@ -1,68 +1,78 @@
 /* This example requires Tailwind CSS v2.0+ */
-import { Fragment, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 
-function WeeklyView() {
+function WeeklyView({currentDate, selectedDate, flagEvents}) {
   const container = useRef(null)
   const containerNav = useRef(null)
   const containerOffset = useRef(null)
 
-  const [state, setState ]= useState(
+  const [state, setState]= useState(
     {
-      selectedDate: new Date('2022-01-17T06:00'),
-      currentDate:  new Date('2022-01-12T06:00'),
-      selectedEvent:{},
+      selectedEvent:1,
       openDetails: false,
-      events: [
-        {
-          eventId: 10,
-          typeId: 3,
-          eventState:{
-            id: 3,
-            label: "Finalizado"
-          },
-          startDate: new Date('2022-01-11T06:00'),
-          endDate : new Date('2022-01-11T07:00')
-        },
-        {
-          eventId: 12,
-          typeId: 2,
-          eventState:{
-            id: 2,
-            label: "En curso"
-          },
-          startDate: new Date('2022-01-12T07:00'),
-          endDate : new Date('2022-01-12T09:00')
-        },
-        {
-          eventId: 14,
-          typeId: 1,
-          eventState:{
-            id: 1,
-            label: "No iniciado"
-          },
-          startDate: new Date('2022-01-14T12:00'),
-          endDate : new Date('2022-01-14T13:00')
-        },
-        {
-          eventId: 15,
-          typeId: 1,
-          eventState:{
-            id: 6,
-            label: "Demorado"
-          },
-          startDate: new Date('2022-01-12T09:00'),
-          endDate : new Date('2022-01-12T10:00')
-        }
-      ]
+      events: []
     }
   );
 
-  const setEvents = () => {
+  const setEvents = (date) => {
+      fetch("http://localhost:8000/xd").then((response)=>{
+        // setState({...state, events: response})
 
-
+      }).catch((err) => {
+          const testEvents = [
+            {
+              eventId: 10,
+              typeId: 3,
+              eventState:{
+                id: 3,
+                label: "Finalizado"
+              },
+              startDate: new Date('2022-06-20T06:00'),
+              endDate : new Date('2022-06-20T07:00')
+            },
+            {
+              eventId: 12,
+              typeId: 2,
+              eventState:{
+                id: 2,
+                label: "En curso"
+              },
+              startDate: new Date('2022-06-20T07:00'),
+              endDate : new Date('2022-06-20T09:00')
+            },
+            {
+              eventId: 14,
+              typeId: 1,
+              eventState:{
+                id: 1,
+                label: "No iniciado"
+              },
+              startDate: new Date('2022-06-23T12:00'),
+              endDate : new Date('2022-06-23T13:00')
+            },
+            {
+              eventId: 15,
+              typeId: 1,
+              eventState:{
+                id: 6,
+                label: "Demorado"
+              },
+              startDate: new Date('2022-06-21T09:00'),
+              endDate : new Date('2022-06-21T10:00')
+            }
+          ]
+          setState({...state, events: testEvents})
+        })
   }
 
+    useEffect(()=>{
+      setEvents(selectedDate)
+  },[flagEvents])
+
+  const setSelectedEvent = (eventId) => {
+    setState({...state, selectedEvent: eventId, openDetails: true})
+  }
 
 
   const strDayOfWeek = (date) => {
@@ -128,10 +138,10 @@ function WeeklyView() {
             {/* WE CAN ADD HERE THE HEADER  AND ITERATE THE VALUES FROM SELECTED DATE TO CREATE AN ARRAY WITH MONTH - DAY */}
             <div className="-mr-px hidden grid-cols-7 divide-x divide-gray-100 border-r border-gray-100 text-sm leading-6 text-gray-500 sm:grid">
               <div className="col-end-1 w-14" />
-              {generateDays(state.selectedDate).map((date) => {
+              {generateDays(selectedDate).map((date) => {
                 return (
                   <div className="flex items-center justify-center py-3"> 
-                    {date.setHours(0,0,0,0) == state.currentDate.setHours(0,0,0,0)?
+                    {date.setHours(0,0,0,0) == currentDate.setHours(0,0,0,0)?
                       <span className="flex items-baseline"> {strDayOfWeek(date)}
                         <span className="ml-1.5 flex h-8 w-8 items-center justify-center rounded-full bg-black font-semibold text-white">
                           {date.getDate()}
@@ -183,6 +193,7 @@ function WeeklyView() {
               </div>
 
               {/* Events */}
+              
               <ol
                 className="col-start-1 col-end-2 row-start-1 grid grid-cols-1 sm:grid-cols-7 sm:pr-8"
                 style={{ gridTemplateRows: '1.75rem repeat(144, minmax(0, 1fr)) auto' }}
@@ -198,8 +209,8 @@ function WeeklyView() {
                     
                     <li className={"relative mt-px flex "+ `col-start-${startDate.getDay()}` } style={{ gridRow: `${(startDate.getHours()*12)-70} / span ${(endDate.getHours()-startDate.getHours())*12} ` }}>
                     <a
-                      onClick={()=> {/*send eventId to*/}}
-                      className={"group absolute inset-1 flex flex-col overflow-y-auto rounded-lg p-2 text-xs leading-5 "+ stateColorMap[eventState.id]} 
+                      onClick={()=> {setSelectedEvent(eventId)}}
+                      className={"group absolute inset-1 flex flex-col overflow-y-auto rounded-lg p-2 text-xs leading-5 cursor-pointer "+ stateColorMap[eventState.id]} 
                     >
                       <p className="order-1 text-sm font-semibold">{eventTypeMap[typeId] +" #"+ eventId} </p>
                       <span className={"absolute text-xs font-medium px-2 py-1 rounded-md bottom-2 right-2 "+stateColorBadgeMap[eventState.id]}>
@@ -210,6 +221,7 @@ function WeeklyView() {
                   )
                 })}
               </ol>
+
             </div>
           </div>
         </div>
