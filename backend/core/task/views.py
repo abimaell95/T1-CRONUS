@@ -77,6 +77,7 @@ class OrderView(generics.ListAPIView):
                 workflowModels.MachineWorkflowStep.objects.create(
                     step_order = step["order"],
                     state_id = 1,
+                    end_datetime = datetime.datetime(2019, 1, 1, 0, 0, 0),
                     machine_id = step["machine"]["id"],
                     order = o)
             datos={'message': "success"}
