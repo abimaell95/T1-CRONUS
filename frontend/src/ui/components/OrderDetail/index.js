@@ -2,46 +2,50 @@ import { useState, useEffect } from 'react'
 import { PencilIcon, TrashIcon, XIcon, CheckIcon, LinkIcon } from '@heroicons/react/solid'
 
 const data_order = {
-    id_order: 2 ,
-    state_id: 2,
-    state_label:"En curso",
-    description: "Construcción de una puerta con ruedas de acero inoxidable utilizando 100 piezas de madera barnizadas y enchapado de oro.",
-    pieces: 100,
-    employee: "Juanito alcachofa",
-    end_date: "2022-06-13T12:30:00Z",
-    client_name: "Pepito Adrián Romero Pérez",
-    invoice_num: "001-001-000000042",
-    file_url: "/#"
-}
+        "id": 1,
+        "state": 1,
+        "label": "No Iniciado",
+        "description": "Pedido para puerta",
+        "num_pieces": 100,
+        "name": "Nicole",
+        "surname": "Agila",
+        "end_datetime": "2022-02-23T11:00:00Z",
+        "client_name": "Carmen Pinto",
+        "invoice_num": "100-5896",
+        "file_url": "archivo.jpg"
+    }
+
 
 const data_workflow = [
     {
-        state_id: 3,
-        step_order: 1,
-        step_activity: "Corte",
-        end_time: "11:05",
+        "id": 1,
+        "order_id": 1,
+        "step_order": 1,
+        "end_datetime": null,
+        "state_id": 2,
+        "step_activity": "Corte"
     },
     {
-        state_id: 1,
-        step_order: 3,
-        step_activity: "Corte",
-        end_time: null,
-    },
-    {
-        state_id: 2,
-        step_order: 2,
-        step_activity: "Enchapado",
-        end_time: null,
+        "id": 3,
+        "order_id": 1,
+        "step_order": 2,
+        "end_datetime": null,
+        "state_id": 1,
+        "step_activity": "Corte"
     }
 ]
 
 function OrderDetail({selectedEvent}) {
-    const [ state, setState ] = useState({
+    const [ dataOrder, setDataOrder ] = useState({
         isLoading: true,
-        dataOrder: {},
-        dataWorkflow: [],
+        data: {},
         errorMsg: ''
     })
+    const [ dataWorkflow, setDataWorkflow ] = useState({
+        isLoading: true,
+        data: [],
+        errorMsg: ''
+    })  
     function getStatusColor (status_id){
         switch(status_id){
             case 2:
@@ -67,41 +71,81 @@ function OrderDetail({selectedEvent}) {
         }
     }
     
-    const handleFetch = () => {
-        fetch("https://appi/get/order/123456")
+    const getOrderDetail = () => {
+        fetch("http://localhost:8000/order/?id=1")
         .then((response) => response.json())
         .then((response) => {
-            setState({
-                ...state,
+            const data = response[0]
+            setDataOrder({
+                ...dataOrder,
                 isLoading: false,
-                dataOrder: data_order
+                data: {
+                    description: data.description,
+                    state_label: data.label,
+                    pieces: data.num_pieces,
+                    employee: data.name,
+                    end_date: data.end_datetime,
+                    client_name: data.client_name,
+                    invoice_num: data.invoice_num,
+                    file_url: data.file_url
+                }
+            });
+        })
+        .catch(() => {
+            setDataOrder({
+                ...dataOrder,
+                data: {
+                    description: data_order.description,
+                    state_label: data_order.label,
+                    pieces: data_order.num_pieces,
+                    employee: data_order.name,
+                    end_date: data_order.end_datetime,
+                    client_name: data_order.client_name,
+                    invoice_num: data_order.invoice_num,
+                    file_url: data_order.file_url
+                },
+                isLoading: false,
+                setErrorMsg: 'Ha ocurrido un problema cargando los datos del pedido'
+            })
+        })
+    }
+
+    const getWorkFlow = () => {
+        fetch("http://localhost:8000/workflow/?id=1")
+        .then((response) => response.json())
+        .then((response) => {
+            setDataWorkflow({
+                ...dataWorkflow,
+                isLoading: false,
+                data: [...response]
             })
         })
         .catch(() => {
-            setState({
-                ...state,
+            setDataWorkflow({
+                ...dataWorkflow,
+                data: [...data_workflow],
                 isLoading: false,
-                setErrorMsg: 'Ha ocurrido un problema cargando los datos del pedido',
-                dataOrder: data_order//remove
+                setErrorMsg: 'Ha ocurrido un problema cargando los datos del pedido'
             })
         })
     }
     
     useEffect(() => {
-        handleFetch();
+        getOrderDetail();
+        getWorkFlow();
     }, [selectedEvent])
         
-            if (state.isLoading)
+            if (dataOrder.isLoading)
                 return <div className='flex justify-center items-center h-screen'>
                     <svg className="animate-spin -ml-1 mr-3 h-12 w-12 text-gray-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
                 </div>
             else{
-                const orderStatusColor = getStatusColor(state.dataOrder.state_id);
-                const date = new Date(state.dataOrder.end_date);
-                const orderdWorkflow = data_workflow.sort((step1, step2) => {
+                const orderStatusColor = getStatusColor(dataOrder.data.state_id);
+                const date = new Date(dataOrder.data.end_date);
+                const orderdWorkflow = dataWorkflow.data.sort((step1, step2) => {
                     return step1.step_order - step2.step_order
                 });
                 return(
@@ -109,7 +153,7 @@ function OrderDetail({selectedEvent}) {
                     <div className="flex justify-between mb-3">
                         <div className='flex space-x-4'>
                             <label className="text-2xl font-bold text-gray-900">Pedido #<span>{ selectedEvent}</span></label>
-                            <span className={orderStatusColor.bg + orderStatusColor.text +"text-xs font-semibold mr-2 px-2.5 py-0.5 rounded self-center"}>{state.dataOrder.state_label}</span>
+                            <span className={orderStatusColor.bg + orderStatusColor.text +"text-xs font-semibold mr-2 px-2.5 py-0.5 rounded self-center"}>{dataOrder.data.state_label}</span>
                         </div>
                         <div className='flex justify-end space-x-3'>
                             <div className='p-2 rounded bg-gray-100'>
@@ -129,7 +173,7 @@ function OrderDetail({selectedEvent}) {
                             <div className='mb-1'>
                                 <label className='text-lg font-bold text-gray-800'>Descripción</label>
                                 <div className='text-base'>
-                                {state.dataOrder.description}
+                                {dataOrder.data.description}
                                 </div>
                             </div>
                             <div className='mb-1'>
@@ -137,11 +181,11 @@ function OrderDetail({selectedEvent}) {
                                 <div>
                                     <div className='flex justify-between'>
                                         <label> Número de piezas </label>
-                                        <label> {state.dataOrder.pieces} </label>
+                                        <label> {dataOrder.data.pieces} </label>
                                     </div>
                                     <div className='flex justify-between'>
                                         <label> Agendado por </label>
-                                        <label> {state.dataOrder.employee} </label>
+                                        <label> {dataOrder.data.employee} </label>
                                     </div>
                                     <div className='flex justify-between'>
                                         <label> Fecha de entrega </label>
@@ -154,11 +198,11 @@ function OrderDetail({selectedEvent}) {
                                 <div>
                                     <div className='flex justify-between'>
                                         <label> Nombre </label>
-                                        <label> {state.dataOrder.client_name} </label>
+                                        <label> {dataOrder.data.client_name} </label>
                                     </div>
                                     <div className='flex justify-between'>
                                         <label> N° de factura </label>
-                                        <label> {state.dataOrder.invoice_num } </label>
+                                        <label> {dataOrder.data.invoice_num } </label>
                                     </div>
                                 </div>
                             </div>
@@ -167,7 +211,7 @@ function OrderDetail({selectedEvent}) {
                                     <label className='text-xl font-bold text-gray-800'>Flujo de trabajo</label>
                                     <span  className='bg-gray-600 rounded text-gray-100'> 
                                         <LinkIcon className='h-4 w-4 text-gray-100 inline mx-1'/>
-                                        <label className='mr-2'>Planificación</label>
+                                    <label className='mr-2'><a href='/#'> Planificación</a></label>
                                     </span>
                                 </div>
                                 <div className='mt-2'>
@@ -197,7 +241,7 @@ function OrderDetail({selectedEvent}) {
                                                 <span className={color.bg+'rounded-full p-2'}>
                                                     <CheckIcon className={"h-5 w-5 "+ color.text}/>
                                                 </span>
-                                                <label className={step.step_order === 2 ? 'font-bold' : ''}>
+                                                <label className={step.state_id === 2 ? 'font-bold' : ''}>
                                                     {step.step_activity}
                                                 </label>
                                                 <label>
