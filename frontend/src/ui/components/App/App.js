@@ -6,15 +6,16 @@ import {
 import{
   Home,
   Tasks,
-  Calendar
+  Calendar,
+  Login
 } from '../../pages'
 
 function App() {
   return(
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Home />}>
-        </Route>
+        <Route path="/" element={<Login />}>
+        </Route>  
         <Route path="tasks" element={<Tasks />}>
         </Route>
         <Route path="calendar" element={<Calendar />}>

@@ -1,8 +1,10 @@
 /* This example requires Tailwind CSS v2.0+ */
 import { useEffect, useRef, useState } from 'react'
 import OrderDetail from '../OrderDetail'
+import CreateOrder from '../CreateOrder';
 
-function WeeklyView({currentDate, selectedDate, flagEvents}) {
+
+function WeeklyView({currentDate, selectedDate, flagEvents, openCreateEvent, setOpenCreateEvent}) {
   const container = useRef(null)
   const containerNav = useRef(null)
   const containerOffset = useRef(null)
@@ -123,7 +125,7 @@ function WeeklyView({currentDate, selectedDate, flagEvents}) {
 
   return (
     <div className="grid grid-cols-8">
-      <div class={state.openDetails ? "col-span-5":"col-span-8"}>
+      <div class={state.openDetails || openCreateEvent ? "col-span-5":"col-span-8"}>
         <div className="flex h-full flex-col">
           <div ref={container} className="flex flex-auto flex-col overflow-auto bg-white">
             <div style={{ width: '165%' }} className="flex max-w-full flex-none flex-col sm:max-w-none md:max-w-full">
@@ -223,9 +225,15 @@ function WeeklyView({currentDate, selectedDate, flagEvents}) {
           </div>
         </div>
       </div>
-      <div class={state.openDetails ? "col-span-3 border-l border-gray-200":"hidden"}>
-        <OrderDetail selectedEvent={state.selectedEvent} closeOrderDetails={closeOrderDetails}/>
-      </div>
+      {state.openDetails &&  
+        <div class={state.openDetails ? "col-span-3 border-l border-gray-200":"hidden"}>
+          <OrderDetail selectedEvent={state.selectedEvent} closeOrderDetails={closeOrderDetails}/>
+        </div>}
+        {openCreateEvent &&  
+        <div class={openCreateEvent ? "col-span-3 border-l border-gray-200":"hidden"}>
+          <CreateOrder setOpenCreateEvent={setOpenCreateEvent}/>
+        </div>}
+
     </div>
   )
 }
