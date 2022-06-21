@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
-import { MenuIcon, TableIcon, CalendarIcon , ChevronLeftIcon, ChevronRightIcon, ChevronDownIcon} from '@heroicons/react/solid'
+import { MenuIcon, ChevronRightIcon, ChevronDownIcon} from '@heroicons/react/solid'
+import {TasksHeader} from '../components/TaskList'
+import CreateOrder from '../components/CreateOrder';
 
 
 function BurgerButton(){
@@ -10,135 +12,131 @@ function BurgerButton(){
     );
 }
 
-
-function TasksHeader(){
-    return(
-        <>
-         <header className="">
-                <div className="flex flex-row px-4 pt-4 justify-center border-b border-gray-200">
-                    <nav class="-mb-px flex space-x-8" aria-label="Tabs">
-                        <a href="#" class="border-indigo-500 text-indigo-600 group inline-flex items-center pb-2 px-1 border-b-2 font-medium text-sm">
-                            <TableIcon className="text-indigo-500 -ml-0.5 mr-2 h-5 w-5"/>
-                            <span>Lista</span>
-                        </a>
-                        <a href="#" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 group inline-flex items-center pb-2 px-1 border-b-2 font-medium text-sm">
-                            <CalendarIcon className="text-gray-400 group-hover:text-gray-500 -ml-0.5 mr-2 h-5 w-5"/>
-                            <span>Calendario</span>
-                        </a>          
-                    </nav>
-
-                </div>
-            </header>
-            <div className="w-full py-6 flex items-center justify-between px-8">
-                <span class="relative z-0 inline-flex shadow-sm rounded-md">
-                    <div type="button" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 cursor-pointer">
-                        <ChevronLeftIcon className="h-5 w-5"/>
-                    </div>
-                    <div className="-ml-px relative inline-flex items-center px-2 py-2  border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
-                    2022, Junio 13 - 19
-                    </div>
-                    <div type="button" class="-ml-px relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 cursor-pointer">
-                        <ChevronRightIcon className="h-5 w-5"/>
-                    </div>
-                </span>
-                <div type="button" class="relative inline-flex items-center px-4 py-2 rounded-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 cursor-pointer">
-                    <CalendarIcon className="-ml-1 mr-2 h-5 w-5 text-gray-400"/>
-                    Agendar
-                </div>
-            </div>
-        </>
-    )
-}
-
 function Tasks (){
+
+    const getMonday = (date) => {
+        const mondayDate = date.getDate() - date.getDay() + ( date.getDay() == 0 ? -6:1);
+        return new Date(date.getFullYear(), date.getMonth(), mondayDate);
+    }
+
+     //get days of current week
+    const generateDays= (date) => {
+    
+        const mondayDate = date.getDate() - date.getDay() + ( date.getDay() == 0 ? -6:1);
+        const mondayOfWeek = new Date(date.getFullYear(), date.getMonth(), mondayDate);
+
+        var days = []
+        
+        for(let i=0; i < 7; i++){
+        let currentDay = new Date(mondayOfWeek.getFullYear(), mondayOfWeek.getMonth(), mondayOfWeek.getDate()+i);
+            days.push(currentDay);
+        }
+        return days;
+    }
+
     const [state, setState] = useState({
         loadingData : true,
-        orders : {}
+        orders : {},
+        selectedDate: getMonday(new Date()),
+        currentDate:  new Date(),
+        flagOrders: false,
+        openCreationForm: false
     });
 
+    const setSelectedDate = (date) => {
+        setState({...state, selectedDate: date, flagOrders: !state.flagOrders})
+    }
 
-    const orderMockData = {
-        "13/05/2022" : [
-            {
-                invoice_id:"001-001-0000000011",
-                client_name: "Juanito Pereza",
-                start_date : "13 de Junio del 2022",
-                end_date : "Entregado",
-                current_step : "Finalizado",
-                state : { 
-                    id: 4,
-                    label: "Finalizado"
-                },
-                scheduler : "Juanito Perez"
-            },
-            {
-                invoice_id:"001-001-0000000012",
-                client_name: "Juanito Pereza",
-                start_date : "13 de Junio del 2022",
-                end_date : "Hoy",
-                current_step : "Corte",
-                state : { 
-                    id: 3,
-                    label: "En curso"
-                },
-                scheduler : "Juanito Perez"
-            },
-            {
-                invoice_id:"001-001-0000000013",
-                client_name: "Juanito Pereza",
-                start_date : "13 de Junio del 2022",
-                end_date : "Hoy",
-                current_step : "No iniciado",
-                state : { 
-                    id: 1,
-                    label: "No iniciado"
-                },
-                scheduler : "Juanito Perez"
-            }
-        ],
-        "14/05/2022" : [
-            {
-                invoice_id:"001-001-0000000015",
-                client_name: "Juanito Pereza",
-                start_date : "14 de Junio del 2022",
-                end_date : "Hoy",
-                current_step : "Finalizado",
-                state : { 
-                    id: 4,
-                    label: "Finalizado"
-                },
-                scheduler : "Juanito Perez"
-            },
-            {
-                invoice_id:"001-001-0000000016",
-                client_name: "Juanito Pereza",
-                start_date : "14 de Junio del 2022",
-                end_date : "Hoy",
-                current_step : "Corte",
-                state : { 
-                    id: 3,
-                    label: "En curso"
-                },
-                scheduler : "Juanito Perez"
-            },
-            {
-                invoice_id:"001-001-0000000017",
-                client_name: "Juanito Pereza",
-                start_date : "14 de Junio del 2022",
-                end_date : "Hoy",
-                current_step : "No iniciado",
-                state : { 
-                    id: 1,
-                    label: "No iniciado"
-                },
-                scheduler : "Juanito Perez"
-            }
-        ],
-        "15/05/2022" : [{}],
-        "16/05/2022" : [{}],
-        "17/05/2022" : [{}],
-        "18/05/2022" : [{}],
-        "19/05/2022" : [{}],
+    const setOpenCreateEvent = () => {
+        setState({...state, openCreationForm: !state.openCreationForm})
+    }
+
+    
+    const orders_mock_data = [
+        {
+            "id": 1,
+            "invoice_num": "100-5896",
+            "client_name": "Carmen Pinto",
+            "start_datetime": "2022-05-22",
+            "end_datetime": "2022-02-23",
+            "state": 1,
+            "state_label": "No Iniciado",
+            "employee": "0927643825",
+            "type_label": "Corte"
+        },
+        {
+            "id": 2,
+            "invoice_num": "100-5897",
+            "client_name": "Carmen Pinto",
+            "start_datetime": "2022-05-23",
+            "end_datetime": "2022-02-24",
+            "state": 1,
+            "state_label": "No Iniciado",
+            "employee": "0927643825",
+            "type_label": "Corte"
+        },
+        {
+            "id": 3,
+            "invoice_num": "100-5898",
+            "client_name": "Carmen Pinto",
+            "start_datetime": "2022-05-22",
+            "end_datetime": "2022-02-23",
+            "state": 1,
+            "state_label": "No Iniciado",
+            "employee": "0927643825",
+            "type_label": "Corte"
+        },
+        {
+            "id": 4,
+            "invoice_num": "100-5899",
+            "client_name": "Carmen Pinto",
+            "start_datetime": "2022-05-22",
+            "end_datetime": "2022-02-23",
+            "state": 1,
+            "state_label": "No Iniciado",
+            "employee": "0927643825",
+            "type_label": "Corte"
+        },
+        {
+            "id": 5,
+            "invoice_num": "100-5900",
+            "client_name": "Carmen Pinto",
+            "start_datetime": "2022-05-23",
+            "end_datetime": "2022-02-23",
+            "state": 1,
+            "state_label": "No Iniciado",
+            "employee": "0927643825",
+            "type_label": "Corte"
+        },
+        {
+            "id": 6,
+            "invoice_num": "100-5901",
+            "client_name": "Carmen Pinto",
+            "start_datetime": "2022-05-22",
+            "end_datetime": "2022-02-23",
+            "state": 1,
+            "state_label": "No Iniciado",
+            "employee": "0927643825",
+            "type_label": "Corte"
+        },
+        {
+            "id": 7,
+            "invoice_num": "100-5902",
+            "client_name": "Carmen Pinto", 
+            "start_datetime": "2022-05-24",
+            "end_datetime": "2022-02-23",
+            "state": 1,
+            "state_label": "No Iniciado",
+            "employee": "0927643825",
+            "type_label": "Corte"
+        }
+    ]
+
+    function dateToString(date){
+        let year = date.getFullYear()
+        let month = date.getMonth().toString().length > 1 ? date.getMonth() : `0${date.getMonth()}` 
+        let day =date.getDate()
+        return `${year}-${month}-${day}`
     }
 
     function loadOrdersData(){
@@ -150,10 +148,17 @@ function Tasks (){
                 orders : data
             })
         }).catch((error)=>{
+            let data = orders_mock_data.reduce((group, task) => {
+                const { start_datetime } = task;
+                group[start_datetime] = group[start_datetime] ?? [];
+                group[start_datetime].push(task);
+                return group;
+            }, {})
+            console.log(data)
             setState({
                 ...state,
                 loadingData: false,
-                orders : orderMockData
+                orders : Object.fromEntries(new Map(generateDays(state.selectedDate).map(date =>[dateToString(date),data[dateToString(date)] || []])))
             })
         });
     }
@@ -161,11 +166,21 @@ function Tasks (){
 
     useEffect(()=>{
         loadOrdersData()
-    },[])
+    },[state.flagOrders])
 
-    if(state.loadingData){
+    return(
+        <div className="h-screen">
+            <TasksHeader selectedView={0} selectedDate={state.selectedDate} setSelectedDate={setSelectedDate} setOpenCreateEvent={setOpenCreateEvent}/>
+            <TaskList ordersList={state.orders} loadingData={state.loadingData} openCreateEvent={state.openCreationForm}  setOpenCreateEvent={setOpenCreateEvent}></TaskList>
+        </div>
+    );
+}
+
+function TaskList({ordersList, loadingData, openCreateEvent, setOpenCreateEvent }){
+
+    if(loadingData){
         return(
-          <div className="flex h-screen justify-center items-center">
+          <div className="flex h-4/5 justify-center items-center">
             <svg className="animate-spin h-16 w-16 text-gray-800" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -175,49 +190,49 @@ function Tasks (){
     }
 
     return(
-        <div className="">
-            <TasksHeader/>
-            <TaskList ordersList={state.orders}></TaskList>
-        </div>
-    );
-}
-
-function TaskList({ordersList}){
-    useEffect(()=>{
-        console.log("Hey")
-    },[])
-
-    return(
-        <div className="flex flex-col">
-            <div className="grid grid-cols-8 border-y border-gray-200 text-center text-gray-800 font-medium">
-                <div className="col-span-2 py-4">
-                    {""}
-                </div>
-                <div className="col-span-1 border-l border-gray-200 py-2">
-                    Cliente
-                </div>
-                <div className="col-span-1 border-l border-gray-200 py-2">
-                    Fecha de creación
-                </div>
-                <div className="col-span-1 border-l border-gray-200 py-2">
-                    Fecha de entrega
-                </div>
-                <div className="col-span-1 border-l border-gray-200 py-2">
-                    Etapa actual
-                </div>
-                <div className="col-span-1 border-l border-gray-200 py-2">
-                    Estado
-                </div>
-                <div className="col-span-1 border-l border-gray-200 py-2">
-                    Agendado por
+        <div className="grid grid-cols-8 ">
+            <div className={`${!openCreateEvent ? "col-span-8" : "col-span-5"}`}>
+                <div className="flex flex-col">
+                    <div className={`border-b border-gray-200 text-center text-gray-800 font-light grid ${!openCreateEvent?"grid-cols-8" :"grid-cols-5"}`}>
+                        <div className="col-span-2 py-4">
+                            {""}
+                        </div>
+                        <div className="col-span-1 border-l border-gray-200 py-2">
+                            Cliente
+                        </div>
+                        <div className="col-span-1 border-l border-gray-200 py-2">
+                            Fecha de creación
+                        </div>
+                        <div className="col-span-1 border-l border-gray-200 py-2">
+                            Fecha de entrega
+                        </div>
+                        {!openCreateEvent && 
+                        <>
+                        <div className="col-span-1 border-l border-gray-200 py-2">
+                            Etapa actual
+                        </div>
+                        <div className="col-span-1 border-l border-gray-200 py-2">
+                            Estado
+                        </div>
+                        <div className="col-span-1 border-l border-gray-200 py-2">
+                            Agendado por
+                        </div>
+                        </>
+                        }
+                    </div>
+                    {Object.keys(ordersList).map((string_date)=>{
+                        return(
+                            <DateRow stringDate={string_date} tasks={ordersList[string_date]} openCreateEvent={openCreateEvent}/>
+                        );
+                    })}
                 </div>
             </div>
-            {Object.keys(ordersList).map((string_date)=>{
-                return(
-                    <DateRow stringDate={string_date} tasks={ordersList[string_date]}/>
-                );
-            })}
+            {openCreateEvent &&
+            <div className="col-span-3 border-l border-gray-200">
+                <CreateOrder setOpenCreateEvent={setOpenCreateEvent}/>
+            </div>}
         </div>
+        
     )
 }
 
@@ -235,7 +250,7 @@ function StateBagde({state}){
     );
 }
 
-function DateRow({stringDate, tasks}){
+function DateRow({stringDate, tasks, openCreateEvent}){
     const [state, setState] = useState({
         open : false
     });
@@ -260,28 +275,31 @@ function DateRow({stringDate, tasks}){
             {state.open && tasks.map((task)=>{
                 if(Object.keys(task).length > 0){
                     return(
-                        <div className="grid grid-cols-8 border-b border-gray-200 text-center text-gray-800 font-light">
+                        <div className={`border-b border-gray-200 text-center text-gray-800 font-light grid ${openCreateEvent?"grid-cols-5" :"grid-cols-8"}`}>
                             <div className="col-span-2 py-2">
-                                {task.invoice_id}
+                                {task.invoice_num}
                             </div>
                             <div className="col-span-1 border-l border-gray-200 py-2">
                                 {task.client_name}
                             </div>
                             <div className="col-span-1 border-l border-gray-200 py-2">
-                                {task.start_date}
+                                {task.start_datetime}
                             </div>
                             <div className="col-span-1 border-l border-gray-200 py-2">
-                                {task.end_date}
+                                {task.end_datetime}
                             </div>
-                            <div className="col-span-1 border-l border-gray-200 py-2">
-                                {task.current_step}
-                            </div>
-                            <div className="col-span-1 border-l border-gray-200 py-2">
-                                <StateBagde state={task.state}/>
-                            </div>
-                            <div className="col-span-1 border-l border-gray-200 py-2">
-                                {task.scheduler}
-                            </div>
+                            {!openCreateEvent&&
+                            <>
+                                <div className="col-span-1 border-l border-gray-200 py-2">
+                                {task.type_label}
+                                </div>
+                                <div className="col-span-1 border-l border-gray-200 py-2">
+                                    <StateBagde state={{id:task.state, label: task.state_label}}/>
+                                </div>
+                                <div className="col-span-1 border-l border-gray-200 py-2">
+                                    {task.employee}
+                                </div>
+                            </>}
                         </div>
                     );
                 }

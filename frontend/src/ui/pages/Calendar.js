@@ -14,7 +14,8 @@ function Calendar(){
         {
           selectedDate: getMonday(new Date()),
           currentDate:  new Date(),
-          flagEvents: false
+          flagEvents: false,
+          openCreationForm: false
         }
     );
 
@@ -24,11 +25,15 @@ function Calendar(){
     }
 
 
+    const setOpenCreateEvent = () => {
+        setState({...state, openCreationForm: !state.openCreationForm})
+    }
+
+
     return(
         <div className="">
-            <TasksHeader selectedView={1} selectedDate={state.selectedDate} setSelectedDate={setSelectedDate}/>
-            <WeeklyView currentDate={state.currentDate} selectedDate={state.selectedDate} flagEvents={state.flagEvents}/>
-            
+            <TasksHeader selectedView={1} selectedDate={state.selectedDate} setSelectedDate={setSelectedDate} setOpenCreateEvent={setOpenCreateEvent}/>
+            <WeeklyView currentDate={state.currentDate} selectedDate={state.selectedDate} flagEvents={state.flagEvents} openCreateEvent={state.openCreationForm}  setOpenCreateEvent={setOpenCreateEvent}/>
         </div>
     );
 }

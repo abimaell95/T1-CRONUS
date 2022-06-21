@@ -78,7 +78,7 @@ function getFormatStringDate(date){
     return date.toISOString().split('T')[0]
 }
 
-function CreateOrder(props) {
+function CreateOrder({setOpenCreateEvent}) {
     const [state,setState] = useState({
             isStartDateSelected : false,
             activityId: 1,
@@ -272,10 +272,11 @@ function CreateOrder(props) {
                 <div className='flex justify-between mb-3'>
                     <label className="text-2xl font-bold text-gray-900">Agendar</label>
                     <div className='flex justify-end space-x-3'>
-                        <div className='p-2 rounded bg-gray-100'>
+                        <div className='p-2 rounded bg-gray-100 cursor-pointer'>
                             <CheckIcon className="h-5 w-5 text-gray-500" onClick={createEvent}/>
                         </div>
-                        <div className='p-2 rounded bg-gray-100'>
+                        <div className='p-2 rounded bg-gray-100 cursor-pointer'
+                            onClick={setOpenCreateEvent}>
                             <XIcon className="h-5 w-5 text-gray-500"/>
                         </div>
                     </div>
