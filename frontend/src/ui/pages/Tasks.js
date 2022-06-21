@@ -51,101 +51,138 @@ function TasksHeader(){
 }
 
 function Tasks (){
+    const [state, setState] = useState({
+        loadingData : true,
+        orders : {}
+    });
+
+
+    const orderMockData = {
+        "13/05/2022" : [
+            {
+                invoice_id:"001-001-0000000011",
+                client_name: "Juanito Pereza",
+                start_date : "13 de Junio del 2022",
+                end_date : "Entregado",
+                current_step : "Finalizado",
+                state : { 
+                    id: 4,
+                    label: "Finalizado"
+                },
+                scheduler : "Juanito Perez"
+            },
+            {
+                invoice_id:"001-001-0000000012",
+                client_name: "Juanito Pereza",
+                start_date : "13 de Junio del 2022",
+                end_date : "Hoy",
+                current_step : "Corte",
+                state : { 
+                    id: 3,
+                    label: "En curso"
+                },
+                scheduler : "Juanito Perez"
+            },
+            {
+                invoice_id:"001-001-0000000013",
+                client_name: "Juanito Pereza",
+                start_date : "13 de Junio del 2022",
+                end_date : "Hoy",
+                current_step : "No iniciado",
+                state : { 
+                    id: 1,
+                    label: "No iniciado"
+                },
+                scheduler : "Juanito Perez"
+            }
+        ],
+        "14/05/2022" : [
+            {
+                invoice_id:"001-001-0000000015",
+                client_name: "Juanito Pereza",
+                start_date : "14 de Junio del 2022",
+                end_date : "Hoy",
+                current_step : "Finalizado",
+                state : { 
+                    id: 4,
+                    label: "Finalizado"
+                },
+                scheduler : "Juanito Perez"
+            },
+            {
+                invoice_id:"001-001-0000000016",
+                client_name: "Juanito Pereza",
+                start_date : "14 de Junio del 2022",
+                end_date : "Hoy",
+                current_step : "Corte",
+                state : { 
+                    id: 3,
+                    label: "En curso"
+                },
+                scheduler : "Juanito Perez"
+            },
+            {
+                invoice_id:"001-001-0000000017",
+                client_name: "Juanito Pereza",
+                start_date : "14 de Junio del 2022",
+                end_date : "Hoy",
+                current_step : "No iniciado",
+                state : { 
+                    id: 1,
+                    label: "No iniciado"
+                },
+                scheduler : "Juanito Perez"
+            }
+        ],
+        "15/05/2022" : [{}],
+        "16/05/2022" : [{}],
+        "17/05/2022" : [{}],
+        "18/05/2022" : [{}],
+        "19/05/2022" : [{}],
+    }
+
+    function loadOrdersData(){
+        fetch(`http://localhost:8000/api/`)
+        .then(response => response.json())
+        .then(data => {
+            setState({
+                ...state,
+                orders : data
+            })
+        }).catch((error)=>{
+            setState({
+                ...state,
+                loadingData: false,
+                orders : orderMockData
+            })
+        });
+    }
+
+
+    useEffect(()=>{
+        loadOrdersData()
+    },[])
+
+    if(state.loadingData){
+        return(
+          <div className="flex h-screen justify-center items-center">
+            <svg className="animate-spin h-16 w-16 text-gray-800" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+          </div>
+        )
+    }
+
     return(
         <div className="">
             <TasksHeader/>
-            <TaskList></TaskList>
+            <TaskList ordersList={state.orders}></TaskList>
         </div>
     );
 }
 
-function TaskList(){
-    const [state, setState] = useState({
-        tasks:{
-            "13/05/2022" : [
-                {
-                    invoice_id:"001-001-0000000011",
-                    client_name: "Juanito Pereza",
-                    start_date : "13 de Junio del 2022",
-                    end_date : "Entregado",
-                    current_step : "Finalizado",
-                    state : { 
-                        id: 4,
-                        label: "Finalizado"
-                    },
-                    scheduler : "Juanito Perez"
-                },
-                {
-                    invoice_id:"001-001-0000000012",
-                    client_name: "Juanito Pereza",
-                    start_date : "13 de Junio del 2022",
-                    end_date : "Hoy",
-                    current_step : "Corte",
-                    state : { 
-                        id: 3,
-                        label: "En curso"
-                    },
-                    scheduler : "Juanito Perez"
-                },
-                {
-                    invoice_id:"001-001-0000000013",
-                    client_name: "Juanito Pereza",
-                    start_date : "13 de Junio del 2022",
-                    end_date : "Hoy",
-                    current_step : "No iniciado",
-                    state : { 
-                        id: 1,
-                        label: "No iniciado"
-                    },
-                    scheduler : "Juanito Perez"
-                }
-            ],
-            "14/05/2022" : [
-                {
-                    invoice_id:"001-001-0000000015",
-                    client_name: "Juanito Pereza",
-                    start_date : "14 de Junio del 2022",
-                    end_date : "Hoy",
-                    current_step : "Finalizado",
-                    state : { 
-                        id: 4,
-                        label: "Finalizado"
-                    },
-                    scheduler : "Juanito Perez"
-                },
-                {
-                    invoice_id:"001-001-0000000016",
-                    client_name: "Juanito Pereza",
-                    start_date : "14 de Junio del 2022",
-                    end_date : "Hoy",
-                    current_step : "Corte",
-                    state : { 
-                        id: 3,
-                        label: "En curso"
-                    },
-                    scheduler : "Juanito Perez"
-                },
-                {
-                    invoice_id:"001-001-0000000017",
-                    client_name: "Juanito Pereza",
-                    start_date : "14 de Junio del 2022",
-                    end_date : "Hoy",
-                    current_step : "No iniciado",
-                    state : { 
-                        id: 1,
-                        label: "No iniciado"
-                    },
-                    scheduler : "Juanito Perez"
-                }
-            ],
-            "15/05/2022" : [{}],
-            "16/05/2022" : [{}],
-            "17/05/2022" : [{}],
-            "18/05/2022" : [{}],
-            "19/05/2022" : [{}],
-        }
-    })
-
+function TaskList({ordersList}){
     useEffect(()=>{
         console.log("Hey")
     },[])
@@ -175,9 +212,9 @@ function TaskList(){
                     Agendado por
                 </div>
             </div>
-            {Object.keys(state.tasks).map((string_date)=>{
+            {Object.keys(ordersList).map((string_date)=>{
                 return(
-                    <DateRow stringDate={string_date} tasks={state.tasks[string_date]}/>
+                    <DateRow stringDate={string_date} tasks={ordersList[string_date]}/>
                 );
             })}
         </div>
