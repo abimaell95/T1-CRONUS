@@ -25,7 +25,7 @@ class OrderView(generics.ListAPIView):
     serializer_class = EventJoinOrderSerializer
     def get_queryset(self):
         id=self.request.GET.get('id','')
-        queryset=EventJoinOrder.objects.raw("select core_orderdetails.id, core_event.state_id as state, core_eventstate.label, core_event.description, core_orderdetails.num_pieces, core_event.employee_id, core_event.end_datetime, core_orderdetails.client_name, core_orderdetails.invoice_num, core_orderdetails.file_url from core_event inner join core_orderdetails on core_event.id = core_orderdetails.event_id inner join core_eventstate on core_eventstate.id = core_event.state_id where core_orderdetails.id = {}".format(id))
+        queryset=EventJoinOrder.objects.raw("select core_orderdetails.id, core_event.state_id as state, core_eventstate.label, core_event.description, core_orderdetails.num_pieces, core_employee.name, core_employee.surname, core_event.end_datetime, core_orderdetails.client_name, core_orderdetails.invoice_num, core_orderdetails.file_url from core_event inner join core_orderdetails on core_event.id = core_orderdetails.event_id inner join core_eventstate on core_eventstate.id = core_event.state_id inner join core_employee on core_event.employee_id=core_employee.id where core_orderdetails.id = {}".format(id))
         return queryset
     
     @transaction.atomic
@@ -111,7 +111,7 @@ class OrdersView(generics.ListAPIView):
         if branch_number == "":
             branch_number=1
         
-        query="select core_orderdetails.id, core_orderdetails.invoice_num, core_orderdetails.client_name, core_event.start_datetime, core_event.end_datetime, core_event.state_id as state, core_eventstate.label as state_label, core_event.employee_id as employee, core_machinetype.label as type_label from core_event inner join core_orderdetails on core_event.id=core_orderdetails.event_id and core_event.branch_id = {} and core_event.start_datetime between '{}-{}-{} 00:00:00' and '{}-{}-{} 00:00:00' inner join core_eventstate on core_event.state_id = core_eventstate.id inner join core_machineworkflowstep on core_orderdetails.current_step_id = core_machineworkflowstep.id inner join core_machine on core_machine.serial_number = core_machineworkflowstep.machine_id inner join core_machinetype on core_machinetype.id=core_machine.type_id".format(branch_number,year,month,day,year,month,int(day)+5)
+        query="select core_orderdetails.id, core_orderdetails.invoice_num, core_orderdetails.client_name, core_event.start_datetime, core_event.end_datetime, core_event.state_id as state, core_eventstate.label as state_label, core_employee.name, core_employee.surname, core_machinetype.label as type_label from core_event inner join core_orderdetails on core_event.id=core_orderdetails.event_id and core_event.branch_id = {} and core_event.start_datetime between '{}-{}-{} 00:00:00' and '{}-{}-{} 00:00:00' inner join core_eventstate on core_event.state_id = core_eventstate.id inner join core_machineworkflowstep on core_orderdetails.current_step_id = core_machineworkflowstep.id inner join core_machine on core_machine.serial_number = core_machineworkflowstep.machine_id inner join core_machinetype on core_machinetype.id=core_machine.type_id inner join core_employee on core_event.employee_id=core_employee.id".format(branch_number,year,month,day,year,month,int(day)+5)
         queryset=EventJoinOrders.objects.raw(query)
         return queryset
 

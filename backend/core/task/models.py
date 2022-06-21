@@ -79,7 +79,8 @@ class EventJoinOrder(models.Model):
     label = models.CharField(max_length=20)
     description = models.CharField(max_length=300, default="Descripcion")
     num_pieces = models.PositiveSmallIntegerField(default=10)
-    employee_id = models.CharField(max_length=10, default='employee00')
+    name = models.CharField(max_length=15, default='name')
+    surname = models.CharField(max_length=15, default='surname')
     end_datetime = models.DateTimeField()
     client_name = models.CharField(max_length=60, default="Cliente")
     invoice_num = models.CharField(max_length=30, default="0001")
@@ -93,7 +94,8 @@ class EventJoinOrders(models.Model):
     end_datetime = models.DateTimeField()
     state = models.IntegerField()
     state_label = models.CharField(max_length=20)
-    employee = models.CharField(max_length=10)
+    name = models.CharField(max_length=15, default='name')
+    surname = models.CharField(max_length=15, default='surname')
     type_label = models.CharField(max_length=20)
 
 class EventJoinEventState(models.Model):
