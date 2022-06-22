@@ -52,6 +52,7 @@ class OrderView(generics.ListAPIView):
             branch_id=1,
             type_id=jd["type"])
             e.save()
+            eJson={'id':e.id,'start_datetime':e.start_datetime,'end_datetime':e.end_datetime,'employee_id':e.employee_id,'state_id':e.state_id,'branch_id':e.branch_id,'type_id':e.type_id}
         except Exception as ex:
             print(ex)
             datos={'message': "Error en Evento"}
@@ -65,7 +66,7 @@ class OrderView(generics.ListAPIView):
             num_pieces=jd["pieces_number"],
             event=e)
             o.save()
-            print(o)
+            oJson={'id':o.id,'invoice_num':o.invoice_num,'file_url':o.file_url,'current_step_id':o.current_step_id,'num_pieces':o.num_pieces,'event_id':e.id}
         except Exception as ex:
             print(ex)
             datos={'message': "Error en el Order"}
@@ -75,15 +76,19 @@ class OrderView(generics.ListAPIView):
             workflowlist = jd["workflow"]
             l = len(workflowlist["steps"])
             c=1
+            wList = []
             for step in workflowlist["steps"]:
-                workflowModels.MachineWorkflowStep.objects.create(
+                w = workflowModels.MachineWorkflowStep.objects.create(
                     step_order = step["order"],
                     state_id = 1,
                     end_datetime = datetime.datetime(2019, 1, 1, 0, 0, 0),
                     machine_id = "000"+str(c),
                     order = o)
+                w.save()
+                wJson={'id':w.id,'step_order':w.step_order,'state_id':w.state_id,'end_datetime':w.end_datetime,'machine_id':w.machine_id,'order_id':o.id}
+                wList.append(wJson)
                 c+=1
-            datos={'message': "success"}
+            datos={'message': "success", 'evento:':eJson, 'order':oJson, 'WorflowMachineSteps':wList}
 
         except Exception as ex:
             print(ex)
