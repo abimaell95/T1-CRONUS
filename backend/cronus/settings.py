@@ -26,7 +26,10 @@ SECRET_KEY = 'django-insecure-+6)+5@_9q%k)l=(tb8z8b@2$hhzvml6vu=j%%(!v*xwsuo!-ut
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENCIALS = True
+
+ALLOWED_HOSTS = ["292d-179-49-35-86.sa.ngrok.io", "127.0.0.1", "localhost"]
 
 
 # Application definition
@@ -39,7 +42,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'core',
-    'rest_framework'
+    'rest_framework',
+    'corsheaders'
 ]
 
 MIDDLEWARE = [
@@ -50,6 +54,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
 
 ROOT_URLCONF = 'cronus.urls'

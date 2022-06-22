@@ -147,13 +147,16 @@ class EventsView(generics.ListAPIView):
         if branch_number == "":
             branch_number=1
 
+        print(self.request.GET)
+
         period = self.request.GET.get('period','')
-        if period == 0: #weekly
+        if period == '0': #weekly
             query_date="core_event.start_datetime between '{}-{}-{} 00:00:00' and '{}-{}-{} 00:00:00'".format(year,month,day,year,month,int(day)+5)
         else: #daily
             query_date="core_event.start_datetime between '{0}-{1}-{2} 00:00:00' and '{0}-{1}-{2} 23:59:59'".format(year,month,day)
 
         query="select core_event.id, core_event.start_datetime, core_event.end_datetime, core_event.state_id, core_eventstate.label from core_event inner join core_eventstate on core_event.state_id=core_eventstate.id where core_event.branch_id={} and {}".format(branch_number,query_date)
+        print(query)
         queryset=EventJoinEventState.objects.raw(query)
         return queryset
 
