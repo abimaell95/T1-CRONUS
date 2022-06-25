@@ -15,12 +15,14 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from django.contrib.auth import login,logout
 from rest_framework import routers
 from core import views
 from core.task import views as eventviews
 from core.workflow import views as workflowviews
+from django.shortcuts import render
+
 
 router = routers.DefaultRouter()
 router.register(r'event_type', eventviews.EventTypeViewSet)
@@ -28,8 +30,11 @@ router.register(r'maintenance_period', eventviews.MaintenancePeriodViewSet)
 router.register(r'reparation_priorities', eventviews.PriorityViewSet)
 router.register(r'branchoffice',views.BranchOfficeViewSet)
 
+
+def render_react(request):
+    return render(request, "index.html")
+
 urlpatterns = [
-    path('', include(router.urls)),
     path('admin/', admin.site.urls),
     path('events/',eventviews.EventsView.as_view()),
     path('workflows/', workflowviews.WorkflowsView.as_view()),
@@ -39,7 +44,10 @@ urlpatterns = [
     path('order/',eventviews.OrderView.as_view()),
     path('workflow/',workflowviews.MachineWorkflowStepView.as_view()),
         
-    path('accounts/login/', login, name='login'),
+    path('accounts/login/', views.login_view, name='login'),
     path('logout/', logout, name='logout'),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+
+    re_path(r"^$", render_react),
+    re_path(r"^(?:.*)/?$", render_react)  
 ]

@@ -52,7 +52,6 @@ class OrderView(generics.ListAPIView):
             branch_id=1,
             type_id=jd["type"])
             e.save()
-            eJson={'id':e.id,'start_datetime':e.start_datetime,'end_datetime':e.end_datetime,'employee_id':e.employee_id,'state_id':e.state_id,'branch_id':e.branch_id,'type_id':e.type_id}
         except Exception as ex:
             print(ex)
             datos={'message': "Error en Evento"}
@@ -66,7 +65,7 @@ class OrderView(generics.ListAPIView):
             num_pieces=jd["pieces_number"],
             event=e)
             o.save()
-            oJson={'id':o.id,'invoice_num':o.invoice_num,'file_url':o.file_url,'current_step_id':o.current_step_id,'num_pieces':o.num_pieces,'event_id':e.id}
+            print(o)
         except Exception as ex:
             print(ex)
             datos={'message': "Error en el Order"}
@@ -76,19 +75,15 @@ class OrderView(generics.ListAPIView):
             workflowlist = jd["workflow"]
             l = len(workflowlist["steps"])
             c=1
-            wList = []
             for step in workflowlist["steps"]:
-                w = workflowModels.MachineWorkflowStep.objects.create(
+                workflowModels.MachineWorkflowStep.objects.create(
                     step_order = step["order"],
                     state_id = 1,
                     end_datetime = datetime.datetime(2019, 1, 1, 0, 0, 0),
                     machine_id = "000"+str(c),
                     order = o)
-                w.save()
-                wJson={'id':w.id,'step_order':w.step_order,'state_id':w.state_id,'end_datetime':w.end_datetime,'machine_id':w.machine_id,'order_id':o.id}
-                wList.append(wJson)
                 c+=1
-            datos={'message': "success", 'evento:':eJson, 'order':oJson, 'WorflowMachineSteps':wList}
+            datos={'message': "success"}
 
         except Exception as ex:
             print(ex)
@@ -119,7 +114,7 @@ class OrdersView(generics.ListAPIView):
         if branch_number == "":
             branch_number=1
         
-        query="select core_orderdetails.id, core_orderdetails.invoice_num, core_orderdetails.client_name, core_event.start_datetime, core_event.end_datetime, core_event.state_id as state, core_eventstate.label as state_label, core_employee.name, core_employee.surname, core_machinetype.label as type_label from core_event inner join core_orderdetails on core_event.id=core_orderdetails.event_id and core_event.branch_id = {} and core_event.start_datetime between '{}-{}-{} 00:00:00' and '{}-{}-{} 00:00:00' inner join core_eventstate on core_event.state_id = core_eventstate.id inner join core_machineworkflowstep on core_orderdetails.current_step_id = core_machineworkflowstep.id inner join core_machine on core_machine.serial_number = core_machineworkflowstep.machine_id inner join core_machinetype on core_machinetype.id=core_machine.type_id inner join core_employee on core_event.employee_id=core_employee.id".format(branch_number,year,month,day,year,month,int(day)+5)
+        query="select core_orderdetails.id, core_orderdetails.invoice_num, core_orderdetails.client_name, core_event.start_datetime, core_event.end_datetime, core_event.state_id as state, core_eventstate.label as state_label, core_employee.name, core_employee.surname, core_machinetype.label as type_label from core_event inner join core_orderdetails on core_event.id=core_orderdetails.event_id and core_event.branch_id = {} and core_event.start_datetime between '{}-{}-{} 00:00:00' and '{}-{}-{} 00:00:00' inner join core_eventstate on core_event.state_id = core_eventstate.id inner join core_machineworkflowstep on core_orderdetails.current_step_id = core_machineworkflowstep.id inner join core_machine on core_machine.serial_number = core_machineworkflowstep.machine_id inner join core_machinetype on core_machinetype.id=core_machine.type_id inner join core_employee on core_event.employee_id=core_employee.id".format(branch_number,year,month,day,year,month,int(day)+7)
         queryset=EventJoinOrders.objects.raw(query)
         return queryset
 
@@ -151,7 +146,7 @@ class EventsView(generics.ListAPIView):
 
         period = self.request.GET.get('period','')
         if period == '0': #weekly
-            query_date="core_event.start_datetime between '{}-{}-{} 00:00:00' and '{}-{}-{} 00:00:00'".format(year,month,day,year,month,int(day)+5)
+            query_date="core_event.start_datetime between '{}-{}-{} 00:00:00' and '{}-{}-{} 00:00:00'".format(year,month,day,year,month,int(day)+7)
         else: #daily
             query_date="core_event.start_datetime between '{0}-{1}-{2} 00:00:00' and '{0}-{1}-{2} 23:59:59'".format(year,month,day)
 
