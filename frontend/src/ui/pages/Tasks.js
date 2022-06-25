@@ -1,28 +1,20 @@
 import { useEffect, useState } from 'react';
-import { MenuIcon, ChevronRightIcon, ChevronDownIcon} from '@heroicons/react/solid'
+import { ChevronRightIcon, ChevronDownIcon} from '@heroicons/react/solid'
 import {TasksHeader} from '../components/TaskList'
 import CreateOrder from '../components/CreateOrder';
 
 
-function BurgerButton(){
-    return(
-        <div className="">
-         <MenuIcon className="h-8 w-8 text-gray-900"/>
-        </div>
-    );
-}
-
 function Tasks (){
 
     const getMonday = (date) => {
-        const mondayDate = date.getDate() - date.getDay() + ( date.getDay() == 0 ? -6:1);
+        const mondayDate = date.getDate() - date.getDay() + ( date.getDay() === 0 ? -6:1);
         return new Date(date.getFullYear(), date.getMonth(), mondayDate);
     }
 
      //get days of current week
     const generateDays= (date) => {
     
-        const mondayDate = date.getDate() - date.getDay() + ( date.getDay() == 0 ? -6:1);
+        const mondayDate = date.getDate() - date.getDay() + ( date.getDay() === 0 ? -6:1);
         const mondayOfWeek = new Date(date.getFullYear(), date.getMonth(), mondayDate);
 
         var days = []
@@ -39,16 +31,20 @@ function Tasks (){
         orders : {},
         selectedDate: getMonday(new Date()),
         currentDate:  new Date(),
-        flagOrders: false,
+        flagEvents: false,
         openCreationForm: false
     });
 
     const setSelectedDate = (date) => {
-        setState({...state, selectedDate: date, flagOrders: !state.flagOrders})
+        setState({...state, selectedDate: date, flagEvents: !state.flagEvents})
     }
 
-    const setOpenCreateEvent = () => {
-        setState({...state, openCreationForm: !state.openCreationForm})
+    const setOpenCreateEvent = (value, withLoadData, loadingKey) => {
+        if(withLoadData){
+            setState({...state, openCreationForm: value,[loadingKey]:!state[loadingKey] })
+        }else{
+            setState({...state, openCreationForm: value})
+        }
     }
 
     
@@ -134,18 +130,28 @@ function Tasks (){
 
     function dateToString(date){
         let year = date.getFullYear()
-        let month = date.getMonth().toString().length > 1 ? date.getMonth() : `0${date.getMonth()}` 
+        let month = date.getMonth().toString().length > 1 ? date.getMonth()+1 : `0${date.getMonth()+1}` 
         let day =date.getDate()
         return `${year}-${month}-${day}`
     }
 
     function loadOrdersData(){
-        fetch(`http://localhost:8000/api/`)
+        let strDate = dateToString(state.selectedDate)
+        let [year, month, day] = strDate.split("-")
+        fetch(`/orders/?year=${year}&month=${month}&day=${day}`)
         .then(response => response.json())
         .then(data => {
+            let orders = data.reduce((group, task) => {
+                const { start_datetime } = task;
+                let striped_datetime = start_datetime.split("T")[0]
+                group[striped_datetime] = group[striped_datetime] ?? [];
+                group[striped_datetime].push(task);
+                return group;
+            }, {})
             setState({
                 ...state,
-                orders : data
+                loadingData: false,
+                orders : Object.fromEntries(new Map(generateDays(state.selectedDate).map(date =>[dateToString(date),orders[dateToString(date)] || []])))
             })
         }).catch((error)=>{
             let data = orders_mock_data.reduce((group, task) => {
@@ -154,7 +160,6 @@ function Tasks (){
                 group[start_datetime].push(task);
                 return group;
             }, {})
-            console.log(data)
             setState({
                 ...state,
                 loadingData: false,
@@ -166,7 +171,7 @@ function Tasks (){
 
     useEffect(()=>{
         loadOrdersData()
-    },[state.flagOrders])
+    },[state.flagEvents])
 
     return(
         <div className="h-screen">
@@ -222,7 +227,7 @@ function TaskList({ordersList, loadingData, openCreateEvent, setOpenCreateEvent 
                     </div>
                     {Object.keys(ordersList).map((string_date)=>{
                         return(
-                            <DateRow stringDate={string_date} tasks={ordersList[string_date]} openCreateEvent={openCreateEvent}/>
+                            <DateRow stringDate={string_date} tasks={ordersList[string_date]} openCreateEvent={openCreateEvent} key={string_date}/>
                         );
                     })}
                 </div>
@@ -239,10 +244,13 @@ function TaskList({ordersList, loadingData, openCreateEvent, setOpenCreateEvent 
 
 function StateBagde({state}){
     const stateMap = {
-        1 : "bg-gray-100 text-gray-800",
-        3 : "bg-yellow-100 text-yellow-800",
-        4 : "bg-green-100 text-green-800"
-    }
+        1: "text-slate-700 bg-slate-100 hover:bg-slate-200",
+        2: "text-amber-700 bg-amber-100 hover:bg-amber-200",
+        3: "text-emerald-700 bg-emerald-100 hover:bg-emerald-200",
+        4: "text-slate-700 bg-slate-100 hover:bg-slate-200",
+        5: "text-slate-700 bg-slate-100 hover:bg-slate-200",
+        6: "text-rose-700 bg-rose-100 hover:bg-rose-200"
+      }
     return(
         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-md font-medium ${stateMap[state.id]}`}>
             {state.label}
@@ -267,15 +275,16 @@ function DateRow({stringDate, tasks, openCreateEvent}){
                 className="py-4 px-4 flex flex-row cursor-pointer hover:bg-gray-50 border-b border-gray-200"
                 onClick={switchDay}
             >
-                {state.open ? <ChevronDownIcon className="h-8 w-8"/> : <ChevronRightIcon className="h-8 w-8"/>}
-                <p className="text-2xl text-gray-900 font-semibold">
+                {state.open ? <ChevronDownIcon className="h-6 w-6"/> : <ChevronRightIcon className="h-6 w-6"/>}
+                <p className="text-xl text-gray-900 font-light">
                     {stringDate}
                 </p>
             </div>
             {state.open && tasks.map((task)=>{
                 if(Object.keys(task).length > 0){
                     return(
-                        <div className={`border-b border-gray-200 text-center text-gray-800 font-light grid ${openCreateEvent?"grid-cols-5" :"grid-cols-8"}`}>
+                        <div key={task.invoice_num}
+                             className={`border-b border-gray-200 text-center text-gray-800 font-light grid ${openCreateEvent?"grid-cols-5" :"grid-cols-8"}`}>
                             <div className="col-span-2 py-2">
                                 {task.invoice_num}
                             </div>
@@ -283,10 +292,10 @@ function DateRow({stringDate, tasks, openCreateEvent}){
                                 {task.client_name}
                             </div>
                             <div className="col-span-1 border-l border-gray-200 py-2">
-                                {task.start_datetime}
+                                {task.start_datetime.split("T")[0]}
                             </div>
                             <div className="col-span-1 border-l border-gray-200 py-2">
-                                {task.end_datetime}
+                                {task.end_datetime.split("T")[0]}
                             </div>
                             {!openCreateEvent&&
                             <>

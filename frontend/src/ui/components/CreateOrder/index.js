@@ -113,7 +113,7 @@ function CreateOrder({setOpenCreateEvent}) {
     })
 
     function getSchedules(date){
-        fetch("http://localhost:8000/available_hours/")
+        fetch("/available_hours/")
         .then((response) => response.json())
         .then((response) => {
             updateState({
@@ -139,7 +139,7 @@ function CreateOrder({setOpenCreateEvent}) {
     }
 
     function getWorkFlowSteps (){
-        fetch("http://localhost:8000/workflows/")
+        fetch("/workflows/")
         .then((response) => response.json())
         .then((response) => {
             setWorkflowSteps({
@@ -162,28 +162,7 @@ function CreateOrder({setOpenCreateEvent}) {
     
     function createEvent(){
         updateState({isLoading: true})
-        console.log({
-            description: state.description,
-            start_date: getFormatStringDate(state.startDate),
-            end_date: getFormatStringDate(state.endDate),
-            start_time: state.schedules.data[state.timeSelected].start,
-            end_time: state.schedules.data[state.timeSelected].end,
-            type: 1,
-            client_name: state.client_name,
-            invoice_num: state.invoice_num,
-            pieces_number: state.pieces,
-            plan_file: '',//state.file,
-            workflow: {
-                id: state.workflowSelected,
-                steps: workflowSteps.orderedData[state.workflowSelected].steps.map((step) => {
-                    return {
-                        workflowstep_id: step.id,
-                        order: step.order
-                    }
-                })
-            }
-        })
-        fetch('http://localhost:8000/order/', {
+        fetch('/order/', {
             method: 'POST',
             body: JSON.stringify({
                 description: state.description,
@@ -209,7 +188,7 @@ function CreateOrder({setOpenCreateEvent}) {
         })
         .then((response) => response.json())
         .then((response) => {
-           updateState({isLoading: false})
+            setOpenCreateEvent(false,true)
         })
         .catch(() => {
             updateState({
@@ -272,11 +251,11 @@ function CreateOrder({setOpenCreateEvent}) {
                 <div className='flex justify-between mb-3'>
                     <label className="text-2xl font-bold text-gray-900">Agendar</label>
                     <div className='flex justify-end space-x-3'>
-                        <div className='p-2 rounded bg-gray-100 cursor-pointer'>
+                        <div className='p-2 rounded bg-gray-100 cursor-pointer hover:bg-gray-50'>
                             <CheckIcon className="h-5 w-5 text-gray-500" onClick={createEvent}/>
                         </div>
-                        <div className='p-2 rounded bg-gray-100 cursor-pointer'
-                            onClick={setOpenCreateEvent}>
+                        <div className='p-2 rounded bg-gray-100 cursor-pointer hover:bg-gray-50'
+                            onClick={()=>setOpenCreateEvent(false, false)}>
                             <XIcon className="h-5 w-5 text-gray-500"/>
                         </div>
                     </div>

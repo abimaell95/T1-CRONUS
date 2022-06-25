@@ -60,8 +60,8 @@ function OrderDetail({selectedEvent, closeOrderDetails}) {
                 }
             case 6:
                 return {
-                    bg: 'bg-red-100 ',
-                    text: 'text-red-800 '
+                    bg: 'bg-rose-100 ',
+                    text: 'text-rose-800 '
                 }
             default:
                 return {
@@ -72,7 +72,7 @@ function OrderDetail({selectedEvent, closeOrderDetails}) {
     }
     
     const getOrderDetail = () => {
-        fetch("http://localhost:8000/order/?id=1")
+        fetch(`/order/?id=${selectedEvent}`)
         .then((response) => response.json())
         .then((response) => {
             const data = response[0]
@@ -87,7 +87,8 @@ function OrderDetail({selectedEvent, closeOrderDetails}) {
                     end_date: data.end_datetime,
                     client_name: data.client_name,
                     invoice_num: data.invoice_num,
-                    file_url: data.file_url
+                    file_url: data.file_url,
+                    state_id : data.state
                 }
             });
         })
@@ -111,7 +112,7 @@ function OrderDetail({selectedEvent, closeOrderDetails}) {
     }
 
     const getWorkFlow = () => {
-        fetch("http://localhost:8000/workflow/?id=1")
+        fetch(`/workflow/?id=${selectedEvent}`)
         .then((response) => response.json())
         .then((response) => {
             setDataWorkflow({
@@ -245,7 +246,7 @@ function OrderDetail({selectedEvent, closeOrderDetails}) {
                                                     {step.step_activity}
                                                 </label>
                                                 <label>
-                                                    {step.end_time ? step.end_time : '-- : --'}
+                                                    {step.end_datetime ? step.end_datetime.slice(0,step.end_datetime.length-1).split("T")[1].slice(0.) : '-- : --'}
                                                 </label>
                                             </div>
                                         })

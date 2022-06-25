@@ -1,7 +1,8 @@
 import { useState } from "react"
-import { Link } from "react-router-dom";
+import { Link, useNavigate} from "react-router-dom";
 
-function Login() {
+function Login({setUser}) {
+    const navigate = useNavigate();
     const [state, setState] = useState({
         username: "",
         password: ""
@@ -12,6 +13,21 @@ function Login() {
             ...state,
             [e.target.name] : e.target.value
         })
+    }
+
+    function login(){
+      fetch('/accounts/login/', {
+      method: 'POST',
+      body: JSON.stringify(state),
+      headers: { 'Content-Type': 'application/json'}
+      })
+      .then(response => response.json())
+      .then(result => {
+        setUser(state)
+        navigate('/tasks')
+      })
+      .catch(error => {
+      });
     }
     
     return (
@@ -27,8 +43,7 @@ function Login() {
           </div>
   
           <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-            <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-              <form className="space-y-6" action="#" method="POST">
+            <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10 flex flex-col gap-4">
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                     Usuario
@@ -65,14 +80,13 @@ function Login() {
   
   
                 <div>
-                  <Link
-                    to="/tasks"
+                  <button
+                    onClick={login}
                     className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
                   >
                     Iniciar sesión
-                  </Link>
+                  </button>
                 </div>
-              </form>
             </div>
           </div>
         </div>

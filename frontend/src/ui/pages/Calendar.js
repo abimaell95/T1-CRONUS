@@ -25,8 +25,12 @@ function Calendar(){
     }
 
 
-    const setOpenCreateEvent = () => {
-        setState({...state, openCreationForm: !state.openCreationForm})
+    const setOpenCreateEvent = (value, withLoadData) => {
+        if(withLoadData){
+            setState({...state, openCreationForm: value,flagEvents:!state.flagEvents })
+        }else{
+            setState({...state, openCreationForm: value})
+        }
     }
 
 

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   BrowserRouter,
   Routes,
@@ -11,10 +12,22 @@ import{
 } from '../../pages'
 
 function App() {
+  const [state, setState] = useState({
+    user: {}
+  })
+
+  function setUser(user){
+    setState({
+      ...state,
+      user: user
+    })
+  }
+
+
   return(
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Login />}>
+        <Route path="/" element={<Login  setUser={setUser}/>}>
         </Route>  
         <Route path="tasks" element={<Tasks />}>
         </Route>

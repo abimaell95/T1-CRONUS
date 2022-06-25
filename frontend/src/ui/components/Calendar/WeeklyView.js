@@ -17,50 +17,31 @@ function WeeklyView({currentDate, selectedDate, flagEvents, openCreateEvent, set
     }
   );
 
-  const setEvents = (date) => {
-      fetch("http://localhost:8000/events/?day="+date.getDate()+"&month="+date.getMonth()+"&year="+date.getFullYear()+"&branch=1&period=0")
-      .then((response)=>{response.json()})
-      .then((response)=>{
-          response.map((event)=>{return {...event, start_datetime: new Date(event.start_datetime), end_datetime:new Date(event.end_datetime)}})
-          setState({...state, events: [...response]})
+  function dateToString(date){
+    let year = date.getFullYear()
+    let month = date.getMonth().toString().length > 1 ? date.getMonth()+1 : `0${date.getMonth()+1}` 
+    let day =date.getDate()
+    return `${year}-${month}-${day}`
+}
+
+  const setEvents = () => {
+      let [year, month, day] =  dateToString(selectedDate).split("-")
+      fetch("/events/?day="+day+"&month="+month+"&year="+year+"&branch=1&period=0")
+      .then((response)=>response.json())
+      .then((data)=>{
+        let events = data.map((event)=>{
+          let start = event.start_datetime.slice(0, event.start_datetime.length -1)
+          let end = event.end_datetime.slice(0, event.start_datetime.length -1)
+          return {...event, start_datetime: new Date(start), end_datetime:new Date(end)}})
+        setState({...state, events: events})
       })
       .catch((err) => {
-          const testEvents = [
-            {
-              id: 10,
-              start_datetime: new Date('2022-06-20T06:00'),
-              end_datetime : new Date('2022-06-20T07:00'),
-              state_id: 3,
-              label: "Finalizado"
-            },
-            {
-              id: 12,
-              start_datetime: new Date('2022-06-20T07:00'),
-              end_datetime : new Date('2022-06-20T08:00'),
-              state_id: 2,
-              label: "En curso"
-            },
-            {
-              id: 14,
-              start_datetime: new Date('2022-06-23T12:00'),
-              end_datetime : new Date('2022-06-23T13:00'),
-              state_id: 1,
-              label: "No Iniciado"
-            },
-            {
-              id: 15,
-              start_datetime: new Date('2022-06-21T09:00'),
-              end_datetime : new Date('2022-06-21T10:00'),
-              state_id: 6,
-              label: "Demorado"
-            }
-          ]
-          setState({...state, events: testEvents})
+          //Adds error state          
         })
   }
 
     useEffect(()=>{
-      setEvents(selectedDate)
+      setEvents()
   },[flagEvents])
 
   const setSelectedEvent = (eventId) => {
@@ -85,7 +66,7 @@ function WeeklyView({currentDate, selectedDate, flagEvents, openCreateEvent, set
   }
 
   const eventTypeMap = {
-    1: "Orden",
+    1: "Pedido",
     2: "Mantenimiento",
     3: "Reparación"
   }
