@@ -13,9 +13,41 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include, re_path
+from django.contrib.auth import login,logout
+from rest_framework import routers
+from core import views
+from core.task import views as eventviews
+from core.workflow import views as workflowviews
+from django.shortcuts import render
+
+
+router = routers.DefaultRouter()
+router.register(r'event_type', eventviews.EventTypeViewSet)
+router.register(r'maintenance_period', eventviews.MaintenancePeriodViewSet)
+router.register(r'reparation_priorities', eventviews.PriorityViewSet)
+router.register(r'branchoffice',views.BranchOfficeViewSet)
+
+
+def render_react(request):
+    return render(request, "index.html")
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('events/',eventviews.EventsView.as_view()),
+    path('workflows/', workflowviews.WorkflowsView.as_view()),
+    path('orders/',eventviews.OrdersView.as_view()),
+    path('available_hours/',eventviews.available_hours),
+
+    path('order/',eventviews.OrderView.as_view()),
+    path('workflow/',workflowviews.MachineWorkflowStepView.as_view()),
+        
+    path('accounts/login/', views.login_view, name='login'),
+    path('logout/', logout, name='logout'),
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+
+    re_path(r"^$", render_react),
+    re_path(r"^(?:.*)/?$", render_react)  
 ]
