@@ -1,40 +1,36 @@
-import { useState } from "react";
+import { React, useState } from 'react';
 import {
   BrowserRouter,
   Routes,
   Route,
-} from "react-router-dom";
-import{
-  Home,
+} from 'react-router-dom';
+import {
   Tasks,
   Calendar,
-  Login
-} from '../../pages'
+  Login,
+} from '../../pages';
 
 function App() {
   const [state, setState] = useState({
-    user: {}
-  })
+    user: {},
+  });
 
-  function setUser(user){
+  function setUser(user) {
     setState({
       ...state,
-      user: user
-    })
+      user,
+    });
   }
 
-
-  return(
+  return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Login  setUser={setUser}/>}>
-        </Route>  
-        <Route path="tasks" element={<Tasks />}>
-        </Route>
-        <Route path="calendar" element={<Calendar />}>
-        </Route>
+        <Route path="/" element={<Login setUser={() => setUser()} />} />
+        <Route path="tasks" element={<Tasks />} />
+        <Route path="calendar" element={<Calendar />} />
       </Routes>
-  </BrowserRouter>)
+    </BrowserRouter>
+  );
 }
 
 export default App;
