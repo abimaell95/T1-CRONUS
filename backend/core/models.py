@@ -1,11 +1,13 @@
 from django.db import models
 
+
 class MachineState(models.Model):
     id = models.BigAutoField(primary_key=True)
-    label =  models.CharField(max_length=20)
+    label = models.CharField(max_length=20)
 
     def __str__(self):
         return self.label
+
 
 class BranchOffice(models.Model):
     id = models.BigAutoField(primary_key=True)
@@ -16,8 +18,9 @@ class BranchOffice(models.Model):
     def __str__(self):
         return self.name
 
+
 class Employee(models.Model):
-    id = models.CharField(primary_key=True,max_length=10)
+    id = models.CharField(primary_key=True, max_length=10)
     name = models.CharField(max_length=15)
     surname = models.CharField(max_length=15)
     address = models.CharField(max_length=30)
@@ -27,15 +30,17 @@ class Employee(models.Model):
     def __str__(self):
         return f'{self.name} {self.surname} : {self.employee_id}'
 
+
 class MachineType(models.Model):
     id = models.BigAutoField(primary_key=True)
-    label =  models.CharField(max_length=20)
+    label = models.CharField(max_length=20)
 
     def __str__(self):
         return self.label
 
+
 class Machine(models.Model):
-    serial_number = models.CharField(primary_key=True,max_length=10)
+    serial_number = models.CharField(primary_key=True, max_length=10)
     model = models.CharField(max_length=20)
     brand = models.CharField(max_length=20)
     purchase_date = models.DateField()
@@ -46,4 +51,3 @@ class Machine(models.Model):
 
     def __str__(self):
         return self.serial_number
-
