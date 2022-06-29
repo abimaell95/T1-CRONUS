@@ -16,6 +16,33 @@ const stateColorBadgeMap = {
   6: 'bg-rose-200',
 };
 
+const stepColorMap = {
+  1: {
+    bg: 'bg-gray-100 ',
+    text: 'text-gray-800 ',
+  },
+  2: {
+    bg: 'bg-yellow-100 ',
+    text: 'text-yellow-800 ',
+  },
+  3: {
+    bg: 'bg-green-100 ',
+    text: 'text-green-800 ',
+  },
+  4: {
+    bg: 'bg-gray-100 ',
+    text: 'text-gray-800 ',
+  },
+  5: {
+    bg: 'bg-gray-100 ',
+    text: 'text-gray-800 ',
+  },
+  6: {
+    bg: 'bg-gray-100 ',
+    text: 'text-gray-800 ',
+  },
+};
+
 const monthMap = {
   0: 'Ene',
   1: 'Febr',
@@ -49,6 +76,10 @@ function getStateColorBadgeMap(id) {
   return stateColorBadgeMap[id];
 }
 
+function getStepColor(id) {
+  return stepColorMap[id];
+}
+
 function getWeekLabel(date) {
   const date2 = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 6);
 
@@ -62,8 +93,9 @@ function strDayOfWeek(date) {
   return `${dayMap[date.getDay()]}`;
 }
 
-export const calendarUtils = {
+export const CalendarUtils = {
   getStateColor,
+  getStepColor,
   getStateColorBadgeMap,
   getWeekLabel,
   strDayOfWeek,
