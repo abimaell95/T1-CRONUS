@@ -1,3 +1,4 @@
+from asyncio.windows_events import NULL
 from rest_framework import viewsets, generics
 from .serializers import EventTypeSerializer, MaintenancePeriodSerializer,\
  PrioritySerializer, EventJoinOrderSerializer,\
@@ -73,10 +74,15 @@ class OrderView(generics.ListAPIView):
                 type_id=jd["type"],
             )
             e.save()
+            eJson={'id':e.id,'start_datetime':e.start_datetime,'end_datetime':e.end_datetime,'employee_id':e.employee_id,'state_id':e.state_id,'branch_id':e.branch_id,'type_id':e.type_id}
         except Exception as ex:
-            print(ex)
-            datos = {"message": "Error en Evento"}
-            return JsonResponse(datos)
+            datos = JsonResponse(
+                {
+                    "error": True,
+                    "status": 500,
+                    "message": "Internal Server Error. Error while creating the event record. "+ex,
+                })
+            return datos
 
         try:
             o = OrderDetails.objects.create(
@@ -88,32 +94,53 @@ class OrderView(generics.ListAPIView):
                 event=e,
             )
             o.save()
-            print(o)
+            oJson={'id':o.id,'invoice_num':o.invoice_num,'file_url':o.file_url,'current_step_id':o.current_step_id,'num_pieces':o.num_pieces,'event_id':e.id}
         except Exception as ex:
-            print(ex)
-            datos = {"message": "Error en el Order"}
-            return JsonResponse(datos)
+            datos = JsonResponse(
+                {
+                    "error": True,
+                    "status": 500,
+                    "message": "Internal Server Error. Error while creating the order record. "+ex,
+                })
+            return datos
 
         try:
-            workflowlist = jd["workflow"]
-            c = 1
-            for step in workflowlist["steps"]:
-                workflowModels.MachineWorkflowStep.objects.create(
-                    step_order=step["order"],
-                    state_id=1,
-                    end_datetime=datetime.datetime(2019, 1, 1, 0, 0, 0),
-                    machine_id="000" + str(c),
-                    order=o,
-                )
-                c += 1
-            datos = {"message": "success"}
+            workflowlist = workflowModels.WorkflowSteps.objects.filter(workflow__id=int(jd["workflow"]))
+            print(workflowlist)
+            c=1
+            wList = []
+            for step in workflowlist:
+                w = workflowModels.MachineWorkflowStep.objects.create(
+                    step_order = step.step_order,
+                    state_id = 1,
+                    end_datetime = datetime.datetime(2019, 1, 1, 0, 0, 0),
+                    machine_id = step.machine_id,
+                    order = o)
+                w.save()
+                wJson={'id':w.id,'step_order':w.step_order,'state_id':w.state_id,'end_datetime':w.end_datetime,'machine_id':w.machine_id,'order_id':o.id}
+                wList.append(wJson)
+                c+=1
+            
+            datos = JsonResponse(
+                {
+                    "error": True,
+                    "status": 500,
+                    "message": "Success",
+                    "evento":eJson, 
+                    "order":oJson, 
+                    "WorflowMachineSteps":wList
+                })
 
         except Exception as ex:
-            print(ex)
-            datos = {"message": "Error en el Workflow"}
-            return JsonResponse(datos)
+            datos = JsonResponse(
+                {
+                    "error": True,
+                    "status": 500,
+                    "message": "Internal Server Error. Error while creating the MarchineWorkflowStep record. "+ex,
+                })
+            return datos
 
-        return JsonResponse(datos)
+        return datos
 
 
 class OrdersView(generics.ListAPIView):
@@ -212,13 +239,33 @@ class EventsView(generics.ListAPIView):
 
 
 def available_hours(request):
+
     if request.method == "GET":
         branch = request.GET.get("branch") or 1
+        if branch is None:
+            datos = JsonResponse(
+                {
+                    "error": True,
+                    "status": 500,
+                    "message": "Internal Server Error. A Branch is needed for this transaction."
+                })
+            return datos
+        
         date = request.GET.get("date") or "2022-02-22"
+        if date is None:
+            datos = JsonResponse(
+                {
+                    "error": True,
+                    "status": 500,
+                    "message": "Internal Server Error. A Date is needed for this transaction."
+                })
+            return datos
+
         data = Event.objects.filter(
             branch__id=branch,
             start_datetime__range=[date + " 00:00:00", date + " 23:59:59"],
         ).extra(order_by=["start_datetime"])
+
         eventos = list(data)
         o = len(list(data))
         c = 0
@@ -238,4 +285,11 @@ def available_hours(request):
                 availableDic = {"start": i, "end": i + 1}
                 availablesList.append(availableDic)
 
-        return JsonResponse({"message": availablesList})
+        datos = JsonResponse(
+                {
+                    "error": False,
+                    "status": 200,
+                    "message": availablesList,
+                })
+
+        return datos
