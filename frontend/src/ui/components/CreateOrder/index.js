@@ -2,6 +2,7 @@ import { React, useState, useEffect } from 'react';
 import { XIcon, CheckIcon } from '@heroicons/react/solid';
 import PropTypes from 'prop-types';
 import MyListbox from '../MyListBox';
+import { DateUtils } from '../../utils';
 
 const schedule = [
   {
@@ -69,20 +70,6 @@ function getEndDate(pieces, date) {
   }
   const endDate = new Date().setDate(date.getDate() + totalDays);
   return new Date(endDate);
-}
-function getStringDate(date) {
-  return `${date.getDate()} de ${new Intl.DateTimeFormat('es-US', { month: 'long' }).format(date)} del ${date.getFullYear()}`;
-}
-
-function getFormatStringDate(date) {
-  return date.toISOString().split('T')[0];
-}
-
-function getAvalibleSchedule(schedules) {
-  return schedules.map((time, idx) => ({
-    label: `${time.start}:00-${time.end}:00`,
-    id: idx,
-  }));
 }
 
 function CreateOrder({ setOpenCreateEvent }) {
@@ -158,7 +145,7 @@ function CreateOrder({ setOpenCreateEvent }) {
           endDate: getEndDate(state.pieces, date),
           schedules: {
             data: [...response.message],
-            dataToString: getAvalibleSchedule(response.message),
+            dataToString: DateUtils.getScheduleListFormat(response.message),
           },
         });
       })
@@ -200,8 +187,8 @@ function CreateOrder({ setOpenCreateEvent }) {
       method: 'POST',
       body: JSON.stringify({
         description: state.description,
-        start_date: getFormatStringDate(state.startDate),
-        end_date: getFormatStringDate(state.endDate),
+        start_date: DateUtils.getFormatStringDate(state.startDate),
+        end_date: DateUtils.getFormatStringDate(state.endDate),
         start_time: state.schedules.data[state.timeSelected].start,
         end_time: state.schedules.data[state.timeSelected].end,
         type: 1,
@@ -341,73 +328,73 @@ function CreateOrder({ setOpenCreateEvent }) {
           />
         </div>
         {
-                        state.isStartDateSelected
+          state.isStartDateSelected
 
-                        && (
-                        <>
-                          <div className="flex justify-between mb-2 items-center">
-                            <span className="font-bold">Horario</span>
-                            <MyListbox
-                              options={state.schedules.dataToString}
-                              setSelectedId={(id) => updateState({ timeSelected: id })}
-                            />
-                          </div>
-                          <div className="flex justify-between mb-2 items-center">
-                            <span className="font-bold">Fecha de entrega</span>
-                            <span className="text-gray-500">{getStringDate(state.endDate)}</span>
-                          </div>
-                          <div className="flex justify-between mb-2 items-center">
-                            <span className="font-bold">Flujo de trabajo</span>
-                            <MyListbox
-                              options={
-                                    Object.keys(workflowSteps.orderedData).map((key) => ({
-                                      id: key,
-                                      label: workflowSteps.orderedData[key].label,
-                                    }))
-                                }
-                              setSelectedId={(id) => updateState({ workflowSelected: id })}
-                            />
-                          </div>
-                          {
-                                state.workflowSelected
-                                && (
-                                <div className="flex justify-between mt-6 ml-4">
-                                  {
-                                        workflowSteps.orderedData[state.workflowSelected].steps.map(
-                                          (step) => (
-                                            <div className="relative h-9" key={step.order}>
-                                              <span className="absolute -left-3 -top-3 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-gray-100 bg-gray-700 rounded-full">
-                                                {step.order}
-                                              </span>
-                                              <span className="border border-gray-300 text-gray-700 font-semibold mr-2 px-2.5 py-0.5 rounded self-center">
-                                                {step.activity}
-                                              </span>
-                                            </div>
-                                          ),
-                                        )
-                                    }
-                                </div>
-                                )
-                            }
-                          <div className="flex justify-center items-center mt-5">
-                            <span className=" bg-gray-200 rounded px-3 py-1 w-36">
-                              <span className="text-gray-700 text-sm">Subir planificación</span>
-                              <input
-                                type="file"
-                                className="invisible w-0"
-                                onChange={(e) => {
-                                  const { files } = e.target;
-                                  const formData = new FormData();
-                                  formData.append('planning', files[0]);
-                                  updateState({ file: formData });
-                                }}
-                              />
-                            </span>
-                          </div>
+          && (
+          <>
+            <div className="flex justify-between mb-2 items-center">
+              <span className="font-bold">Horario</span>
+              <MyListbox
+                options={state.schedules.dataToString}
+                setSelectedId={(id) => updateState({ timeSelected: id })}
+              />
+            </div>
+            <div className="flex justify-between mb-2 items-center">
+              <span className="font-bold">Fecha de entrega</span>
+              <span className="text-gray-500">{DateUtils.fullDatetoString(state.endDate)}</span>
+            </div>
+            <div className="flex justify-between mb-2 items-center">
+              <span className="font-bold">Flujo de trabajo</span>
+              <MyListbox
+                options={
+                      Object.keys(workflowSteps.orderedData).map((key) => ({
+                        id: key,
+                        label: workflowSteps.orderedData[key].label,
+                      }))
+                  }
+                setSelectedId={(id) => updateState({ workflowSelected: id })}
+              />
+            </div>
+            {
+                  state.workflowSelected
+                  && (
+                  <div className="flex justify-between mt-6 ml-4">
+                    {
+                          workflowSteps.orderedData[state.workflowSelected].steps.map(
+                            (step) => (
+                              <div className="relative h-9" key={step.order}>
+                                <span className="absolute -left-3 -top-3 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-gray-100 bg-gray-700 rounded-full">
+                                  {step.order}
+                                </span>
+                                <span className="border border-gray-300 text-gray-700 font-semibold mr-2 px-2.5 py-0.5 rounded self-center">
+                                  {step.activity}
+                                </span>
+                              </div>
+                            ),
+                          )
+                      }
+                  </div>
+                  )
+              }
+            <div className="flex justify-center items-center mt-5">
+              <span className=" bg-gray-200 rounded px-3 py-1 w-36">
+                <span className="text-gray-700 text-sm">Subir planificación</span>
+                <input
+                  type="file"
+                  className="invisible w-0"
+                  onChange={(e) => {
+                    const { files } = e.target;
+                    const formData = new FormData();
+                    formData.append('planning', files[0]);
+                    updateState({ file: formData });
+                  }}
+                />
+              </span>
+            </div>
 
-                        </>
-                        )
-                    }
+          </>
+          )
+        }
 
       </div>
     </div>

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import {
   PencilIcon, TrashIcon, XIcon, CheckIcon, LinkIcon,
 } from '@heroicons/react/solid';
+import { DateUtils, CalendarUtils } from '../../utils';
 
 const dataOrderDummy = {
   id: 1,
@@ -48,30 +49,6 @@ function OrderDetail({ selectedEvent, closeOrderDetails }) {
     data: [],
     errorMsg: '',
   });
-  function getStatusColor(statusId) {
-    switch (statusId) {
-      case 2:
-        return {
-          bg: 'bg-yellow-100 ',
-          text: 'text-yellow-800 ',
-        };
-      case 3:
-        return {
-          bg: 'bg-green-100 ',
-          text: 'text-green-800 ',
-        };
-      case 6:
-        return {
-          bg: 'bg-rose-100 ',
-          text: 'text-rose-800 ',
-        };
-      default:
-        return {
-          bg: 'bg-gray-100 ',
-          text: 'text-gray-800 ',
-        };
-    }
-  }
 
   const getOrderDetail = () => {
     fetch(`/order/?id=${selectedEvent}`)
@@ -149,7 +126,6 @@ function OrderDetail({ selectedEvent, closeOrderDetails }) {
     );
   }
 
-  const orderStatusColor = getStatusColor(dataOrder.data.state_id);
   const date = new Date(dataOrder.data.end_date);
   const orderdWorkflow = dataWorkflow.data.sort(
     (step1, step2) => step1.step_order - step2.step_order,
@@ -162,7 +138,7 @@ function OrderDetail({ selectedEvent, closeOrderDetails }) {
             Pedido #
             <span>{ selectedEvent}</span>
           </span>
-          <span className={`${orderStatusColor.bg + orderStatusColor.text}text-xs font-semibold mr-2 px-2.5 py-0.5 rounded self-center`}>{dataOrder.data.state_label}</span>
+          <span className={`${CalendarUtils.getStateColor(dataOrder.data.state_id)}text-xs font-semibold mr-2 px-2.5 py-0.5 rounded self-center`}>{dataOrder.data.state_label}</span>
         </div>
         <div className="flex justify-end space-x-3">
           <div className="p-2 rounded bg-gray-100">
@@ -203,7 +179,7 @@ function OrderDetail({ selectedEvent, closeOrderDetails }) {
               <div className="flex justify-between">
                 <span> Fecha de entrega </span>
                 <span>
-                  {`${date.getDate()} de ${new Intl.DateTimeFormat('es-US', { month: 'long' }).format(date)} del ${date.getFullYear()}`}
+                  {DateUtils.fullDatetoString(date)}
                 </span>
               </div>
             </div>
@@ -235,42 +211,23 @@ function OrderDetail({ selectedEvent, closeOrderDetails }) {
             </div>
             <div className="mt-2">
               {
-                                        orderdWorkflow.map((step) => {
-                                          function getColor() {
-                                            switch (step.state_id) {
-                                              case 2:
-                                                return {
-                                                  bg: 'bg-yellow-100 ',
-                                                  text: 'text-yellow-800 ',
-                                                };
-                                              case 3:
-                                                return {
-                                                  bg: 'bg-green-100 ',
-                                                  text: 'text-green-800 ',
-                                                };
-                                              default:
-                                                return {
-                                                  bg: 'bg-gray-100 ',
-                                                  text: 'text-gray-800 ',
-                                                };
-                                            }
-                                          }
-                                          const color = getColor();
-                                          return (
-                                            <div className="flex justify-between mb-2" key={step.step_order}>
-                                              <span className={`${color.bg}rounded-full p-2`}>
-                                                <CheckIcon className={`h-5 w-5 ${color.text}`} />
-                                              </span>
-                                              <span className={step.state_id === 2 ? 'font-bold' : ''}>
-                                                {step.step_activity}
-                                              </span>
-                                              <span>
-                                                {step.end_datetime ? step.end_datetime.slice(0, step.end_datetime.length - 1).split('T')[1].slice(0.0) : '-- : --'}
-                                              </span>
-                                            </div>
-                                          );
-                                        })
-                                    }
+                orderdWorkflow.map((step) => {
+                  const color = CalendarUtils.getStepColor(step.state_id);
+                  return (
+                    <div className="flex justify-between mb-2" key={step.step_order}>
+                      <span className={`${color.bg}rounded-full p-2`}>
+                        <CheckIcon className={`h-5 w-5 ${color.text}`} />
+                      </span>
+                      <span className={step.state_id === 2 ? 'font-bold' : ''}>
+                        {step.step_activity}
+                      </span>
+                      <span>
+                        {step.end_datetime ? step.end_datetime.slice(0, step.end_datetime.length - 1).split('T')[1].slice(0.0) : '-- : --'}
+                      </span>
+                    </div>
+                  );
+                })
+              }
 
             </div>
           </div>
