@@ -98,7 +98,7 @@ function getCalendarRow(date) {
 }
 
 function getCalendarSpan(startDate, endDate) {
-  return (endDate.getHours() - startDate.getHours()) * 12
+  return (endDate.getHours() - startDate.getHours()) * 12;
 }
 
 export const CalendarUtils = {

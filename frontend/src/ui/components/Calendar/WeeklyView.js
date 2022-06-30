@@ -58,7 +58,6 @@ function WeeklyView({
     3: 'Reparación',
   };
 
-
   return (
     <div className="grid grid-cols-8">
       <div className={state.openDetails || openCreateEvent ? 'col-span-5' : 'col-span-8'}>
