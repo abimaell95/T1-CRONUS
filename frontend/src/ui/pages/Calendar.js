@@ -1,16 +1,13 @@
 import { React, useState } from 'react';
 import { WeeklyView } from '../components/Calendar';
 import { TasksHeader } from '../components/TaskList';
+import { DateUtils } from '../../utils';
 
 function Calendar() {
-  const getMonday = (date) => {
-    const mondayDate = date.getDate() - date.getDay() + (date.getDay() === 0 ? -6 : 1);
-    return new Date(date.getFullYear(), date.getMonth(), mondayDate);
-  };
-
+  
   const [state, setState] = useState(
     {
-      selectedDate: getMonday(new Date()),
+      selectedDate: DateUtils.getMonday(new Date()),
       currentDate: new Date(),
       flagEvents: false,
       openCreationForm: false,
