@@ -3,6 +3,7 @@ import { XIcon, CheckIcon } from '@heroicons/react/solid';
 import PropTypes from 'prop-types';
 import MyListbox from '../MyListBox';
 import { DateUtils, OrderUtils } from '../../utils';
+import { CalendarService } from '../../../services';
 
 const schedule = [
   {
@@ -113,12 +114,6 @@ function CreateOrder({ setOpenCreateEvent }) {
     setState({ ...state, timeSelected: id });
   }
 
-  const [schedules, setSchedules] = useState({
-    data: schedule,
-    dataToString: null,
-    isLoading: true,
-  });
-
   const [workflowSteps, setWorkflowSteps] = useState({
     data: workflowStepsDummy,
     orderedData: OrderUtils.getWorkflowOrdered(workflowStepsDummy),
@@ -126,8 +121,7 @@ function CreateOrder({ setOpenCreateEvent }) {
   });
 
   function getSchedules(date) {
-    fetch('/available_hours/')
-      .then((response) => response.json())
+    CalendarService.getAvailableHours(date, 1)
       .then((response) => {
         const updatedState = getUpdatedState(
           state,
@@ -145,62 +139,62 @@ function CreateOrder({ setOpenCreateEvent }) {
         setState(updatedState);
       })
       .catch(() => {
-        setSchedules({
-          ...schedules,
+        const updatedState = getUpdatedState(state, {
           isLoading: false,
-          data: [...schedule],
-          setErrorMsg: 'Ha ocurrido un problema cargando los horarios disponibles',
+          startDate: date,
+          isStartDateSelected: true,
+          endDate: OrderUtils.getEndDate(state.pieces, date),
+          schedules: {
+            data: [...schedule],
+            dataToString: DateUtils.getScheduleListFormat(schedule),
+          },
         });
+        setState(updatedState);
       });
   }
 
   function getWorkFlowSteps() {
-    fetch('/workflows/')
-      .then((response) => response.json())
+    CalendarService.getWorkFlowSteps()
       .then((response) => {
-        setWorkflowSteps({
-          ...workflowSteps,
+        const workflowStepUpdated = getUpdatedState(workflowSteps, {
           isLoading: false,
           data: [...response],
           orderedData: OrderUtils.getWorkflowOrdered(response),
-
         });
+        setWorkflowSteps(workflowStepUpdated);
       })
       .catch(() => {
-        setWorkflowSteps({
+        const workflowStepUpdated = getUpdatedState(workflowSteps, {
           ...workflowSteps,
           isLoading: false,
           data: [...workflowStepsDummy],
           setErrorMsg: 'Ha ocurrido un problema cargando los horarios disponibles',
         });
+        setWorkflowSteps(workflowStepUpdated);
       });
   }
 
   function createEvent() {
     isLoading(true);
-    fetch('/order/', {
-      method: 'POST',
-      body: JSON.stringify({
-        description: state.description,
-        start_date: DateUtils.getFormatStringDate(state.startDate),
-        end_date: DateUtils.getFormatStringDate(state.endDate),
-        start_time: state.schedules.data[state.timeSelected].start,
-        end_time: state.schedules.data[state.timeSelected].end,
-        type: 1,
-        client_name: state.client_name,
-        invoice_num: state.invoice_num,
-        pieces_number: state.pieces,
-        plan_file: '',
-        workflow: {
-          id: state.workflowSelected,
-          steps: workflowSteps.orderedData[state.workflowSelected].steps.map((step) => ({
-            workflowstep_id: step.id,
-            order: step.order,
-          })),
-        },
-      }),
+    CalendarService.createOrder({
+      description: state.description,
+      start_date: DateUtils.getFormatStringDate(state.startDate),
+      end_date: DateUtils.getFormatStringDate(state.endDate),
+      start_time: state.schedules.data[state.timeSelected].start,
+      end_time: state.schedules.data[state.timeSelected].end,
+      type: 1,
+      client_name: state.client_name,
+      invoice_num: state.invoice_num,
+      pieces_number: state.pieces,
+      plan_file: '',
+      workflow: {
+        id: state.workflowSelected,
+        steps: workflowSteps.orderedData[state.workflowSelected].steps.map((step) => ({
+          workflowstep_id: step.id,
+          order: step.order,
+        })),
+      },
     })
-      .then((response) => response.json())
       .then(() => {
         setOpenCreateEvent(false, true);
       })
