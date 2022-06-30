@@ -6,6 +6,7 @@ import {
 import PropTypes from 'prop-types';
 import OrderDetail from '../OrderDetail';
 import CreateOrder from '../CreateOrder';
+import { DateUtils, CalendarUtils } from '../../utils';
 
 function WeeklyView({
   currentDate, selectedDate, flagEvents, openCreateEvent, setOpenCreateEvent,
@@ -22,15 +23,8 @@ function WeeklyView({
     },
   );
 
-  function dateToString(date) {
-    const year = date.getFullYear();
-    const month = date.getMonth().toString().length > 1 ? date.getMonth() + 1 : `0${date.getMonth() + 1}`;
-    const day = date.getDate();
-    return `${year}-${month}-${day}`;
-  }
-
   const setEvents = () => {
-    const [year, month, day] = dateToString(selectedDate).split('-');
+    const [year, month, day] = DateUtils.dateToString(selectedDate).split('-');
     fetch(`/events/?day=${day}&month=${month}&year=${year}&branch=1&period=0`)
       .then((response) => response.json())
       .then((data) => {
@@ -58,59 +52,10 @@ function WeeklyView({
     setState({ ...state, openDetails: false });
   };
 
-  const strDayOfWeek = (date) => {
-    const dayMap = {
-      0: 'Dom',
-      1: 'Lun',
-      2: 'Mar',
-      3: 'Mie',
-      4: 'Jue',
-      5: 'Vie',
-      6: 'Sab',
-    };
-    return `${dayMap[date.getDay()]}`;
-  };
-
   const eventTypeMap = {
     1: 'Pedido',
     2: 'Mantenimiento',
     3: 'Reparación',
-  };
-
-  const stateColorMap = {
-    1: 'text-slate-700 bg-slate-100 hover:bg-slate-200',
-    2: 'text-amber-700 bg-amber-100 hover:bg-amber-200',
-    3: 'text-emerald-700 bg-emerald-100 hover:bg-emerald-200',
-    4: 'text-slate-700 bg-slate-100 hover:bg-slate-200',
-    5: 'text-slate-700 bg-slate-100 hover:bg-slate-200',
-    6: 'text-rose-700 bg-rose-100 hover:bg-rose-200',
-  };
-
-  const stateColorBadgeMap = {
-    1: 'bg-slate-200',
-    2: 'bg-amber-200',
-    3: 'bg-emerald-200',
-    4: 'bg-slate-200',
-    5: 'bg-slate-200',
-    6: 'bg-rose-200',
-  };
-
-  // get days of current week
-  const generateDays = (date) => {
-    const mondayDate = date.getDate() - date.getDay() + (date.getDay() === 0 ? -6 : 1);
-    const mondayOfWeek = new Date(date.getFullYear(), date.getMonth(), mondayDate);
-
-    const days = [];
-
-    for (let i = 0; i < 7; i += 1) {
-      const currentDay = new Date(
-        mondayOfWeek.getFullYear(),
-        mondayOfWeek.getMonth(),
-        mondayOfWeek.getDate() + i,
-      );
-      days.push(currentDay);
-    }
-    return days;
   };
 
   return (
@@ -128,13 +73,13 @@ function WeeklyView({
                 }
                 <div className="-mr-px hidden grid-cols-7 divide-x divide-gray-100 border-r border-gray-100 text-sm leading-6 text-gray-500 sm:grid">
                   <div className="col-end-1 w-14" />
-                  {generateDays(selectedDate).map((date, idx) => (
+                  {DateUtils.generateDays(selectedDate).map((date, idx) => (
                     <div className="flex items-center justify-center py-3" key={idx}>
                       {date.setHours(0, 0, 0, 0) === currentDate.setHours(0, 0, 0, 0)
                         ? (
                           <span className="flex items-baseline">
                             {' '}
-                            {strDayOfWeek(date)}
+                            {CalendarUtils.strDayOfWeek(date)}
                             <span className="ml-1.5 flex h-8 w-8 items-center justify-center rounded-full bg-black font-semibold text-white">
                               {date.getDate()}
                             </span>
@@ -142,7 +87,7 @@ function WeeklyView({
                         )
                         : (
                           <span>
-                            {strDayOfWeek(date)}
+                            {CalendarUtils.strDayOfWeek(date)}
                             {' '}
                             <span className="items-center justify-center font-semibold text-gray-900">{date.getDate()}</span>
                           </span>
@@ -198,17 +143,17 @@ function WeeklyView({
                     {state.events.map(({
                       id, start_datetime, end_datetime, state_id, label,
                     }) => (
-                      <li key={id} className={`relative mt-px flex col-start-${start_datetime.getDay()}`} style={{ gridRow: `${(start_datetime.getHours() * 12) - 70} / span ${(end_datetime.getHours() - start_datetime.getHours()) * 12} ` }}>
+                      <li key={id} className={`relative mt-px flex col-start-${start_datetime.getDay()}`} style={{ gridRow: `${CalendarUtils.getCalendarRow(start_datetime)} / span ${CalendarUtils.getCalendarSpan(start_datetime, end_datetime)}` }}>
                         <a
                           onClick={() => { setSelectedEvent(id); }}
-                          className={`group absolute inset-1 flex flex-col overflow-y-auto rounded-lg p-2 text-xs leading-5 cursor-pointer ${stateColorMap[state_id]}`}
+                          className={`group absolute inset-1 flex flex-col overflow-y-auto rounded-lg p-2 text-xs leading-5 cursor-pointer ${CalendarUtils.getStateColor(state_id)}`}
                           href="#/"
                         >
                           <p className="order-1 text-sm font-semibold">
                             {`${eventTypeMap[1]} #${id}`}
                             {' '}
                           </p>
-                          <span className={`absolute text-xs font-medium px-2 py-1 rounded-md bottom-2 right-2 ${stateColorBadgeMap[state_id]}`}>
+                          <span className={`absolute text-xs font-medium px-2 py-1 rounded-md bottom-2 right-2 ${CalendarUtils.getStateColorBadgeMap(state_id)}`}>
                             {label}
                           </span>
                         </a>
