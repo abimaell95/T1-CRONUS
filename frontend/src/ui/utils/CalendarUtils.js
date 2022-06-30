@@ -93,10 +93,20 @@ function strDayOfWeek(date) {
   return `${dayMap[date.getDay()]}`;
 }
 
+function getCalendarRow(date) {
+  return (date.getHours() * 12) - 70;
+}
+
+function getCalendarSpan(startDate, endDate) {
+  return (endDate.getHours() - startDate.getHours()) * 12
+}
+
 export const CalendarUtils = {
   getStateColor,
   getStepColor,
   getStateColorBadgeMap,
   getWeekLabel,
   strDayOfWeek,
+  getCalendarRow,
+  getCalendarSpan,
 };
