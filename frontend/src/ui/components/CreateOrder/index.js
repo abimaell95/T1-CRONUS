@@ -2,7 +2,7 @@ import { React, useState, useEffect } from 'react';
 import { XIcon, CheckIcon } from '@heroicons/react/solid';
 import PropTypes from 'prop-types';
 import MyListbox from '../MyListBox';
-import { DateUtils } from '../../utils';
+import { DateUtils, OrderUtils } from '../../utils';
 
 const schedule = [
   {
@@ -57,21 +57,6 @@ const workflowStepsDummy = [
   },
 ];
 
-function getEndDate(pieces, date) {
-  let totalDays;
-  if (pieces <= 100) {
-    totalDays = 0;
-  } else if (pieces <= 200) {
-    totalDays = 1;
-  } else if (pieces <= 500) {
-    totalDays = 2;
-  } else {
-    totalDays = 4;
-  }
-  const endDate = new Date().setDate(date.getDate() + totalDays);
-  return new Date(endDate);
-}
-
 function CreateOrder({ setOpenCreateEvent }) {
   const [state, setState] = useState({
     isStartDateSelected: false,
@@ -94,32 +79,38 @@ function CreateOrder({ setOpenCreateEvent }) {
 
   });
 
-  function updateState(stateUpdated) {
-    setState(
-      {
-        ...state,
-        ...stateUpdated,
-      },
-    );
+  function getUpdatedState(currentState, stateUpdated) {
+    return {
+      ...currentState,
+      ...stateUpdated,
+    };
   }
 
-  function getWorkflowOrdered(workflowSteps) {
-    return workflowSteps.reduce((acc, workflow) => {
-      const step = {
-        id: workflow.step_id,
-        order: workflow.step_order,
-        activity: workflow.type_label,
-      };
-      let steps = acc[workflow.id]?.steps || [];
-      steps = [...steps, step];
-      return {
-        ...acc,
-        [workflow.id]: {
-          label: workflow.label,
-          steps: steps.sort((s1, s2) => s1.order - s2.order),
-        },
-      };
-    }, {});
+  function setFormData(name, value) {
+    setState({
+      ...state,
+      [name]: value,
+    });
+  }
+
+  function setWorkflowSelectedId(id) {
+    setState({ ...state, workflowSelected: id });
+  }
+
+  function setPieces(pieces) {
+    setState({
+      ...state,
+      pieces: parseInt(pieces, 10),
+      endDate: OrderUtils.getEndDate(pieces, state.startDate),
+    });
+  }
+
+  function isLoading(value) {
+    setState({ ...state, isLoading: value });
+  }
+
+  function setTimeSelectedId(id) {
+    setState({ ...state, timeSelected: id });
   }
 
   const [schedules, setSchedules] = useState({
@@ -130,7 +121,7 @@ function CreateOrder({ setOpenCreateEvent }) {
 
   const [workflowSteps, setWorkflowSteps] = useState({
     data: workflowStepsDummy,
-    orderedData: getWorkflowOrdered(workflowStepsDummy),
+    orderedData: OrderUtils.getWorkflowOrdered(workflowStepsDummy),
     isLoading: true,
   });
 
@@ -138,16 +129,20 @@ function CreateOrder({ setOpenCreateEvent }) {
     fetch('/available_hours/')
       .then((response) => response.json())
       .then((response) => {
-        updateState({
-          isLoading: false,
-          startDate: date,
-          isStartDateSelected: true,
-          endDate: getEndDate(state.pieces, date),
-          schedules: {
-            data: [...response.message],
-            dataToString: DateUtils.getScheduleListFormat(response.message),
+        const updatedState = getUpdatedState(
+          state,
+          {
+            isLoading: false,
+            startDate: date,
+            isStartDateSelected: true,
+            endDate: OrderUtils.getEndDate(state.pieces, date),
+            schedules: {
+              data: [...response.message],
+              dataToString: DateUtils.getScheduleListFormat(response.message),
+            },
           },
-        });
+        );
+        setState(updatedState);
       })
       .catch(() => {
         setSchedules({
@@ -167,7 +162,7 @@ function CreateOrder({ setOpenCreateEvent }) {
           ...workflowSteps,
           isLoading: false,
           data: [...response],
-          orderedData: getWorkflowOrdered(response),
+          orderedData: OrderUtils.getWorkflowOrdered(response),
 
         });
       })
@@ -182,7 +177,7 @@ function CreateOrder({ setOpenCreateEvent }) {
   }
 
   function createEvent() {
-    updateState({ isLoading: true });
+    isLoading(true);
     fetch('/order/', {
       method: 'POST',
       body: JSON.stringify({
@@ -210,10 +205,14 @@ function CreateOrder({ setOpenCreateEvent }) {
         setOpenCreateEvent(false, true);
       })
       .catch(() => {
-        updateState({
-          isLoading: false,
-          setErrorMsg: 'Ha ocurrido un problema creando el pedido',
-        });
+        const updatedState = getUpdatedState(
+          state,
+          {
+            isLoading: false,
+            setErrorMsg: 'Ha ocurrido un problema creando el pedido',
+          },
+        );
+        setState(updatedState);
       });
   }
 
@@ -266,14 +265,12 @@ function CreateOrder({ setOpenCreateEvent }) {
           <span className="font-bold">Descripción</span>
           <div className="mt-1">
             <textarea
-              id="about"
-              name="about"
+              id="description"
+              name="description"
               rows={3}
               className="text-gray-500 shadow-sm focus:ring-gray-500 focus:border-gray-500 mt-1 block w-full sm:text-sm border border-gray-300 rounded-md"
               defaultValue=""
-              onChange={(e) => {
-                updateState({ description: e.target.value });
-              }}
+              onChange={(e) => setFormData(e.target.name, e.target.value)}
             />
           </div>
         </div>
@@ -284,24 +281,17 @@ function CreateOrder({ setOpenCreateEvent }) {
             name="pieces"
             id="pieces"
             className="text-gray-500 mt-1 focus:ring-gray-500 focus:border-gray-500 block shadow-sm sm:text-sm border-gray-300 rounded-md w-48"
-            onChange={(e) => {
-              updateState({
-                pieces: parseInt(e.target.value, 10),
-                endDate: getEndDate(e.target.value, state.startDate),
-              });
-            }}
+            onChange={(e) => setPieces(e.target.value)}
           />
         </div>
         <div className="flex justify-between mb-2 items-center">
           <span className="font-bold">Factura</span>
           <input
             type="text"
-            name="invoice"
-            id="invoice"
+            name="invoice_num"
+            id="invoice_num"
             className="text-gray-500 mt-1 focus:ring-gray-500 focus:border-gray-500 block shadow-sm sm:text-sm border-gray-300 rounded-md w-48"
-            onChange={(e) => {
-              updateState({ invoice_num: e.target.value });
-            }}
+            onChange={(e) => setFormData(e.target.name, e.target.value)}
           />
         </div>
         <div className="flex justify-between mb-2 items-center">
@@ -311,9 +301,7 @@ function CreateOrder({ setOpenCreateEvent }) {
             name="client_name"
             id="client_name"
             className="text-gray-500 mt-1 focus:ring-gray-500 focus:border-gray-500 block shadow-sm sm:text-sm border-gray-300 rounded-md w-48"
-            onChange={(e) => {
-              updateState({ client_name: e.target.value });
-            }}
+            onChange={(e) => setFormData(e.target.name, e.target.value)}
           />
         </div>
         <div className="flex justify-between mb-2 items-center">
@@ -321,6 +309,7 @@ function CreateOrder({ setOpenCreateEvent }) {
           <input
             className="text-gray-500 mt-1 focus:ring-gray-500 focus:border-gray-500 block shadow-sm sm:text-sm border-gray-300 rounded-md w-48"
             type="date"
+            name="startDate"
             onChange={(e) => {
               const date = new Date(`${e.target.value}T00:00:00`);
               getSchedules(date);
@@ -336,7 +325,7 @@ function CreateOrder({ setOpenCreateEvent }) {
               <span className="font-bold">Horario</span>
               <MyListbox
                 options={state.schedules.dataToString}
-                setSelectedId={(id) => updateState({ timeSelected: id })}
+                setSelectedId={(id) => setTimeSelectedId(id)}
               />
             </div>
             <div className="flex justify-between mb-2 items-center">
@@ -352,7 +341,7 @@ function CreateOrder({ setOpenCreateEvent }) {
                         label: workflowSteps.orderedData[key].label,
                       }))
                   }
-                setSelectedId={(id) => updateState({ workflowSelected: id })}
+                setSelectedId={(id) => setWorkflowSelectedId(id)}
               />
             </div>
             {
@@ -382,11 +371,12 @@ function CreateOrder({ setOpenCreateEvent }) {
                 <input
                   type="file"
                   className="invisible w-0"
+                  name="file"
                   onChange={(e) => {
                     const { files } = e.target;
                     const formData = new FormData();
                     formData.append('planning', files[0]);
-                    updateState({ file: formData });
+                    setFormData(e.target.name, formData);
                   }}
                 />
               </span>
