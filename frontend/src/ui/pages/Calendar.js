@@ -1,10 +1,9 @@
 import { React, useState } from 'react';
 import { WeeklyView } from '../components/Calendar';
 import { TasksHeader } from '../components/TaskList';
-import { DateUtils } from '../../utils';
+import { DateUtils } from '../utils';
 
 function Calendar() {
-  
   const [state, setState] = useState(
     {
       selectedDate: DateUtils.getMonday(new Date()),
