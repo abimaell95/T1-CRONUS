@@ -4,6 +4,7 @@ import {
   PencilIcon, TrashIcon, XIcon, CheckIcon, LinkIcon,
 } from '@heroicons/react/solid';
 import { DateUtils, CalendarUtils } from '../../utils';
+import { CalendarService } from '../../../services';
 
 const dataOrderDummy = {
   id: 1,
@@ -50,30 +51,38 @@ function OrderDetail({ selectedEvent, closeOrderDetails }) {
     errorMsg: '',
   });
 
+  function getUpdatedState(currentState, stateUpdated) {
+    return {
+      ...currentState,
+      ...stateUpdated,
+    };
+  }
+
+  function updateDataOrder(data) {
+    const dataOrderUpdated = { ...dataOrder, data, isLoading: false };
+    setDataOrder(dataOrderUpdated);
+    return dataOrderUpdated;
+  }
+
   const getOrderDetail = () => {
-    fetch(`/order/?id=${selectedEvent}`)
-      .then((response) => response.json())
+    CalendarService.getOrderDetails(selectedEvent)
       .then((response) => {
         const data = response[0];
-        setDataOrder({
-          ...dataOrder,
-          isLoading: false,
-          data: {
-            description: data.description,
-            state_label: data.label,
-            pieces: data.num_pieces,
-            employee: data.name,
-            end_date: data.end_datetime,
-            client_name: data.client_name,
-            invoice_num: data.invoice_num,
-            file_url: data.file_url,
-            state_id: data.state,
-          },
-        });
+        const newDataOrder = {
+          description: data.description,
+          state_label: data.label,
+          pieces: data.num_pieces,
+          employee: data.name,
+          end_date: data.end_datetime,
+          client_name: data.client_name,
+          invoice_num: data.invoice_num,
+          file_url: data.file_url,
+          state_id: data.state,
+        };
+        updateDataOrder(newDataOrder);
       })
       .catch(() => {
-        setDataOrder({
-          ...dataOrder,
+        const dataOrderUpdated = getUpdatedState(dataOrder, {
           data: {
             description: dataOrderDummy.description,
             state_label: dataOrderDummy.label,
@@ -87,26 +96,26 @@ function OrderDetail({ selectedEvent, closeOrderDetails }) {
           isLoading: false,
           setErrorMsg: 'Ha ocurrido un problema cargando los datos del pedido',
         });
+        setDataOrder(dataOrderUpdated);
       });
   };
 
   const getWorkFlow = () => {
-    fetch(`/workflow/?id=${selectedEvent}`)
-      .then((response) => response.json())
+    CalendarService.getOrderWorkFlow(selectedEvent)
       .then((response) => {
-        setDataWorkflow({
-          ...dataWorkflow,
+        const dataWorkflowUpdated = getUpdatedState(dataWorkflow, {
           isLoading: false,
           data: [...response],
         });
+        setDataWorkflow(dataWorkflowUpdated);
       })
       .catch(() => {
-        setDataWorkflow({
-          ...dataWorkflow,
+        const dataWorkflowUpdated = getUpdatedState(dataWorkflow, {
           data: [...dataWorkflowDummy],
           isLoading: false,
           setErrorMsg: 'Ha ocurrido un problema cargando los datos del pedido',
         });
+        setDataWorkflow(dataWorkflowUpdated);
       });
   };
 
