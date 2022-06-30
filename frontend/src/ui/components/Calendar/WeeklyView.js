@@ -144,7 +144,7 @@ function WeeklyView({
                     {state.events.map(({
                       id, start_datetime, end_datetime, state_id, label,
                     }) => (
-                      <li key={id} className={`relative mt-px flex col-start-${start_datetime.getDay()}`} style={{ gridRow: `${(start_datetime.getHours() * 12) - 70} / span ${(end_datetime.getHours() - start_datetime.getHours()) * 12} ` }}>
+                      <li key={id} className={`relative mt-px flex col-start-${start_datetime.getDay()}`} style={{ gridRow: `${CalendarUtils.getCalendarRow(start_datetime)} / span ${CalendarUtils.getCalendarSpan(start_datetime, end_datetime)}` }}>
                         <a
                           onClick={() => { setSelectedEvent(id); }}
                           className={`group absolute inset-1 flex flex-col overflow-y-auto rounded-lg p-2 text-xs leading-5 cursor-pointer ${CalendarUtils.getStateColor(state_id)}`}
