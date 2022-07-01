@@ -7,6 +7,7 @@ import PropTypes from 'prop-types';
 import OrderDetail from '../OrderDetail';
 import CreateOrder from '../CreateOrder';
 import { DateUtils, CalendarUtils } from '../../utils';
+import { CalendarService } from '../../../services';
 
 function WeeklyView({
   currentDate, selectedDate, flagEvents, openCreateEvent, setOpenCreateEvent,
@@ -23,10 +24,8 @@ function WeeklyView({
     },
   );
 
-  const setEvents = () => {
-    const [year, month, day] = DateUtils.dateToString(selectedDate).split('-');
-    fetch(`/events/?day=${day}&month=${month}&year=${year}&branch=1&period=0`)
-      .then((response) => response.json())
+  const setEvents = (date) => {
+    CalendarService.getEvents(date)
       .then((data) => {
         const events = data.map((event) => {
           const start = event.start_datetime.slice(0, event.start_datetime.length - 1);
@@ -41,7 +40,7 @@ function WeeklyView({
   };
 
   useEffect(() => {
-    setEvents();
+    setEvents(selectedDate);
   }, [flagEvents]);
 
   const setSelectedEvent = (eventId) => {
