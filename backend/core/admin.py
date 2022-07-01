@@ -7,15 +7,25 @@ from .task.models import EventType, EventState,\
 from .workflow.models import StepState, MachineWorkflowStep, Workflow,\
     WorkflowSteps, MachineWorkflowStepJoinMachine, WorkflowJoinWSteps
 
+
+class EmployeeAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'surname', 'branch_id')
+
+
+class EventAdmin(admin.ModelAdmin):
+    list_display = ('id', 'description', 'start_datetime', 'end_datetime')
+
+
 admin.site.register(MachineState)
 admin.site.register(BranchOffice)
-admin.site.register(Employee)
+admin.site.register(Employee, EmployeeAdmin)
 admin.site.register(MachineType)
 admin.site.register(Machine)
 
+
 admin.site.register(EventType)
 admin.site.register(EventState)
-admin.site.register(Event)
+admin.site.register(Event, EventAdmin)
 admin.site.register(OrderDetails)
 admin.site.register(MaintenancePeriod)
 admin.site.register(MaintenanceDetails)

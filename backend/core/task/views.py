@@ -7,7 +7,6 @@ from .serializers import EventTypeSerializer, MaintenancePeriodSerializer,\
 from .models import EventType, MaintenancePeriod, Priority, EventJoinOrder,\
     Event, OrderDetails, EventJoinOrders, EventJoinEventState
 from django.db import transaction
-from django.http import JsonResponse
 import json
 from ..workflow import models as workflowModels
 import datetime
@@ -155,7 +154,7 @@ class OrderView(generics.ListCreateAPIView):
                     }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response({
-                        "data": {"evento": eJson,"order": oJson,"WorflowMachineSteps": wList},
+                        "data": {"evento": eJson, "order": oJson, "WorflowMachineSteps": wList},
                         "message": "Ok"
                     }, status=status.HTTP_201_CREATED)
 
