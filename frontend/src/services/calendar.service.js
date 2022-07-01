@@ -1,4 +1,4 @@
-import { CalendarUtils } from '../ui/utils';
+import { DateUtils } from '../ui/utils';
 
 function handleResponse(response) {
   return response.text().then((text) => {
@@ -21,7 +21,7 @@ async function createOrder(order) {
 }
 
 async function getAvailableHours(date, branchId) {
-  const dateString = CalendarUtils.dateToString(date);
+  const dateString = DateUtils.dateToString(date);
   const requestOptions = {
     method: 'GET',
   };
@@ -29,7 +29,7 @@ async function getAvailableHours(date, branchId) {
 }
 
 async function getEvents(date, branch = 1, period = 0) {
-  const [year, month, day] = CalendarUtils.dateToString(date).split('-');
+  const [year, month, day] = DateUtils.dateToString(date).split('-');
   const requestOptions = {
     method: 'GET',
   };
@@ -51,7 +51,7 @@ async function getOrderWorkFlow(orderId) {
 }
 
 async function getOrders(date) {
-  const [year, month, day] = CalendarUtils.dateToString(date).split('-');
+  const [year, month, day] = DateUtils.dateToString(date).split('-');
   const requestOptions = {
     method: 'GET',
   };
