@@ -99,10 +99,9 @@ class EventJoinStateTestSetUp(APITestCase):
             state_id=1,
             type_id=1
         )
-        response=self.client.get('/api/events/?year=2022&month=06&day=05&branch=1&period=0')
-        responsedic=response.data
-        valores=responsedic['data']
-        for v in valores:
+        response=self.client.get('/api/events/?year=2022&month=06&day=01&branch=1&period=0')
+        responsedic = response.data
+        for v in responsedic:
             for clave, valor in v.items():
                 if clave == 'start_datetime':
                     print(clave + ": " + valor)
