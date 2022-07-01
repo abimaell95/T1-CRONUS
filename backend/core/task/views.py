@@ -183,6 +183,8 @@ class OrdersView(generics.ListAPIView):
 
         if int(day) < 4:
             day_str = "0{}".format(int(day)+6)
+        else:
+            day_str = "{}".format(int(day)+6)
 
         query = (
             "select core_orderdetails.id, core_orderdetails.invoice_num,"
