@@ -86,8 +86,10 @@ function getStepColor(id) {
  @third_test : date not null
 */
 function getWeekLabel(date) {
+  if (date == null) {
+    return '';
+  }
   const date2 = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 6);
-
   if (date.getMonth() === date2.getMonth()) {
     return `${date.getFullYear()}, ${monthMap[date.getMonth()]} ${date.getDate()} - ${date2.getDate()}`;
   }
@@ -105,18 +107,25 @@ function strDayOfWeek(date) {
  @fourth_test : date not null
 */
 function getCalendarRow(date) {
+  if (date == null || date.getHours() < 6 || date.getHours() > 17) {
+    return -1;
+  }
   return (date.getHours() * 12) - 70;
 }
 
 /*
 @first_test : date > 1 hour range returns - 1
 @second_test : endDate == startDate returns -1
-@third_test : endDate > startDate return -1
+@third_test : endDate < startDate return -1
 @fourth_test : date - works correctly
-@fifth_test : date not null
+@fifth_test : date not null -1
 */
 function getCalendarSpan(startDate, endDate) {
-  return (endDate.getHours() - startDate.getHours()) * 12;
+  if (!startDate || !endDate || startDate >= endDate) {
+    return -1;
+  }
+  const diff = endDate.getHours() - startDate.getHours();
+  return diff > 1 ? -1 : diff * 12;
 }
 
 export const CalendarUtils = {
