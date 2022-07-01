@@ -85,6 +85,7 @@ class OrderView(generics.ListCreateAPIView):
             e.save()
             eJson = {
                 'id': e.id,
+                'description': e.description,
                 'start_datetime': e.start_datetime,
                 'end_datetime': e.end_datetime,
                 'employee_id': e.employee_id,
@@ -155,7 +156,7 @@ class OrderView(generics.ListCreateAPIView):
                     }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response({
-                        "data": {"evento": eJson,"order": oJson,"WorflowMachineSteps": wList},
+                        "data": {"event": eJson, "order": oJson, "WorflowMachineSteps": wList},
                         "message": "Ok"
                     }, status=status.HTTP_201_CREATED)
 
@@ -281,17 +282,17 @@ def available_hours(request):
     if request.method == "GET":
         branch = request.GET.get("branch") or 1
         if branch is None:
-            return Response({
+            return JsonResponse({
                         "data": [],
-                        "message": "No branch value. A BranchOffice is needed for this transaction."
-                    }, status=status.HTTP_400_BAD_REQUEST)
+                        "message": "No branch value. A BranchOffice is needed for this transaction.",
+                        "status":"HTTP_400_BAD_REQUEST"})
 
         date = request.GET.get("date") or "2022-02-22"
         if date is None:
-            return Response({
+            return JsonResponse({
                         "data": [],
-                        "message": "No date value. A Date is needed for this transaction."
-                    }, status=status.HTTP_400_BAD_REQUEST)
+                        "message": "No date value. A Date is needed for this transaction.",
+                        "status":"HTTP_400_BAD_REQUEST"})
 
         data = Event.objects.filter(
             branch__id=branch,
@@ -317,7 +318,7 @@ def available_hours(request):
                 availableDic = {"start": i, "end": i + 1}
                 availablesList.append(availableDic)
 
-            return Response({
+            return JsonResponse({
                         "data": availablesList,
-                        "message": "Ok"
-                    }, status=status.HTTP_200_OK)
+                        "message": "Ok",
+                        "status":"200"})

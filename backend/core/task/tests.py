@@ -1,3 +1,8 @@
+import json
+from rest_framework.test import APITestCase
+from rest_framework import status
+from django.test import TestCase
+import datetime
 from core.models import BranchOffice, Employee
 from core.task.models import Event, EventState, EventType
 from rest_framework.test import APITestCase
@@ -137,22 +142,33 @@ class EventJoinStateTestSetUp(APITestCase):
 
                     
     def test_orderPost(self):
-        data = {"description": "ewew",
-                "start_date": "2022-06-17",
-                "end_date": "2022-06-17",
-                "start_time": 7,
-                "end_time": 8,
-                "type": 1,
-                "client_name": "h",
-                "invoice_num": "fg",
-                "pieces_number": 0,
-                "plan_file": "null",
-                "workflow":1}
-        response = self.client.post('/api/order/',data)
+        data = {'description': 'ewew',
+                'start_date': '2022-06-17',
+                'end_date': '2022-06-17',
+                'start_time': 7,
+                'end_time': 8,
+                'type': 1,
+                'client_name': 'h',
+                'invoice_num': 'fg',
+                'pieces_number': 0,
+                'plan_file': 'null',
+                'workflow':1}
+        response = self.client.post('/api/order/',json.dumps(data),content_type="application/json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        data = response.data.get('data')
+        event = data.get('event')
+        print(event)
+        order = data.get('order')
+        print(order)
+
+        c_event = Event.objects.get(id=event.get('id'))
+        self.assertEqual(str(c_event), event.get('description'))
+        c_order = OrderDetails.objects.get(id=order.get('id'))
+        self.assertEqual(str(c_order), str(order.get('id')))
+
 
     def test_availableHours(self):
-        get_str = '/api/orders/?branch={}&date={}'.format(
-            self.branch, self.date)
+        get_str = '/api/available_hours/?branch={}&date={}'.format(
+            self.branch1, self.date)
         response = self.client.get(get_str)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
