@@ -149,7 +149,7 @@ class EventJoinStateTestSetUp(APITestCase):
                 "plan_file": "null",
                 "workflow":1}
         response = self.client.post('/api/order/',data)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_availableHours(self):
         get_str = '/api/orders/?branch={}&date={}'.format(
