@@ -1,3 +1,8 @@
+/*
+@first_test - [] empty array
+@second_test - null object
+@third_test - working fine
+*/
 function getWorkflowOrdered(workflowSteps) {
   return workflowSteps.reduce((acc, workflow) => {
     const step = {
@@ -17,6 +22,15 @@ function getWorkflowOrdered(workflowSteps) {
   }, {});
 }
 
+/*
+@first_test - 0 pieces, null date
+@second_test - 0 pieces, not null date
+@third_test - 100 pieces, not null date
+@fourth_test - 200 pieces, not null date
+@fifth_test - 500 pieces, not null date
+@sixth_test - > 500 pieces, not null date
+@seventh_test - > -1 pieces , not null date
+*/
 function getEndDate(pieces, date) {
   let totalDays;
   if (pieces <= 100) {
