@@ -4,8 +4,11 @@
 @second_test : date is null ggggg
 */
 function getMonday(date) {
-  const mondayDate = date.getDate() - date.getDay() + (date.getDay() === 0 ? -6 : 1);
-  return new Date(date.getFullYear(), date.getMonth(), mondayDate);
+  if (date != null) {
+    const mondayDate = date.getDate() - date.getDay() + (date.getDay() === 0 ? -6 : 1);
+    return new Date(date.getFullYear(), date.getMonth(), mondayDate);
+  }
+  return null;
 }
 
 /*
@@ -14,16 +17,17 @@ function getMonday(date) {
 @third_test : date is null - [] - 0 len
 */
 function generateDays(date) {
-  const mondayOfWeek = getMonday(date);
   const days = [];
-
-  for (let i = 0; i < 7; i += 1) {
-    const currentDay = new Date(
-      mondayOfWeek.getFullYear(),
-      mondayOfWeek.getMonth(),
-      mondayOfWeek.getDate() + i,
-    );
-    days.push(currentDay);
+  if (date != null) {
+    const mondayOfWeek = getMonday(date);
+    for (let i = 0; i < 7; i += 1) {
+      const currentDay = new Date(
+        mondayOfWeek.getFullYear(),
+        mondayOfWeek.getMonth(),
+        mondayOfWeek.getDate() + i,
+      );
+      days.push(currentDay);
+    }
   }
   return days;
 }
