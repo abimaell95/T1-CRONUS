@@ -4,6 +4,9 @@
 @third_test - working fine
 */
 function getWorkflowOrdered(workflowSteps) {
+  if (!workflowSteps) {
+    return {};
+  }
   return workflowSteps.reduce((acc, workflow) => {
     const step = {
       id: workflow.step_id,
@@ -24,7 +27,6 @@ function getWorkflowOrdered(workflowSteps) {
 
 /*
 @first_test - 0 pieces, null date
-@second_test - 0 pieces, not null date
 @third_test - 100 pieces, not null date
 @fourth_test - 200 pieces, not null date
 @fifth_test - 500 pieces, not null date
@@ -32,6 +34,9 @@ function getWorkflowOrdered(workflowSteps) {
 @seventh_test - > -1 pieces , not null date
 */
 function getEndDate(pieces, date) {
+  if (!date || pieces < 0) {
+    return null;
+  }
   let totalDays;
   if (pieces <= 100) {
     totalDays = 0;
@@ -42,7 +47,7 @@ function getEndDate(pieces, date) {
   } else {
     totalDays = 4;
   }
-  const endDate = new Date().setDate(date.getDate() + totalDays);
+  const endDate = new Date(date).setDate(date.getDate() + totalDays);
   return new Date(endDate);
 }
 
