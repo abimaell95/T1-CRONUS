@@ -1,12 +1,20 @@
+/*
+@first_test : date is monday
+@second_test : date is sunday
+@second_test : date is null ggggg
+*/
 function getMonday(date) {
   const mondayDate = date.getDate() - date.getDay() + (date.getDay() === 0 ? -6 : 1);
   return new Date(date.getFullYear(), date.getMonth(), mondayDate);
 }
 
-// get days of current week
+/*
+@first_test : date is monday - [first]] is that monday - 7 len
+@second-test : date is sunday - [last] is that sunday - 7 len
+@third_test : date is null - [] - 0 len
+*/
 function generateDays(date) {
-  const mondayDate = date.getDate() - date.getDay() + (date.getDay() === 0 ? -6 : 1);
-  const mondayOfWeek = new Date(date.getFullYear(), date.getMonth(), mondayDate);
+  const mondayOfWeek = getMonday(date);
   const days = [];
 
   for (let i = 0; i < 7; i += 1) {

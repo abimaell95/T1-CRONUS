@@ -80,6 +80,11 @@ function getStepColor(id) {
   return stepColorMap[id];
 }
 
+/*
+ @first_test : date - end of month
+ @second_test : works correctly - not end of month :D
+ @third_test : date not null
+*/
 function getWeekLabel(date) {
   const date2 = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 6);
 
@@ -93,10 +98,23 @@ function strDayOfWeek(date) {
   return `${dayMap[date.getDay()]}`;
 }
 
+/*
+ @first_test : date - if out of range upper returns -1
+ @second_test : date - if out of range lower returns -1
+ @third_test : date - works correctly in range
+ @fourth_test : date not null
+*/
 function getCalendarRow(date) {
   return (date.getHours() * 12) - 70;
 }
 
+/*
+@first_test : date > 1 hour range returns - 1
+@second_test : endDate == startDate returns -1
+@third_test : endDate > startDate return -1
+@fourth_test : date - works correctly
+@fifth_test : date not null
+*/
 function getCalendarSpan(startDate, endDate) {
   return (endDate.getHours() - startDate.getHours()) * 12;
 }
