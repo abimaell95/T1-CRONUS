@@ -93,14 +93,10 @@ class OrderView(generics.ListCreateAPIView):
                 'type_id': e.type_id
             }
         except Exception as ex:
-            datos = JsonResponse(
-                {
-                    "error": True,
-                    "status": 500,
-                    "message": "Error while creating the event record." + str(ex),
-                    "data":[]
-                })
-            return datos
+            return Response({
+                        "data": [],
+                        "message": "Error while creating the event record." + str(ex)
+                    }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         try:
             o = OrderDetails.objects.create(
@@ -121,14 +117,10 @@ class OrderView(generics.ListCreateAPIView):
                 'event_id': e.id
             }
         except Exception as ex:
-            datos = JsonResponse(
-                {
-                    "error": True,
-                    "status": 500,
-                    "message": "Error while creating the order record." + str(ex),
-                    "data":[]
-                })
-            return datos
+            return Response({
+                        "data": [],
+                        "message": "Error while creating the order record." + str(ex)
+                    }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         try:
             workflowlist = workflowModels.WorkflowSteps.objects.filter(
@@ -156,25 +148,16 @@ class OrderView(generics.ListCreateAPIView):
                 wList.append(wJson)
                 c += 1
 
-            datos = JsonResponse(
-                {
-                    "error": False,
-                    "status": 200,
-                    "message": "Ok",
-                    "data": {"evento": eJson,"order": oJson,"WorflowMachineSteps": wList}
-                })
-
         except Exception as ex:
-            datos = JsonResponse(
-                {
-                    "error": True,
-                    "status": 500,
-                    "message": "Error while creating the MWStep record." + str(ex),
-                    "data":[]                    
-                })
-            return datos
+            return Response({
+                        "data": [],
+                        "message": "Error while creating the MWStep record." + str(ex)
+                    }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        return datos
+        return Response({
+                        "data": {"evento": eJson,"order": oJson,"WorflowMachineSteps": wList},
+                        "message": "Ok"
+                    }, status=status.HTTP_201_CREATED)
 
 
 class OrdersView(generics.ListAPIView):
@@ -298,25 +281,17 @@ def available_hours(request):
     if request.method == "GET":
         branch = request.GET.get("branch") or 1
         if branch is None:
-            datos = JsonResponse(
-                {
-                    "error": True,
-                    "status": 500,
-                    "message": "A Branch is needed for this transaction.",
-                    "data":[]
-                })
-            return datos
+            return Response({
+                        "data": [],
+                        "message": "No branch value. A BranchOffice is needed for this transaction."
+                    }, status=status.HTTP_400_BAD_REQUEST)
 
         date = request.GET.get("date") or "2022-02-22"
         if date is None:
-            datos = JsonResponse(
-                {
-                    "error": True,
-                    "status": 500,
-                    "message": "A Date is needed for this transaction.",
-                    "data":[]                    
-                })
-            return datos
+            return Response({
+                        "data": [],
+                        "message": "No date value. A Date is needed for this transaction."
+                    }, status=status.HTTP_400_BAD_REQUEST)
 
         data = Event.objects.filter(
             branch__id=branch,
@@ -342,12 +317,7 @@ def available_hours(request):
                 availableDic = {"start": i, "end": i + 1}
                 availablesList.append(availableDic)
 
-        datos = JsonResponse(
-                {
-                    "error": False,
-                    "status": 200,
-                    "message": "Ok",
-                    "data": availablesList
-                })
-
-        return datos
+            return Response({
+                        "data": availablesList,
+                        "message": "Ok"
+                    }, status=status.HTTP_200_OK)
