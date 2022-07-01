@@ -137,9 +137,19 @@ class EventJoinStateTestSetUp(APITestCase):
 
                     
     def test_orderPost(self):
-        data = {"description": "ewew","start_date": "2022-06-17","end_date": "2022-06-17","start_time": 7,"end_time": 8,"type": 1,"client_name": "h","invoice_num": "fg","pieces_number": 0,"plan_file": "null","workflow":1}
+        data = {"description": "ewew",
+                "start_date": "2022-06-17",
+                "end_date": "2022-06-17",
+                "start_time": 7,
+                "end_time": 8,
+                "type": 1,
+                "client_name": "h",
+                "invoice_num": "fg",
+                "pieces_number": 0,
+                "plan_file": "null",
+                "workflow":1}
         response = self.client.post('/api/order/',data)
-        self.assertEqual(response.status, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_availableHours(self):
         get_str = '/api/orders/?branch={}&date={}'.format(
