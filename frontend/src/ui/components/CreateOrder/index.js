@@ -2,6 +2,8 @@ import { React, useState, useEffect } from 'react';
 import { XIcon, CheckIcon } from '@heroicons/react/solid';
 import PropTypes from 'prop-types';
 import MyListbox from '../MyListBox';
+import { DateUtils, OrderUtils } from '../../utils';
+import { CalendarService } from '../../../services';
 
 const schedule = [
   {
@@ -56,35 +58,6 @@ const workflowStepsDummy = [
   },
 ];
 
-function getEndDate(pieces, date) {
-  let totalDays;
-  if (pieces <= 100) {
-    totalDays = 0;
-  } else if (pieces <= 200) {
-    totalDays = 1;
-  } else if (pieces <= 500) {
-    totalDays = 2;
-  } else {
-    totalDays = 4;
-  }
-  const endDate = new Date().setDate(date.getDate() + totalDays);
-  return new Date(endDate);
-}
-function getStringDate(date) {
-  return `${date.getDate()} de ${new Intl.DateTimeFormat('es-US', { month: 'long' }).format(date)} del ${date.getFullYear()}`;
-}
-
-function getFormatStringDate(date) {
-  return date.toISOString().split('T')[0];
-}
-
-function getAvalibleSchedule(schedules) {
-  return schedules.map((time, idx) => ({
-    label: `${time.start}:00-${time.end}:00`,
-    id: idx,
-  }));
-}
-
 function CreateOrder({ setOpenCreateEvent }) {
   const [state, setState] = useState({
     isStartDateSelected: false,
@@ -107,126 +80,133 @@ function CreateOrder({ setOpenCreateEvent }) {
 
   });
 
-  function updateState(stateUpdated) {
-    setState(
-      {
-        ...state,
-        ...stateUpdated,
-      },
-    );
+  function getUpdatedState(currentState, stateUpdated) {
+    return {
+      ...currentState,
+      ...stateUpdated,
+    };
   }
 
-  function getWorkflowOrdered(workflowSteps) {
-    return workflowSteps.reduce((acc, workflow) => {
-      const step = {
-        id: workflow.step_id,
-        order: workflow.step_order,
-        activity: workflow.type_label,
-      };
-      let steps = acc[workflow.id]?.steps || [];
-      steps = [...steps, step];
-      return {
-        ...acc,
-        [workflow.id]: {
-          label: workflow.label,
-          steps: steps.sort((s1, s2) => s1.order - s2.order),
-        },
-      };
-    }, {});
+  function setFormData(name, value) {
+    setState({
+      ...state,
+      [name]: value,
+    });
   }
 
-  const [schedules, setSchedules] = useState({
-    data: schedule,
-    dataToString: null,
-    isLoading: true,
-  });
+  function setWorkflowSelectedId(id) {
+    setState({ ...state, workflowSelected: id });
+  }
+
+  function setPieces(pieces) {
+    setState({
+      ...state,
+      pieces: parseInt(pieces, 10),
+      endDate: OrderUtils.getEndDate(pieces, state.startDate),
+    });
+  }
+
+  function isLoading(value) {
+    setState({ ...state, isLoading: value });
+  }
+
+  function setTimeSelectedId(id) {
+    setState({ ...state, timeSelected: id });
+  }
 
   const [workflowSteps, setWorkflowSteps] = useState({
     data: workflowStepsDummy,
-    orderedData: getWorkflowOrdered(workflowStepsDummy),
+    orderedData: OrderUtils.getWorkflowOrdered(workflowStepsDummy),
     isLoading: true,
   });
 
   function getSchedules(date) {
-    fetch('/available_hours/')
-      .then((response) => response.json())
+    CalendarService.getAvailableHours(date, 1)
       .then((response) => {
-        updateState({
+        const updatedState = getUpdatedState(
+          state,
+          {
+            isLoading: false,
+            startDate: date,
+            isStartDateSelected: true,
+            endDate: OrderUtils.getEndDate(state.pieces, date),
+            schedules: {
+              data: [...response.message],
+              dataToString: DateUtils.getScheduleListFormat(response.message),
+            },
+          },
+        );
+        setState(updatedState);
+      })
+      .catch(() => {
+        const updatedState = getUpdatedState(state, {
           isLoading: false,
           startDate: date,
           isStartDateSelected: true,
-          endDate: getEndDate(state.pieces, date),
+          endDate: OrderUtils.getEndDate(state.pieces, date),
           schedules: {
-            data: [...response.message],
-            dataToString: getAvalibleSchedule(response.message),
+            data: [...schedule],
+            dataToString: DateUtils.getScheduleListFormat(schedule),
           },
         });
-      })
-      .catch(() => {
-        setSchedules({
-          ...schedules,
-          isLoading: false,
-          data: [...schedule],
-          setErrorMsg: 'Ha ocurrido un problema cargando los horarios disponibles',
-        });
+        setState(updatedState);
       });
   }
 
   function getWorkFlowSteps() {
-    fetch('/workflows/')
-      .then((response) => response.json())
+    CalendarService.getWorkFlowSteps()
       .then((response) => {
-        setWorkflowSteps({
-          ...workflowSteps,
+        const workflowStepUpdated = getUpdatedState(workflowSteps, {
           isLoading: false,
           data: [...response],
-          orderedData: getWorkflowOrdered(response),
-
+          orderedData: OrderUtils.getWorkflowOrdered(response),
         });
+        setWorkflowSteps(workflowStepUpdated);
       })
       .catch(() => {
-        setWorkflowSteps({
+        const workflowStepUpdated = getUpdatedState(workflowSteps, {
           ...workflowSteps,
           isLoading: false,
           data: [...workflowStepsDummy],
           setErrorMsg: 'Ha ocurrido un problema cargando los horarios disponibles',
         });
+        setWorkflowSteps(workflowStepUpdated);
       });
   }
 
   function createEvent() {
-    updateState({ isLoading: true });
-    fetch('/order/', {
-      method: 'POST',
-      body: JSON.stringify({
-        description: state.description,
-        start_date: getFormatStringDate(state.startDate),
-        end_date: getFormatStringDate(state.endDate),
-        start_time: state.schedules.data[state.timeSelected].start,
-        end_time: state.schedules.data[state.timeSelected].end,
-        type: 1,
-        client_name: state.client_name,
-        invoice_num: state.invoice_num,
-        pieces_number: state.pieces,
-        plan_file: '',
-        workflow: {
-          id: state.workflowSelected,
-          steps: workflowSteps.orderedData[state.workflowSelected].steps.map((step) => ({
-            workflowstep_id: step.id,
-            order: step.order,
-          })),
-        },
-      }),
+    isLoading(true);
+    CalendarService.createOrder({
+      description: state.description,
+      start_date: DateUtils.getFormatStringDate(state.startDate),
+      end_date: DateUtils.getFormatStringDate(state.endDate),
+      start_time: state.schedules.data[state.timeSelected].start,
+      end_time: state.schedules.data[state.timeSelected].end,
+      type: 1,
+      client_name: state.client_name,
+      invoice_num: state.invoice_num,
+      pieces_number: state.pieces,
+      plan_file: '',
+      workflow: {
+        id: state.workflowSelected,
+        steps: workflowSteps.orderedData[state.workflowSelected].steps.map((step) => ({
+          workflowstep_id: step.id,
+          order: step.order,
+        })),
+      },
     })
-      .then((response) => response.json())
       .then(() => {
         setOpenCreateEvent(false, true);
       })
       .catch(() => {
-        updateState({
-          isLoading: false,
-          setErrorMsg: 'Ha ocurrido un problema creando el pedido',
-        });
+        const updatedState = getUpdatedState(
+          state,
+          {
+            isLoading: false,
+            setErrorMsg: 'Ha ocurrido un problema creando el pedido',
+          },
+        );
+        setState(updatedState);
       });
   }
 
@@ -279,14 +259,12 @@ function CreateOrder({ setOpenCreateEvent }) {
           <span className="font-bold">Descripción</span>
           <div className="mt-1">
             <textarea
-              id="about"
-              name="about"
+              id="description"
+              name="description"
               rows={3}
               className="text-gray-500 shadow-sm focus:ring-gray-500 focus:border-gray-500 mt-1 block w-full sm:text-sm border border-gray-300 rounded-md"
               defaultValue=""
-              onChange={(e) => {
-                updateState({ description: e.target.value });
-              }}
+              onChange={(e) => setFormData(e.target.name, e.target.value)}
             />
           </div>
         </div>
@@ -297,24 +275,17 @@ function CreateOrder({ setOpenCreateEvent }) {
             name="pieces"
             id="pieces"
             className="text-gray-500 mt-1 focus:ring-gray-500 focus:border-gray-500 block shadow-sm sm:text-sm border-gray-300 rounded-md w-48"
-            onChange={(e) => {
-              updateState({
-                pieces: parseInt(e.target.value, 10),
-                endDate: getEndDate(e.target.value, state.startDate),
-              });
-            }}
+            onChange={(e) => setPieces(e.target.value)}
           />
         </div>
         <div className="flex justify-between mb-2 items-center">
           <span className="font-bold">Factura</span>
           <input
             type="text"
-            name="invoice"
-            id="invoice"
+            name="invoice_num"
+            id="invoice_num"
             className="text-gray-500 mt-1 focus:ring-gray-500 focus:border-gray-500 block shadow-sm sm:text-sm border-gray-300 rounded-md w-48"
-            onChange={(e) => {
-              updateState({ invoice_num: e.target.value });
-            }}
+            onChange={(e) => setFormData(e.target.name, e.target.value)}
           />
         </div>
         <div className="flex justify-between mb-2 items-center">
@@ -324,9 +295,7 @@ function CreateOrder({ setOpenCreateEvent }) {
             name="client_name"
             id="client_name"
             className="text-gray-500 mt-1 focus:ring-gray-500 focus:border-gray-500 block shadow-sm sm:text-sm border-gray-300 rounded-md w-48"
-            onChange={(e) => {
-              updateState({ client_name: e.target.value });
-            }}
+            onChange={(e) => setFormData(e.target.name, e.target.value)}
           />
         </div>
         <div className="flex justify-between mb-2 items-center">
@@ -334,6 +303,7 @@ function CreateOrder({ setOpenCreateEvent }) {
           <input
             className="text-gray-500 mt-1 focus:ring-gray-500 focus:border-gray-500 block shadow-sm sm:text-sm border-gray-300 rounded-md w-48"
             type="date"
+            name="startDate"
             onChange={(e) => {
               const date = new Date(`${e.target.value}T00:00:00`);
               getSchedules(date);
@@ -341,73 +311,74 @@ function CreateOrder({ setOpenCreateEvent }) {
           />
         </div>
         {
-                        state.isStartDateSelected
+          state.isStartDateSelected
 
-                        && (
-                        <>
-                          <div className="flex justify-between mb-2 items-center">
-                            <span className="font-bold">Horario</span>
-                            <MyListbox
-                              options={state.schedules.dataToString}
-                              setSelectedId={(id) => updateState({ timeSelected: id })}
-                            />
-                          </div>
-                          <div className="flex justify-between mb-2 items-center">
-                            <span className="font-bold">Fecha de entrega</span>
-                            <span className="text-gray-500">{getStringDate(state.endDate)}</span>
-                          </div>
-                          <div className="flex justify-between mb-2 items-center">
-                            <span className="font-bold">Flujo de trabajo</span>
-                            <MyListbox
-                              options={
-                                    Object.keys(workflowSteps.orderedData).map((key) => ({
-                                      id: key,
-                                      label: workflowSteps.orderedData[key].label,
-                                    }))
-                                }
-                              setSelectedId={(id) => updateState({ workflowSelected: id })}
-                            />
-                          </div>
-                          {
-                                state.workflowSelected
-                                && (
-                                <div className="flex justify-between mt-6 ml-4">
-                                  {
-                                        workflowSteps.orderedData[state.workflowSelected].steps.map(
-                                          (step) => (
-                                            <div className="relative h-9" key={step.order}>
-                                              <span className="absolute -left-3 -top-3 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-gray-100 bg-gray-700 rounded-full">
-                                                {step.order}
-                                              </span>
-                                              <span className="border border-gray-300 text-gray-700 font-semibold mr-2 px-2.5 py-0.5 rounded self-center">
-                                                {step.activity}
-                                              </span>
-                                            </div>
-                                          ),
-                                        )
-                                    }
-                                </div>
-                                )
-                            }
-                          <div className="flex justify-center items-center mt-5">
-                            <span className=" bg-gray-200 rounded px-3 py-1 w-36">
-                              <span className="text-gray-700 text-sm">Subir planificación</span>
-                              <input
-                                type="file"
-                                className="invisible w-0"
-                                onChange={(e) => {
-                                  const { files } = e.target;
-                                  const formData = new FormData();
-                                  formData.append('planning', files[0]);
-                                  updateState({ file: formData });
-                                }}
-                              />
-                            </span>
-                          </div>
+          && (
+          <>
+            <div className="flex justify-between mb-2 items-center">
+              <span className="font-bold">Horario</span>
+              <MyListbox
+                options={state.schedules.dataToString}
+                setSelectedId={(id) => setTimeSelectedId(id)}
+              />
+            </div>
+            <div className="flex justify-between mb-2 items-center">
+              <span className="font-bold">Fecha de entrega</span>
+              <span className="text-gray-500">{DateUtils.fullDatetoString(state.endDate)}</span>
+            </div>
+            <div className="flex justify-between mb-2 items-center">
+              <span className="font-bold">Flujo de trabajo</span>
+              <MyListbox
+                options={
+                      Object.keys(workflowSteps.orderedData).map((key) => ({
+                        id: key,
+                        label: workflowSteps.orderedData[key].label,
+                      }))
+                  }
+                setSelectedId={(id) => setWorkflowSelectedId(id)}
+              />
+            </div>
+            {
+                  state.workflowSelected
+                  && (
+                  <div className="flex justify-between mt-6 ml-4">
+                    {
+                          workflowSteps.orderedData[state.workflowSelected].steps.map(
+                            (step) => (
+                              <div className="relative h-9" key={step.order}>
+                                <span className="absolute -left-3 -top-3 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-gray-100 bg-gray-700 rounded-full">
+                                  {step.order}
+                                </span>
+                                <span className="border border-gray-300 text-gray-700 font-semibold mr-2 px-2.5 py-0.5 rounded self-center">
+                                  {step.activity}
+                                </span>
+                              </div>
+                            ),
+                          )
+                      }
+                  </div>
+                  )
+              }
+            <div className="flex justify-center items-center mt-5">
+              <span className=" bg-gray-200 rounded px-3 py-1 w-36">
+                <span className="text-gray-700 text-sm">Subir planificación</span>
+                <input
+                  type="file"
+                  className="invisible w-0"
+                  name="file"
+                  onChange={(e) => {
+                    const { files } = e.target;
+                    const formData = new FormData();
+                    formData.append('planning', files[0]);
+                    setFormData(e.target.name, formData);
+                  }}
+                />
+              </span>
+            </div>
 
-                        </>
-                        )
-                    }
+          </>
+          )
+        }
 
       </div>
     </div>
