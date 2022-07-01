@@ -108,5 +108,41 @@ class EventJoinStateTestSetUp(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         return super().setUp()
 
-    def test_run(self):
-        pass
+    def test_weekly(self):
+        get_str = '/api/orders/?year={}&month={}&day={}'.format(
+            self.year, self.month, self.day)
+        response = self.client.get(get_str)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        for i in response.data["data"]:
+            for k, v in i.items():
+                if k == 'start_datetime':
+                    low_date = datetime.datetime.strptime(
+                        '{}-{}-{} 00:00:00'.format(
+                            self.year, self.month, self.day
+                        ),
+                        '%Y-%m-%d %H:%M:%S'
+                    )
+                    up_date = datetime.datetime.strptime(
+                        '{}-{}-{} 23:59:59'.format(
+                            self.year, self.month, int(self.day) + 6
+                        ),
+                        '%Y-%m-%d %H:%M:%S'
+                    )
+                    date_str = v.replace("T", " ").replace("Z", "")
+                    order_date = datetime.datetime.strptime(
+                        date_str, '%Y-%m-%d %H:%M:%S'
+                    )
+                    condition = order_date > low_date and order_date < up_date
+                    self.assertEqual(condition, True)
+
+                    
+    def test_orderPost(self):
+        data = {"description": "ewew","start_date": "2022-06-17","end_date": "2022-06-17","start_time": 7,"end_time": 8,"type": 1,"client_name": "h","invoice_num": "fg","pieces_number": 0,"plan_file": "null","workflow":1}
+        response = self.client.post('/api/order/',data)
+        self.assertEqual(response.status, 200)
+
+    def test_availableHours(self):
+        get_str = '/api/orders/?branch={}&date={}'.format(
+            self.branch, self.date)
+        response = self.client.get(get_str)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)

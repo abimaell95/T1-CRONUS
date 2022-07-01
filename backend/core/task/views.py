@@ -97,7 +97,8 @@ class OrderView(generics.ListCreateAPIView):
                 {
                     "error": True,
                     "status": 500,
-                    "message": "Error while creating the event record." + ex,
+                    "message": "Error while creating the event record." + str(ex),
+                    "data":[]
                 })
             return datos
 
@@ -124,7 +125,8 @@ class OrderView(generics.ListCreateAPIView):
                 {
                     "error": True,
                     "status": 500,
-                    "message": "Error while creating the order record." + ex,
+                    "message": "Error while creating the order record." + str(ex),
+                    "data":[]
                 })
             return datos
 
@@ -156,12 +158,10 @@ class OrderView(generics.ListCreateAPIView):
 
             datos = JsonResponse(
                 {
-                    "error": True,
-                    "status": 500,
-                    "message": "Success",
-                    "evento": eJson,
-                    "order": oJson,
-                    "WorflowMachineSteps": wList
+                    "error": False,
+                    "status": 200,
+                    "message": "Ok",
+                    "data": {"evento": eJson,"order": oJson,"WorflowMachineSteps": wList}
                 })
 
         except Exception as ex:
@@ -169,7 +169,8 @@ class OrderView(generics.ListCreateAPIView):
                 {
                     "error": True,
                     "status": 500,
-                    "message": "Error while creating the MWStep record." + ex,
+                    "message": "Error while creating the MWStep record." + str(ex),
+                    "data":[]                    
                 })
             return datos
 
@@ -301,7 +302,8 @@ def available_hours(request):
                 {
                     "error": True,
                     "status": 500,
-                    "message": "A Branch is needed for this transaction."
+                    "message": "A Branch is needed for this transaction.",
+                    "data":[]
                 })
             return datos
 
@@ -311,7 +313,8 @@ def available_hours(request):
                 {
                     "error": True,
                     "status": 500,
-                    "message": "A Date is needed for this transaction."
+                    "message": "A Date is needed for this transaction.",
+                    "data":[]                    
                 })
             return datos
 
@@ -343,7 +346,8 @@ def available_hours(request):
                 {
                     "error": False,
                     "status": 200,
-                    "message": availablesList,
+                    "message": "Ok",
+                    "data": availablesList
                 })
 
         return datos
