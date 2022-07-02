@@ -35,7 +35,6 @@ function WeeklyView({
         setState({ ...state, events });
       })
       .catch(() => {
-        console.log('inside catch');
         setState({
           ...state,
           events: [
