@@ -107,6 +107,7 @@ class EventJoinOrders(models.Model):
     state_label = models.CharField(max_length=20)
     name = models.CharField(max_length=15, default='name')
     surname = models.CharField(max_length=15, default='surname')
+    branch_id = models.IntegerField()
     type_label = models.CharField(max_length=20)
 
 

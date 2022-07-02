@@ -1,4 +1,6 @@
+from rest_framework import status
 from rest_framework import viewsets, generics
+from rest_framework.response import Response
 from .serializers import EventTypeSerializer, MaintenancePeriodSerializer,\
  PrioritySerializer, EventJoinOrderSerializer,\
  EventJoinOrdersSerializer, EventJoinEventStateSerializer
@@ -27,11 +29,11 @@ class PriorityViewSet(viewsets.ModelViewSet):
 
 
 # JOIN TABLES VIEWS
-class OrderView(generics.ListAPIView):
+class OrderView(generics.ListCreateAPIView):
     serializer_class = EventJoinOrderSerializer
 
-    def get_queryset(self):
-        id = self.request.GET.get("id", "")
+    def list(self, request, *args, **kwargs):
+        id = request.GET.get("id", "")
         queryset = EventJoinOrder.objects.raw(
             "select core_orderdetails.id, core_event.state_id"
             " as state, core_eventstate.label,"
@@ -47,7 +49,15 @@ class OrderView(generics.ListAPIView):
             " core_event.employee_id=core_employee.id"
             " where core_orderdetails.id = {}".format(id)
         )
-        return queryset
+        serializer = self.get_serializer(queryset, many=True)
+        if len(serializer.data):
+            return Response({
+                'data': serializer.data,
+            }, status=status.HTTP_200_OK)
+        return Response({
+            "data": [],
+            "message": "Not found."
+        }, status=status.HTTP_404_NOT_FOUND)
 
     @transaction.atomic
     def post(self, request):
@@ -73,10 +83,22 @@ class OrderView(generics.ListAPIView):
                 type_id=jd["type"],
             )
             e.save()
+            eJson = {
+                'id': e.id,
+                'description': e.description,
+                'start_datetime': e.start_datetime,
+                'end_datetime': e.end_datetime,
+                'employee_id': e.employee_id,
+                'state_id': e.state_id,
+                'branch_id': e.branch_id,
+                'type_id': e.type_id
+            }
         except Exception as ex:
-            print(ex)
-            datos = {"message": "Error en Evento"}
-            return JsonResponse(datos)
+            return Response({
+                        "data": [],
+                        "message": "Error while creating the event record."
+                                   + str(ex)
+                    }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         try:
             o = OrderDetails.objects.create(
@@ -88,53 +110,85 @@ class OrderView(generics.ListAPIView):
                 event=e,
             )
             o.save()
-            print(o)
+            oJson = {
+                'id': o.id,
+                'invoice_num': o.invoice_num,
+                'file_url': o.file_url,
+                'current_step_id': o.current_step_id,
+                'num_pieces': o.num_pieces,
+                'event_id': e.id
+            }
         except Exception as ex:
-            print(ex)
-            datos = {"message": "Error en el Order"}
-            return JsonResponse(datos)
+            return Response({
+                        "data": [],
+                        "message": "Error while creating the order record."
+                                   + str(ex)
+                    }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         try:
-            workflowlist = jd["workflow"]
+            workflowlist = workflowModels.WorkflowSteps.objects.filter(
+                workflow__id=int(jd["workflow"])
+            )
+            print(workflowlist)
             c = 1
-            for step in workflowlist["steps"]:
-                workflowModels.MachineWorkflowStep.objects.create(
-                    step_order=step["order"],
+            wList = []
+            for step in workflowlist:
+                w = workflowModels.MachineWorkflowStep.objects.create(
+                    step_order=step.step_order,
                     state_id=1,
                     end_datetime=datetime.datetime(2019, 1, 1, 0, 0, 0),
-                    machine_id="000" + str(c),
-                    order=o,
-                )
+                    machine_id=step.machine_id,
+                    order=o)
+                w.save()
+                wJson = {
+                    'id': w.id,
+                    'step_order': w.step_order,
+                    'state_id': w.state_id,
+                    'end_datetime': w.end_datetime,
+                    'machine_id': w.machine_id,
+                    'order_id': o.id
+                }
+                wList.append(wJson)
                 c += 1
-            datos = {"message": "success"}
 
         except Exception as ex:
-            print(ex)
-            datos = {"message": "Error en el Workflow"}
-            return JsonResponse(datos)
+            return Response({
+                        "data": [],
+                        "message": "Error while creating the MWStep record."
+                                   + str(ex)
+                    }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        return JsonResponse(datos)
+        return Response({
+                        "data": {"event": eJson, "order": oJson,
+                                 "WorflowMachineSteps": wList},
+                        "message": "Ok"
+                        }, status=status.HTTP_201_CREATED)
 
 
 class OrdersView(generics.ListAPIView):
     serializer_class = EventJoinOrdersSerializer
 
-    def get_queryset(self):
-        year = self.request.GET.get("year", "")
+    def list(self, request, *args, **kwargs):
+        year = request.GET.get("year", "")
         if year == "":
             year = datetime.datetime.now().year
 
-        month = self.request.GET.get("month", "")
+        month = request.GET.get("month", "")
         if month == "":
             month = datetime.datetime.now().month
 
-        day = self.request.GET.get("day", "")
+        day = request.GET.get("day", "")
         if day == "":
             day = datetime.datetime.now().day
 
-        branch_number = self.request.GET.get("branch", "")
+        branch_number = request.GET.get("branch", "")
         if branch_number == "":
             branch_number = 1
+
+        if int(day) < 4:
+            day_str = "0{}".format(int(day)+6)
+        else:
+            day_str = "{}".format(int(day)+6)
 
         query = (
             "select core_orderdetails.id, core_orderdetails.invoice_num,"
@@ -142,6 +196,7 @@ class OrdersView(generics.ListAPIView):
             " core_event.end_datetime, core_event.state_id"
             " as state, core_eventstate.label as state_label,"
             " core_employee.name, core_employee.surname,"
+            " core_event.branch_id,"
             " core_machinetype.label as type_label from"
             " core_event inner join core_orderdetails"
             " on core_event.id=core_orderdetails.event_id"
@@ -156,41 +211,49 @@ class OrdersView(generics.ListAPIView):
             " core_machinetype on core_machinetype.id=core_machine.type_id"
             " inner join core_employee on "
             " core_event.employee_id=core_employee.id".format(
-                branch_number, year, month, day, year, month, int(day) + 7
+                branch_number, year, month, day, year, month, day_str
             )
         )
         queryset = EventJoinOrders.objects.raw(query)
-        return queryset
+        serializer = self.get_serializer(queryset, many=True)
+        if len(serializer.data):
+            return Response({
+                'data': serializer.data
+            }, status=status.HTTP_200_OK)
+        return Response({
+            "data": [],
+            "message": "Not found."
+        }, status=status.HTTP_404_NOT_FOUND)
 
 
 class EventsView(generics.ListAPIView):
     serializer_class = EventJoinEventStateSerializer
 
-    def get_queryset(self):
-        year = self.request.GET.get("year", "")
+    def list(self, request, *args, **kwargs):
+        year = request.GET.get("year", "")
         if year == "":
             year = datetime.datetime.now().year
 
-        month = self.request.GET.get("month", "")
+        month = request.GET.get("month", "")
         if month == "":
             month = datetime.datetime.now().month
 
-        day = self.request.GET.get("day", "")
+        day = request.GET.get("day", "")
         if day == "":
             day = datetime.datetime.now().day
 
-        branch_number = self.request.GET.get("branch", "")
+        branch_number = request.GET.get("branch", "")
         if branch_number == "":
             branch_number = 1
 
-        period = self.request.GET.get("period", "")
+        period = request.GET.get("period", "")
         if period == "0":
             # weekly
             query_date = "core_event.start_datetime between" \
                          " '{}-{}-{} 00:00:00' and" \
-                         " '{}-{}-{} 00:00:00'".format(year, month,
+                         " '{}-{}-{} 23:59:59'".format(year, month,
                                                        day, year, month,
-                                                       int(day) + 7)
+                                                       int(day) + 6)
         else:
             # daily
             query_date = "core_event.start_datetime between" \
@@ -208,17 +271,42 @@ class EventsView(generics.ListAPIView):
         )
 
         queryset = EventJoinEventState.objects.raw(query)
-        return queryset
+
+        serializer = self.get_serializer(queryset, many=True)
+        if len(serializer.data):
+            return Response({
+                'data': serializer.data
+            }, status=status.HTTP_200_OK)
+        return Response({
+            "data": [],
+            "message": "Not found."
+        }, status=status.HTTP_404_NOT_FOUND)
 
 
 def available_hours(request):
+
     if request.method == "GET":
         branch = request.GET.get("branch") or 1
+        if branch is None:
+            return JsonResponse({
+                        "data": [],
+                        "message": "No branch value. A"
+                        " BranchOffice is needed for this transaction.",
+                        "status": "HTTP_400_BAD_REQUEST"})
+
         date = request.GET.get("date") or "2022-02-22"
+        if date is None:
+            return JsonResponse({
+                        "data": [],
+                        "message": "No date value."
+                        " A Date is needed for this transaction.",
+                        "status": "HTTP_400_BAD_REQUEST"})
+
         data = Event.objects.filter(
             branch__id=branch,
             start_datetime__range=[date + " 00:00:00", date + " 23:59:59"],
         ).extra(order_by=["start_datetime"])
+
         eventos = list(data)
         o = len(list(data))
         c = 0
@@ -238,4 +326,7 @@ def available_hours(request):
                 availableDic = {"start": i, "end": i + 1}
                 availablesList.append(availableDic)
 
-        return JsonResponse({"message": availablesList})
+            return JsonResponse({
+                        "data": availablesList,
+                        "message": "Ok",
+                        "status": "200"})
