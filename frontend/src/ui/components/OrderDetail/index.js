@@ -67,7 +67,7 @@ function OrderDetail({ selectedEvent, closeOrderDetails }) {
   const getOrderDetail = () => {
     CalendarService.getOrderDetails(selectedEvent)
       .then((response) => {
-        const data = response[0];
+        const data = response.data[0];
         const newDataOrder = {
           description: data.description,
           state_label: data.label,

@@ -131,8 +131,8 @@ function CreateOrder({ setOpenCreateEvent }) {
             isStartDateSelected: true,
             endDate: OrderUtils.getEndDate(state.pieces, date),
             schedules: {
-              data: [...response.message],
-              dataToString: DateUtils.getScheduleListFormat(response.message),
+              data: [...response.data],
+              dataToString: DateUtils.getScheduleListFormat(response.data),
             },
           },
         );

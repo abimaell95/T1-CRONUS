@@ -9,8 +9,6 @@ function Login({ setUser }) {
     password: '',
   });
 
-  const [s, setS] = useState({ value: 'JEJE' });
-
   function onChangeInput(e) {
     setState({
       ...state,
@@ -18,14 +16,8 @@ function Login({ setUser }) {
     });
   }
 
-  function setDummy(newValue, newValue2) {
-    const newState = { ...s, value: newValue, value2: newValue2 };
-    setS(newState);
-    return newState;
-  }
-
   function login() {
-    fetch('/accounts/login/', {
+    fetch('http://127.0.0.1:8000/accounts/login/', {
       method: 'POST',
       body: JSON.stringify(state),
       headers: { 'Content-Type': 'application/json' },
@@ -93,13 +85,6 @@ function Login({ setUser }) {
               className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
             >
               Iniciar sesión
-            </button>
-            <button
-              type="button"
-              onClick={() => setDummy('hola', 'K')}
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-            >
-              {s.value}
             </button>
           </div>
         </div>

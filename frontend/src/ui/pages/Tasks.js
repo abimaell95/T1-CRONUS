@@ -29,8 +29,8 @@ function Tasks() {
   function loadOrdersData() {
     CalendarService.getOrders(state.selectedDate)
       .then(
-        (data) => {
-          const orders = data.reduce((group, task) => {
+        (response) => {
+          const orders = response.data.reduce((group, task) => {
             const { start_datetime } = task;
             const stripedDatetime = start_datetime.split('T')[0];
             const actualGroup = group[stripedDatetime] ?? [];
