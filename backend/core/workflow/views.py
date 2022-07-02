@@ -40,7 +40,7 @@ class MachineWorkflowStepView(generics.ListAPIView):
 class WorkflowsView(generics.ListAPIView):
     serializer_class = WorkflowJoinWStepsSerializer
 
-    def get_queryset(self):
+    def list(self, request, *args, **kwargs):
         queryset = WorkflowJoinWSteps.objects.raw(
             "select core_workflow.id, core_workflow.label,"
             "core_workflowsteps.id as "
@@ -52,4 +52,12 @@ class WorkflowsView(generics.ListAPIView):
             " inner join core_machinetype on "
             "core_machinetype.id = core_machine.type_id;"
         )
-        return queryset
+        serializer = self.get_serializer(queryset, many=True)
+        if len(serializer.data):
+            return Response({
+                'data': serializer.data,
+            }, status=status.HTTP_200_OK)
+        return Response({
+            "data": [],
+            "message": "No content."
+        }, status=status.HTTP_204_NO_CONTENT)

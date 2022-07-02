@@ -326,7 +326,7 @@ def available_hours(request):
                 availableDic = {"start": i, "end": i + 1}
                 availablesList.append(availableDic)
 
-            return JsonResponse({
-                        "data": availablesList,
-                        "message": "Ok",
-                        "status": "200"})
+        return JsonResponse({
+                    "data": availablesList,
+                    "message": "Ok",
+                    "status": "200"})
