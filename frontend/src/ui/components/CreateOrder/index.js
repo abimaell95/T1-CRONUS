@@ -159,7 +159,7 @@ function CreateOrder({ setOpenCreateEvent }) {
         const workflowStepUpdated = getUpdatedState(workflowSteps, {
           isLoading: false,
           data: [...response.data],
-          orderedData: OrderUtils.getWorkflowOrdered(response),
+          orderedData: OrderUtils.getWorkflowOrdered(response.data),
         });
         setWorkflowSteps(workflowStepUpdated);
       })
@@ -187,13 +187,7 @@ function CreateOrder({ setOpenCreateEvent }) {
       invoice_num: state.invoice_num,
       pieces_number: state.pieces,
       plan_file: '',
-      workflow: {
-        id: state.workflowSelected,
-        steps: workflowSteps.orderedData[state.workflowSelected].steps.map((step) => ({
-          workflowstep_id: step.id,
-          order: step.order,
-        })),
-      },
+      workflow: state.workflowSelected,
     })
       .then(() => {
         setOpenCreateEvent(false, true);
