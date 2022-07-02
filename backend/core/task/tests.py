@@ -3,12 +3,11 @@ from rest_framework.test import APITestCase
 from rest_framework import status
 from django.test import TestCase
 import datetime
-from core.models import BranchOffice, Employee
-from core.task.models import Event, EventState, EventType
 from core.models import Machine, MachineType,\
     MachineState, Employee, BranchOffice
 from core.task.models import Event, OrderDetails, EventState, EventType
 from core.workflow.models import MachineWorkflowStep, StepState
+
 
 class EventJoinStateTestSetUp(APITestCase):
 
@@ -27,9 +26,9 @@ class EventJoinStateTestSetUp(APITestCase):
         )
         self.branch_office = BranchOffice.objects.create(
             id=1,
-            name= 'Sucursal 1',
-            address= 'Alborada 3ra etapa',
-            city= 'Daule'
+            name='Sucursal 1',
+            address='Alborada 3ra etapa',
+            city='Daule'
         )
         self.event_type = EventType.objects.create(
             id=1,
@@ -68,7 +67,7 @@ class EventJoinStateTestSetUp(APITestCase):
         self.event = Event.objects.create(
             id=4,
             description='tarea4',
-            start_datetime= '2022-06-15 06:00:00',
+            start_datetime='2022-06-15 06:00:00',
             end_datetime='2022-06-15 18:00:00',
             branch_id=1,
             employee_id=1,
@@ -98,7 +97,7 @@ class EventJoinStateTestSetUp(APITestCase):
         self.event = Event.objects.create(
             id=7,
             description='tarea6',
-            start_datetime= '2022-06-30 06:00:00',
+            start_datetime='2022-06-30 06:00:00',
             end_datetime='2022-06-30 18:00:00',
             branch_id=1,
             employee_id=1,
@@ -107,14 +106,15 @@ class EventJoinStateTestSetUp(APITestCase):
         )
 
     def test_run(self):
-        response=self.client.get('/api/events/?year=2022&month=06&day=01&branch=01&period=1')
+        response = self.client.get(
+            '/api/events/?year=2022&month=06&day=01&branch=01&period=1')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         responsedic = response.data["data"]
         for v in responsedic:
             for clave, valor in v.items():
                 if clave == 'start_datetime':
-                    self.assertEqual(valor.split("T")[0],"2022-06-01")
-        
+                    self.assertEqual(valor.split("T")[0], "2022-06-01")
+
 
 class OrderIdTest(TestCase):
     id = 1
@@ -189,7 +189,7 @@ class AllOrderTest(TestCase):
     year = "2022"
     branch2 = 2
     branch1 = 1
-    date = "{}-{}-{}".format(year,month,day)
+    date = "{}-{}-{}".format(year, month, day)
 
     def setUp(self) -> None:
         StepState.objects.create(id=1, label="No Iniciado")
@@ -396,9 +396,9 @@ class AllOrderTest(TestCase):
                     order_date = datetime.datetime.strptime(
                         date_str, '%Y-%m-%d %H:%M:%S'
                     )
-                    condition = order_date > low_date and order_date < up_date
+                    condition = low_date < order_date < up_date
                     self.assertEqual(condition, True)
- 
+
     def test_orderPost(self):
         data = {'description': 'ewew',
                 'start_date': '2022-06-17',
@@ -410,8 +410,9 @@ class AllOrderTest(TestCase):
                 'invoice_num': 'fg',
                 'pieces_number': 0,
                 'plan_file': 'null',
-                'workflow':1}
-        response = self.client.post('/api/order/',json.dumps(data),content_type="application/json")
+                'workflow': 1}
+        response = self.client.post('/api/order/', json.dumps(data),
+                                    content_type="application/json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         data = response.data.get('data')
         event = data.get('event')
@@ -423,7 +424,6 @@ class AllOrderTest(TestCase):
         self.assertEqual(str(c_event), event.get('description'))
         c_order = OrderDetails.objects.get(id=order.get('id'))
         self.assertEqual(str(c_order), str(order.get('id')))
-
 
     def test_availableHours(self):
         get_str = '/api/available_hours/?branch={}&date={}'.format(

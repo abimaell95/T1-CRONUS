@@ -96,7 +96,8 @@ class OrderView(generics.ListCreateAPIView):
         except Exception as ex:
             return Response({
                         "data": [],
-                        "message": "Error while creating the event record." + str(ex)
+                        "message": "Error while creating the event record."
+                                   + str(ex)
                     }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         try:
@@ -120,7 +121,8 @@ class OrderView(generics.ListCreateAPIView):
         except Exception as ex:
             return Response({
                         "data": [],
-                        "message": "Error while creating the order record." + str(ex)
+                        "message": "Error while creating the order record."
+                                   + str(ex)
                     }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         try:
@@ -152,13 +154,15 @@ class OrderView(generics.ListCreateAPIView):
         except Exception as ex:
             return Response({
                         "data": [],
-                        "message": "Error while creating the MWStep record." + str(ex)
+                        "message": "Error while creating the MWStep record."
+                                   + str(ex)
                     }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response({
-                        "data": {"event": eJson, "order": oJson, "WorflowMachineSteps": wList},
+                        "data": {"event": eJson, "order": oJson,
+                                 "WorflowMachineSteps": wList},
                         "message": "Ok"
-                    }, status=status.HTTP_201_CREATED)
+                        }, status=status.HTTP_201_CREATED)
 
 
 class OrdersView(generics.ListAPIView):
@@ -286,15 +290,17 @@ def available_hours(request):
         if branch is None:
             return JsonResponse({
                         "data": [],
-                        "message": "No branch value. A BranchOffice is needed for this transaction.",
-                        "status":"HTTP_400_BAD_REQUEST"})
+                        "message": "No branch value. A"
+                        " BranchOffice is needed for this transaction.",
+                        "status": "HTTP_400_BAD_REQUEST"})
 
         date = request.GET.get("date") or "2022-02-22"
         if date is None:
             return JsonResponse({
                         "data": [],
-                        "message": "No date value. A Date is needed for this transaction.",
-                        "status":"HTTP_400_BAD_REQUEST"})
+                        "message": "No date value."
+                        " A Date is needed for this transaction.",
+                        "status": "HTTP_400_BAD_REQUEST"})
 
         data = Event.objects.filter(
             branch__id=branch,
@@ -323,4 +329,4 @@ def available_hours(request):
             return JsonResponse({
                         "data": availablesList,
                         "message": "Ok",
-                        "status":"200"})
+                        "status": "200"})
