@@ -291,16 +291,16 @@ def available_hours(request):
             return JsonResponse({
                         "data": [],
                         "message": "No branch value. A"
-                        " BranchOffice is needed for this transaction.",
-                        "status": "HTTP_400_BAD_REQUEST"})
+                        " BranchOffice is needed for this transaction."},
+                        status=status.HTTP_400_BAD_REQUEST)
 
         date = request.GET.get("date") or "2022-02-22"
         if date is None:
             return JsonResponse({
                         "data": [],
                         "message": "No date value."
-                        " A Date is needed for this transaction.",
-                        "status": "HTTP_400_BAD_REQUEST"})
+                        " A Date is needed for this transaction."},
+                        status=status.HTTP_400_BAD_REQUEST)
 
         data = Event.objects.filter(
             branch__id=branch,
@@ -327,6 +327,5 @@ def available_hours(request):
                 availablesList.append(availableDic)
 
         return JsonResponse({
-                    "data": availablesList,
-                    "message": "Ok",
-                    "status": "200"})
+                    "data": availablesList},
+                    status=status.HTTP_200_OK)
