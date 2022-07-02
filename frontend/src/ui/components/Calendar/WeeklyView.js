@@ -1,7 +1,7 @@
 /* This example requires Tailwind CSS v2.0+ */
 import {
   React, useState, useEffect,
-  useRef,
+  useRef, Fragment,
 } from 'react';
 import PropTypes from 'prop-types';
 import OrderDetail from '../OrderDetail';
@@ -138,14 +138,15 @@ function WeeklyView({
                   >
                     <div ref={containerOffset} className="row-end-1 h-7" />
                     {[...Array(12).keys()].map((value, idx) => (
-                      <div key={idx}>
+                      // eslint-disable-next-line react/jsx-fragments
+                      <Fragment key={idx}>
                         <div>
                           <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs leading-5 text-gray-400">
                             {value + 6 > 9 ? `${value + 6}h00` : `0${value + 6}h00`}
                           </div>
                         </div>
                         <div />
-                      </div>
+                      </Fragment>
                     ))}
                   </div>
 
