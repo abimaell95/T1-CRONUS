@@ -35,7 +35,40 @@ function WeeklyView({
         setState({ ...state, events });
       })
       .catch(() => {
-        setState({ ...state, events: [] });
+        console.log('inside catch');
+        setState({
+          ...state,
+          events: [
+            {
+              id: 3,
+              start_datetime: new Date('2022-06-30T07:00:00'),
+              end_datetime: new Date('2022-06-30T08:00:00'),
+              state_id: 1,
+              label: 'No Iniciado',
+            },
+            {
+              id: 4,
+              start_datetime: new Date('2022-06-30T08:00:00'),
+              end_datetime: new Date('2022-06-30T09:00:00'),
+              state_id: 1,
+              label: 'No Iniciado',
+            },
+            {
+              id: 5,
+              start_datetime: new Date('2022-06-30T06:00:00'),
+              end_datetime: new Date('2022-07-02T07:00:00'),
+              state_id: 1,
+              label: 'No Iniciado',
+            },
+            {
+              id: 9,
+              start_datetime: new Date('2022-06-28T07:00:00'),
+              end_datetime: new Date('2022-06-28T08:00:00'),
+              state_id: 1,
+              label: 'No Iniciado',
+            },
+          ],
+        });
         // Adds error state
       });
   };
@@ -106,13 +139,15 @@ function WeeklyView({
                   >
                     <div ref={containerOffset} className="row-end-1 h-7" />
                     {[...Array(12).keys()].map((value, idx) => (
-                      <div key={idx}>
-                        <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs leading-5 text-gray-400">
-                          {value + 6 > 9 ? `${value + 6}h00` : `0${value + 6}h00`}
+                      <>
+                        <div key={idx}>
+                          <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs leading-5 text-gray-400">
+                            {value + 6 > 9 ? `${value + 6}h00` : `0${value + 6}h00`}
+                          </div>
                         </div>
-                      </div>
+                        <div />
+                      </>
                     ))}
-                    <div />
                   </div>
 
                   {/* Vertical lines */}
