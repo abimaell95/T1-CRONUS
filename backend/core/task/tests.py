@@ -353,7 +353,7 @@ class AllOrderTest(TestCase):
         get_str = '/api/orders/?year={}&month={}&day={}&branch={}'.format(
             self.year, self.month, self.day, not_existing_branch)
         response = self.client.get(get_str)
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(response.data["data"], [])
 
     def test_weekly_ok(self):
@@ -393,7 +393,7 @@ class AllOrderTest(TestCase):
         get_str = '/api/orders/?year={}&month={}&day={}'.format(
             self.year, incorrect_month, self.day)
         response = self.client.get(get_str)
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(response.data["data"], [])
 
     def test_orderPost(self):

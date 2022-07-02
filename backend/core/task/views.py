@@ -222,8 +222,8 @@ class OrdersView(generics.ListAPIView):
             }, status=status.HTTP_200_OK)
         return Response({
             "data": [],
-            "message": "Not found."
-        }, status=status.HTTP_404_NOT_FOUND)
+            "message": "No content."
+        }, status=status.HTTP_204_NO_CONTENT)
 
 
 class EventsView(generics.ListAPIView):
@@ -279,8 +279,8 @@ class EventsView(generics.ListAPIView):
             }, status=status.HTTP_200_OK)
         return Response({
             "data": [],
-            "message": "Not found."
-        }, status=status.HTTP_404_NOT_FOUND)
+            "message": "No content."
+        }, status=status.HTTP_204_NO_CONTENT)
 
 
 def available_hours(request):
