@@ -1,2 +1,2 @@
-export * from './calendar.service';
-export * from './user.service';
+export { CalendarService } from './calendar.service';
+export { UserService } from './user.service';
