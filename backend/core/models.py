@@ -28,7 +28,7 @@ class Employee(models.Model):
     branch = models.ForeignKey("BranchOffice", on_delete=models.CASCADE)
 
     def __str__(self):
-        return f'{self.name} {self.surname} : {self.employee_id}'
+        return f'{self.name} {self.surname} : {self.id}'
 
 
 class MachineType(models.Model):

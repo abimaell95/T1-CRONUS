@@ -36,7 +36,7 @@ class WorkflowSteps(models.Model):
     machine = models.ForeignKey('Machine', on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.id
+        return str(self.id)
 
 
 # JOIN TABLES MODELS
