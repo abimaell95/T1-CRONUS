@@ -158,7 +158,7 @@ function CreateOrder({ setOpenCreateEvent }) {
       .then((response) => {
         const workflowStepUpdated = getUpdatedState(workflowSteps, {
           isLoading: false,
-          data: [...response],
+          data: [...response.data],
           orderedData: OrderUtils.getWorkflowOrdered(response),
         });
         setWorkflowSteps(workflowStepUpdated);

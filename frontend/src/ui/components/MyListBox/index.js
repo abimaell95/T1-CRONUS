@@ -1,4 +1,7 @@
-import { React, useState, Fragment } from 'react';
+import {
+  React, useState, Fragment,
+  useEffect,
+} from 'react';
 import { CheckIcon, SelectorIcon } from '@heroicons/react/solid';
 import { Listbox, Transition } from '@headlessui/react';
 import PropTypes from 'prop-types';
@@ -15,6 +18,10 @@ function MyListbox(props) {
     setSelected(e);
     setSelectedId(e.id);
   }
+
+  useEffect(() => {
+    setSelected(options ? options[0] : null);
+  }, [options]);
 
   return (
     <Listbox value={selected} onChange={(e) => onChange(e)}>

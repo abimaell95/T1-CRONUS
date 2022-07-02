@@ -35,6 +35,7 @@ function WeeklyView({
         setState({ ...state, events });
       })
       .catch(() => {
+        setState({ ...state, events: [] });
         // Adds error state
       });
   };
