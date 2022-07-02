@@ -142,23 +142,30 @@ function WeeklyView({
                       */}
                     {state.events.map(({
                       id, start_datetime, end_datetime, state_id, label,
-                    }) => (
-                      <li key={id} className={`relative mt-px flex col-start-${start_datetime.getDay()}`} style={{ gridRow: `${CalendarUtils.getCalendarRow(start_datetime)} / span ${CalendarUtils.getCalendarSpan(start_datetime, end_datetime)}` }}>
-                        <a
-                          onClick={() => { setSelectedEvent(id); }}
-                          className={`group absolute inset-1 flex flex-col overflow-y-auto rounded-lg p-2 text-xs leading-5 cursor-pointer ${CalendarUtils.getStateColor(state_id)}`}
-                          href="#/"
-                        >
-                          <p className="order-1 text-sm font-semibold">
-                            {`${eventTypeMap[1]} #${id}`}
-                            {' '}
-                          </p>
-                          <span className={`absolute text-xs font-medium px-2 py-1 rounded-md bottom-2 right-2 ${CalendarUtils.getStateColorBadgeMap(state_id)}`}>
-                            {label}
-                          </span>
-                        </a>
-                      </li>
-                    ))}
+                    }) => {
+                      const row = CalendarUtils.getCalendarRow(start_datetime);
+                      const span = CalendarUtils.getCalendarSpan(start_datetime, end_datetime);
+                      if (row > -1 && span > -1) {
+                        return (
+                          <li key={id} className={`relative mt-px flex col-start-${start_datetime.getDay()}`} style={{ gridRow: `${row} / span ${span}` }}>
+                            <a
+                              onClick={() => { setSelectedEvent(id); }}
+                              className={`group absolute inset-1 flex flex-col overflow-y-auto rounded-lg p-2 text-xs leading-5 cursor-pointer ${CalendarUtils.getStateColor(state_id)}`}
+                              href="#/"
+                            >
+                              <p className="order-1 text-sm font-semibold">
+                                {`${eventTypeMap[1]} #${id}`}
+                                {' '}
+                              </p>
+                              <span className={`absolute text-xs font-medium px-2 py-1 rounded-md bottom-2 right-2 ${CalendarUtils.getStateColorBadgeMap(state_id)}`}>
+                                {label}
+                              </span>
+                            </a>
+                          </li>
+                        );
+                      }
+                      return <> </>;
+                    })}
                   </ol>
                 </div>
               </div>
