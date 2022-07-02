@@ -105,8 +105,8 @@ class EventJoinStateTestSetUp(TestCase):
         )
 
     def test_run(self):
-        get_str = '/api/events/?year=2022&month=06&day=01&branch=01&period=1'
-        response = self.client.get(get_str)
+        response = self.client.get(
+            '/api/events/?year=2022&month=06&day=01&branch=01&period=1')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         responsedic = response.data["data"]
         for v in responsedic:
