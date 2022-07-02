@@ -67,7 +67,13 @@ class WorkflowIdTest(TestCase):
             state_id=1
         )
 
-    def test_run(self):
+    def test_ok(self):
         response = self.client.get("/api/workflow/?id={}".format(self.id))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["data"][0]["order_id"], self.id)
+
+    def test_notok(self):
+        incorrect_id = 2
+        response = self.client.get("/api/workflow/?id={}".format(incorrect_id))
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.data["data"], [])
