@@ -1,0 +1,10 @@
+{
+    "dev": {
+        "aws_region": "us-west-2",
+        "django_settings": "cronus.settings",
+        "profile_name": "default",
+        "project_name": "backend",
+        "runtime": "python3.8",
+        "s3_bucket": "zappa-inl6r1y0j"
+    }
+}

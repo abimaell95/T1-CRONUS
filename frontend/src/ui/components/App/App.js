@@ -25,9 +25,9 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Login setUser={() => setUser()} />} />
         <Route path="tasks" element={<Tasks />} />
         <Route path="calendar" element={<Calendar />} />
+        <Route path="*" element={<Login setUser={() => setUser()} />} />
       </Routes>
     </BrowserRouter>
   );

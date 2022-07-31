@@ -17,7 +17,7 @@ function Login({ setUser }) {
   }
 
   function login() {
-    fetch('http://127.0.0.1:8000/accounts/login/', {
+    fetch('/accounts/login/', {
       method: 'POST',
       body: JSON.stringify(state),
       headers: { 'Content-Type': 'application/json' },

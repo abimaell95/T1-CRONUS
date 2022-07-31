@@ -15,7 +15,7 @@ async function login(userData) {
     body: JSON.stringify(userData),
     headers: { 'Content-Type': 'application/json' },
   };
-  return fetch('/accounts/login/', requestOptions).then(handleResponse);
+  return fetch('/dev/accounts/login/', requestOptions).then(handleResponse);
 }
 
 export const UserService = {

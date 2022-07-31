@@ -17,7 +17,7 @@ async function createOrder(order) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(order),
   };
-  return fetch('http://localhost:8000/api/order/', requestOptions).then(handleResponse);
+  return fetch('/dev/api/order/', requestOptions).then(handleResponse);
 }
 
 async function getAvailableHours(date, branchId) {
@@ -25,7 +25,7 @@ async function getAvailableHours(date, branchId) {
   const requestOptions = {
     method: 'GET',
   };
-  return fetch(`http://localhost:8000/api/available_hours/?date=${dateString}&branch=${branchId}`, requestOptions).then(handleResponse);
+  return fetch(`/dev/api/available_hours/?date=${dateString}&branch=${branchId}`, requestOptions).then(handleResponse);
 }
 
 async function getEvents(date, branch = 1, period = 0) {
@@ -33,21 +33,21 @@ async function getEvents(date, branch = 1, period = 0) {
   const requestOptions = {
     method: 'GET',
   };
-  return fetch(`http://localhost:8000/api/events/?day=${day}&month=${month}&year=${year}&branch=${branch}&period=${period}`, requestOptions).then(handleResponse);
+  return fetch(`/dev/api/events/?day=${day}&month=${month}&year=${year}&branch=${branch}&period=${period}`, requestOptions).then(handleResponse);
 }
 
 async function getOrderDetails(orderId) {
   const requestOptions = {
     method: 'GET',
   };
-  return fetch(`http://localhost:8000/api/order/?id=${orderId}`, requestOptions).then(handleResponse);
+  return fetch(`/dev/api/order/?id=${orderId}`, requestOptions).then(handleResponse);
 }
 
 async function getOrderWorkFlow(orderId) {
   const requestOptions = {
     method: 'GET',
   };
-  return fetch(`http://localhost:8000/api/workflow/?id=${orderId}`, requestOptions).then(handleResponse);
+  return fetch(`/dev/api/workflow/?id=${orderId}`, requestOptions).then(handleResponse);
 }
 
 async function getOrders(date) {
@@ -55,14 +55,14 @@ async function getOrders(date) {
   const requestOptions = {
     method: 'GET',
   };
-  return fetch(`http://localhost:8000/api/orders/?year=${year}&month=${month}&day=${day}`, requestOptions).then(handleResponse);
+  return fetch(`/dev/api/orders/?year=${year}&month=${month}&day=${day}`, requestOptions).then(handleResponse);
 }
 
 async function getWorkFlowSteps() {
   const requestOptions = {
     method: 'GET',
   };
-  return fetch('http://localhost:8000/api/workflows/', requestOptions).then(handleResponse);
+  return fetch('/dev/api/workflows/', requestOptions).then(handleResponse);
 }
 
 export const CalendarService = {

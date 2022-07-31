@@ -32,7 +32,8 @@ CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENCIALS = True
 
 ALLOWED_HOSTS = ["292d-179-49-35-86.sa.ngrok.io", "127.0.0.1",
-                 "localhost", "95bb-181-198-230-74.ngrok.io"]
+                 "localhost", "95bb-181-198-230-74.ngrok.io",
+                 "fdbdhyziaj.execute-api.us-west-2.amazonaws.com"]
 
 
 # Application definition
@@ -46,7 +47,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'core',
     'rest_framework',
-    'corsheaders'
+    'corsheaders',
+    'django_s3_storage'
 ]
 
 MIDDLEWARE = [
@@ -85,13 +87,23 @@ WSGI_APPLICATION = 'cronus.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-DATABASES = {
+THIS_IS_THE_CONFIG = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'cronus', # dbname
+        'USER': 'cronusadmin', # master username
+        'PASSWORD': 'cronus2022', # master password
+        'HOST': 'mynewcluster.cluster-cb42naljehp6.us-west-2.rds.amazonaws.com', # Endpoint
+        'PORT': '3306',
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -145,20 +157,25 @@ LOGOUT_REDIRECT_URL = reverse_lazy('login')
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
-STATIC_URL = 'static/'
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 STATICFILES_DIRS = [
   # Tell Django where to look for React's static files (css, js)
-  os.path.join(BASE_DIR, "build/static"),
+  os.path.join(BASE_DIR, "build"),
 ]
-
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 doctests = True
+
+
+S3_BUCKET = "zappa-inl6r1y0j"
+
+STATICFILES_STORAGE = "django_s3_storage.storage.StaticS3Storage"
+
+AWS_S3_BUCKET_NAME_STATIC = S3_BUCKET
+
+STATIC_URL = "https://%s.s3.amazonaws.com/" % S3_BUCKET

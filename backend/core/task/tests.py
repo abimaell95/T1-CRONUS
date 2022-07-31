@@ -9,7 +9,6 @@ from core.workflow.models import MachineWorkflowStep, StepState
 
 
 class EventJoinStateTestSetUp(TestCase):
-    fechainicio = '2022-06-01T06:00:00Z'
 
     def setUp(self):
         self.employee = Employee.objects.create(
@@ -105,17 +104,15 @@ class EventJoinStateTestSetUp(TestCase):
             type_id=1
         )
 
-    def test_ok(self):
-        get_str = '/api/events/?year=2022&month=06&day=01&branch=01&period=0'
-        response = self.client.get(get_str)
+    def test_run(self):
+        response = self.client.get(
+            '/api/events/?year=2022&month=06&day=01&branch=01&period=1')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["data"][0]["start_datetime"], self.fechainicio)
-
-    def test_not_ok(self):
-        get_str = '/api/events/?year=2022&month=06&day=11&branch=01&period=1'
-        response = self.client.get(get_str)
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-        self.assertEqual(response.data["data"], [])
+        responsedic = response.data["data"]
+        for v in responsedic:
+            for clave, valor in v.items():
+                if clave == 'start_datetime':
+                    self.assertEqual(valor.split("T")[0], "2022-06-01")
 
 
 class OrderIdTest(TestCase):

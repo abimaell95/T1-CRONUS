@@ -15,25 +15,19 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import path, include, re_path
+from django.urls import path, include
 from django.contrib.auth import logout
+from django.views.generic import TemplateView
 from rest_framework import routers
 from core import views
 from core.task import views as eventviews
 from core.workflow import views as workflowviews
-from django.shortcuts import render
-
 
 router = routers.DefaultRouter()
 router.register(r"event_type", eventviews.EventTypeViewSet)
 router.register(r"maintenance_period", eventviews.MaintenancePeriodViewSet)
 router.register(r"reparation_priorities", eventviews.PriorityViewSet)
 router.register(r"branchoffice", views.BranchOfficeViewSet)
-
-
-def render_react(request):
-    return render(request, "index.html")
-
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -48,6 +42,6 @@ urlpatterns = [
     path("logout/", logout, name="logout"),
     path("api-auth/", include("rest_framework.urls",
                               namespace="rest_framework")),
-    re_path(r"^$", render_react),
-    re_path(r"^(?:.*)/?$", render_react),
+    path('', TemplateView.as_view(template_name="index.html"), {'resource': ''}),
+    path('<path:resource>', TemplateView.as_view(template_name="index.html"))
 ]
