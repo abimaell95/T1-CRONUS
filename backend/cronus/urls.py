@@ -34,6 +34,7 @@ urlpatterns = [
     path("api/", include(router.urls)),
     path("api/events/", eventviews.EventsView.as_view()),
     path("api/workflows/", workflowviews.WorkflowsView.as_view()),
+    path("api/machines/", views.MachinesView.as_view()),
     path("api/orders/", eventviews.OrdersView.as_view()),
     path("api/available_hours/", eventviews.available_hours),
     path("api/order/", eventviews.OrderView.as_view()),
