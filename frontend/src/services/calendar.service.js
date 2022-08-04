@@ -69,7 +69,7 @@ async function getPiecesRange() {
   const requestOptions = {
     method: 'GET',
   };
-  return fetch('/dev/api/pieces-rabge/', requestOptions).then(handleResponse);
+  return fetch('/dev/api/pieces-range/', requestOptions).then(handleResponse);
 }
 
 export const CalendarService = {
