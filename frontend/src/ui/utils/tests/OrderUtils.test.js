@@ -66,22 +66,22 @@ test('getEndDate date is null', () => {
 });
 
 test('getEndDate current day', () => {
-  const date = OrderUtils.getEndDate(100, new Date('2022-05-06'));
+  const date = OrderUtils.getEndDate(0, new Date('2022-05-06'));
   expect(date.toDateString()).toBe(new Date('2022-05-06').toDateString());
 });
 
 test('getEndDate next day', () => {
-  const date = OrderUtils.getEndDate(200, new Date('2022-05-06'));
+  const date = OrderUtils.getEndDate(1, new Date('2022-05-06'));
   expect(date.toDateString()).toBe(new Date('2022-05-07').toDateString());
 });
 
 test('getEndDate next 2 days', () => {
-  const date = OrderUtils.getEndDate(500, new Date('2022-05-06'));
+  const date = OrderUtils.getEndDate(2, new Date('2022-05-06'));
   expect(date.toDateString()).toBe(new Date('2022-05-08').toDateString());
 });
 
 test('getEndDate next 4 days', () => {
-  const date = OrderUtils.getEndDate(501, new Date('2022-05-06'));
+  const date = OrderUtils.getEndDate(4, new Date('2022-05-06'));
   expect(date.toDateString()).toBe(new Date('2022-05-10').toDateString());
 });
 

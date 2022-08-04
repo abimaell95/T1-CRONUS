@@ -58,12 +58,35 @@ const workflowStepsDummy = [
   },
 ];
 
+const piecesRangeDummy = [
+  {
+    id: 1,
+    duration: 0, // hoy
+    range: '0-99',
+  },
+  {
+    id: 2,
+    duration: 1, // 1 dias +
+    range: '100-199',
+  },
+  {
+    id: 3,
+    duration: 2, // 2 dias +
+    range: '200-499',
+  },
+  {
+    id: 4,
+    duration: 4,
+    range: '500+', // 4 dias +
+  },
+];
+
 function CreateOrder({ setOpenCreateEvent }) {
   const [state, setState] = useState({
     isStartDateSelected: false,
     activityId: 1,
     description: '',
-    pieces: 0,
+    piecesSelected: 1,
     client_name: '',
     invoice_num: '',
     startDate: new Date(),
@@ -78,6 +101,11 @@ function CreateOrder({ setOpenCreateEvent }) {
     timeSelected: 1,
     schedules: {},
 
+  });
+
+  const [piecesRange, setpiecesRange] = useState({
+    isLoading: false,
+    data: [],
   });
 
   function getUpdatedState(currentState, stateUpdated) {
@@ -98,11 +126,18 @@ function CreateOrder({ setOpenCreateEvent }) {
     setState({ ...state, workflowSelected: id });
   }
 
-  function setPieces(pieces) {
+  function getPiecesRangeById(id) {
+    return piecesRange.data.find(
+      (pieceRange) => pieceRange.id === id,
+    );
+  }
+
+  function setPiecesSelected(piecesSelected) {
+    const pieceRangeSelected = getPiecesRangeById(piecesSelected);
     setState({
       ...state,
-      pieces: parseInt(pieces, 10),
-      endDate: OrderUtils.getEndDate(pieces, state.startDate),
+      piecesSelected,
+      endDate: OrderUtils.getEndDate(pieceRangeSelected.duration, state.startDate),
     });
   }
 
@@ -123,13 +158,14 @@ function CreateOrder({ setOpenCreateEvent }) {
   function getSchedules(date) {
     CalendarService.getAvailableHours(date, 1)
       .then((response) => {
+        const pieceRangeSelected = getPiecesRangeById(state.piecesSelected);
         const updatedState = getUpdatedState(
           state,
           {
             isLoading: false,
             startDate: date,
             isStartDateSelected: true,
-            endDate: OrderUtils.getEndDate(state.pieces, date),
+            endDate: OrderUtils.getEndDate(pieceRangeSelected.duration, date),
             schedules: {
               data: [...response.data],
               dataToString: DateUtils.getScheduleListFormat(response.data),
@@ -139,11 +175,12 @@ function CreateOrder({ setOpenCreateEvent }) {
         setState(updatedState);
       })
       .catch(() => {
+        const pieceRangeSelected = getPiecesRangeById(state.piecesSelected);
         const updatedState = getUpdatedState(state, {
           isLoading: false,
           startDate: date,
           isStartDateSelected: true,
-          endDate: OrderUtils.getEndDate(state.pieces, date),
+          endDate: OrderUtils.getEndDate(pieceRangeSelected.duration, date),
           schedules: {
             data: [...schedule],
             dataToString: DateUtils.getScheduleListFormat(schedule),
@@ -174,6 +211,34 @@ function CreateOrder({ setOpenCreateEvent }) {
       });
   }
 
+  function getPiecesRange() {
+    CalendarService.getPiecesRange()
+      .then((response) => {
+        const piecesRangeUpdated = getUpdatedState(piecesRange, {
+          isLoading: false,
+          data: response.data.map((pieceRange) => ({
+            id: pieceRange.id,
+            label: pieceRange.range,
+            duration: pieceRange.duration,
+          })),
+        });
+        setpiecesRange(piecesRangeUpdated);
+      })
+      .catch(() => {
+        const piecesRangeUpdated = getUpdatedState(piecesRange, {
+          ...piecesRange,
+          isLoading: false,
+          data: piecesRangeDummy.map((pieceRange) => ({
+            id: pieceRange.id,
+            label: pieceRange.range,
+            duration: pieceRange.duration,
+          })),
+          setErrorMsg: 'Ha ocurrido un problema cargando los horarios disponibles',
+        });
+        setpiecesRange(piecesRangeUpdated);
+      });
+  }
+
   function createEvent() {
     isLoading(true);
     CalendarService.createOrder({
@@ -185,7 +250,7 @@ function CreateOrder({ setOpenCreateEvent }) {
       type: 1,
       client_name: state.client_name,
       invoice_num: state.invoice_num,
-      pieces_number: state.pieces,
+      pieces_range_id: state.piecesSelected,
       plan_file: '',
       workflow: state.workflowSelected,
     })
@@ -206,7 +271,9 @@ function CreateOrder({ setOpenCreateEvent }) {
 
   useEffect(() => {
     getWorkFlowSteps();
+    getPiecesRange();
   }, []);
+
   if (state.isLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -264,12 +331,9 @@ function CreateOrder({ setOpenCreateEvent }) {
         </div>
         <div className="flex justify-between mb-2 items-center">
           <span className="font-bold">Número de piezas</span>
-          <input
-            type="number"
-            name="pieces"
-            id="pieces"
-            className="text-gray-500 mt-1 focus:ring-gray-500 focus:border-gray-500 block shadow-sm sm:text-sm border-gray-300 rounded-md w-48"
-            onChange={(e) => setPieces(e.target.value)}
+          <MyListbox
+            options={piecesRange.data}
+            setSelectedId={(id) => setPiecesSelected(id)}
           />
         </div>
         <div className="flex justify-between mb-2 items-center">

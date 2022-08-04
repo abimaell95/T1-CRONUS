@@ -33,10 +33,11 @@ function getWorkflowOrdered(workflowSteps) {
 @sixth_test - > 500 pieces, not null date
 @seventh_test - > -1 pieces , not null date
 */
-function getEndDate(pieces, date) {
-  if (!date || pieces < 0) {
+function getEndDate(duration, date) {
+  if (!date || duration < 0) {
     return null;
   }
+  /**
   let totalDays;
   if (pieces <= 100) {
     totalDays = 0;
@@ -46,8 +47,8 @@ function getEndDate(pieces, date) {
     totalDays = 2;
   } else {
     totalDays = 4;
-  }
-  const endDate = new Date(date).setDate(date.getDate() + totalDays);
+  } */
+  const endDate = new Date(date).setDate(date.getDate() + duration);
   return new Date(endDate);
 }
 
