@@ -1,4 +1,5 @@
 import json
+import numpy as np
 from .serializers import BranchOfficeSerializer, MachineSerializer
 from .models import BranchOffice, Machine
 from rest_framework import status
@@ -32,9 +33,17 @@ class MachinesView(generics.ListAPIView):
         )
         queryset = Machine.objects.raw(query)
         serializer = self.get_serializer(queryset, many=True)
+        #probar
+        data=np.array(serializer.data)
+        orders=[]
+        for i in serializer.data:
+            orders.append(i.step_order)
+        orders=np.array(orders)
+        data=data[np.argsort(orders)]
+
         if len(serializer.data):
             return Response({
-                'data': serializer.data
+                'data': data
             }, status=status.HTTP_200_OK)
         return Response({
             "data": [],
