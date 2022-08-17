@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import MyListbox from '../MyListBox';
 import { DateUtils, OrderUtils } from '../../utils';
 import { CalendarService } from '../../../services';
+import SelectorCheckbox from '../SelectorCheckbox';
 
 const schedule = [
   {
@@ -383,6 +384,10 @@ function CreateOrder({ setOpenCreateEvent }) {
             <div className="flex justify-between mb-2 items-center">
               <span className="font-bold">Fecha de entrega</span>
               <span className="text-gray-500">{DateUtils.fullDatetoString(state.endDate)}</span>
+            </div>
+            <div className="flex justify-between mb-2 items-center">
+              <span className="font-bold">Servicios</span>
+              <SelectorCheckbox />
             </div>
             <div className="flex justify-between mb-2 items-center">
               <span className="font-bold">Flujo de trabajo</span>
