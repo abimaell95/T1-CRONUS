@@ -245,11 +245,14 @@ class EventsView(generics.ListAPIView):
         machine_type = request.GET.get("machinetype", "")
         if machine_type == "":
             select_state = "core_event.state_id, core_eventstate.label, "
-            join_state = "inner join core_eventstate on core_event.state_id=core_eventstate.id"
+            join_state = "inner join core_eventstate on" \
+                         " core_event.state_id=core_eventstate.id"
             query_filter = "and core_machinetype.id={}".format(machine_type)
-        else: 
-            select_state = "core_core_machineworkflowstep.state_id, core_stepstate.label, "
-            join_state = "inner join core_stepstate on core_machineworkflowstep.state_id=core_stepstate.id"
+        else:
+            select_state = "core_core_machineworkflowstep.state_id," \
+                           " core_stepstate.label, "
+            join_state = "inner join core_stepstate on" \
+                         " core_machineworkflowstep.state_id=core_stepstate.id"
             query_filter = ""
 
         branch_number = request.GET.get("branch", "")
@@ -283,7 +286,8 @@ class EventsView(generics.ListAPIView):
             " inner join core_machinetype"
             " on core_machine.type_id=core_machinetype.id {}"
             " where core_event.branch_id={} and {} {}".format(
-                select_state, join_state, branch_number, query_date, query_filter
+                select_state, join_state, branch_number,
+                query_date, query_filter
             )
         )
 

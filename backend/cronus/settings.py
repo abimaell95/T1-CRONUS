@@ -90,18 +90,18 @@ WSGI_APPLICATION = 'cronus.wsgi.application'
 DATABASES = {
     'prod': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'cronus', # dbname
-        'USER': 'cronusadmin', # master username
-        'PASSWORD': 'cronus2022', # master password
-        'HOST': 'mynewcluster.cluster-cb42naljehp6.us-west-2.rds.amazonaws.com', # Endpoint
+        'NAME': 'cronus',  # dbname
+        'USER': 'cronusadmin',  # master username
+        'PASSWORD': 'cronus2022',  # master password
+        'HOST': 'mynewcluster.cluster-cb42naljehp6.us-west-2.rds.amazonaws.com',  # Endpoint
         'PORT': '3306',
     },
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'cronus',
-        'USER': 'cronuser', # master username
-        'PASSWORD': 'password', # master password
-        'HOST': 'localhost', # Endpoint
+        'USER': 'cronuser',  # master username
+        'PASSWORD': 'password',  # master password
+        'HOST': 'localhost',  # Endpoint
         'PORT': '3306'
     },
     'old': {
