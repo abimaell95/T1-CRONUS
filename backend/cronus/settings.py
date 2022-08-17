@@ -87,21 +87,26 @@ WSGI_APPLICATION = 'cronus.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-THIS_IS_THE_CONFIG = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}
-
 DATABASES = {
+    'prod': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'cronus',  # dbname
+        'USER': 'cronusadmin',  # master username
+        'PASSWORD': 'cronus2022',  # master password
+        'HOST': 'mynewcluster.cluster-cb42naljehp6.us-west-2.rds.amazonaws.com',  # Endpoint
+        'PORT': '3306',
+    },
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'cronus', # dbname
-        'USER': 'cronusadmin', # master username
-        'PASSWORD': 'cronus2022', # master password
-        'HOST': 'mynewcluster.cluster-cb42naljehp6.us-west-2.rds.amazonaws.com', # Endpoint
-        'PORT': '3306',
+        'NAME': 'cronus',
+        'USER': 'cronuser',  # master username
+        'PASSWORD': 'password',  # master password
+        'HOST': 'localhost',  # Endpoint
+        'PORT': '3306'
+    },
+    'old': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
 
