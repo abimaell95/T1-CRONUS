@@ -1,10 +1,11 @@
 import json
-
+import numpy as np
 from .task.serializers import PiecesRangeSerializer
-
 from .task.models import PiecesRange
+
 from .serializers import BranchOfficeSerializer, MachineSerializer, MachineTypeSerializer
 from .models import BranchOffice, Machine, MachineType
+
 from rest_framework import status
 from rest_framework import viewsets, generics
 from rest_framework.response import Response
@@ -36,9 +37,17 @@ class MachinesView(generics.ListAPIView):
         )
         queryset = Machine.objects.raw(query)
         serializer = self.get_serializer(queryset, many=True)
+        # probar
+        data = np.array(serializer.data)
+        orders = []
+        for i in serializer.data:
+            orders.append(i.step_order)
+        orders = np.array(orders)
+        data = data[np.argsort(orders)]
+
         if len(serializer.data):
             return Response({
-                'data': serializer.data
+                'data': data
             }, status=status.HTTP_200_OK)
         return Response({
             "data": [],
