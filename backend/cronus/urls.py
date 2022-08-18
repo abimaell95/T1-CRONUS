@@ -32,6 +32,7 @@ router.register(r"branchoffice", views.BranchOfficeViewSet)
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include(router.urls)),
+    path("api/pieces_range", views.PiecesRangeView.as_view()),
     path("api/events/", eventviews.EventsView.as_view()),
     path("api/workflows/", workflowviews.WorkflowsView.as_view()),
     path("api/machines/", views.MachinesView.as_view()),

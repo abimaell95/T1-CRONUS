@@ -43,6 +43,7 @@ class Machine(models.Model):
     serial_number = models.CharField(primary_key=True, max_length=10)
     model = models.CharField(max_length=20)
     brand = models.CharField(max_length=20)
+    step_order = models.PositiveSmallIntegerField()
     purchase_date = models.DateField()
     type = models.ForeignKey('MachineType', on_delete=models.CASCADE)
     state = models.ForeignKey('MachineState', on_delete=models.CASCADE)

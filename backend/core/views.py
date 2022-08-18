@@ -1,6 +1,10 @@
 import json
-from .serializers import BranchOfficeSerializer, MachineSerializer
-from .models import BranchOffice, Machine
+
+from .task.serializers import PiecesRangeSerializer
+
+from .task.models import PiecesRange
+from .serializers import BranchOfficeSerializer, MachineSerializer, MachineTypeSerializer
+from .models import BranchOffice, Machine, MachineType
 from rest_framework import status
 from rest_framework import viewsets, generics
 from rest_framework.response import Response
@@ -40,6 +44,15 @@ class MachinesView(generics.ListAPIView):
             "data": [],
             "message": "No content."
         }, status=status.HTTP_204_NO_CONTENT)
+
+
+class MachineTypeView(generics.ListAPIView):
+    queryset = MachineType.objects.all().order_by("id")
+    serializer_class = MachineTypeSerializer
+
+class PiecesRangeView(generics.ListAPIView):
+    queryset = PiecesRange.objects.all().order_by("id")
+    serializer_class = PiecesRangeSerializer
 
 @csrf_exempt
 def login_view(request):

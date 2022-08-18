@@ -35,6 +35,7 @@ class MachineSerializer(ModelSerializer):
             "serial_number",
             "model",
             "brand",
+            "step_order",
             "purchase_date",
             "type",
             "state",
