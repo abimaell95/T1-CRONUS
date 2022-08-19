@@ -250,6 +250,19 @@ class EventsView(generics.ListAPIView):
         if day == "":
             day = datetime.datetime.now().day
 
+        machine_type = request.GET.get("machinetype", "")
+        if machine_type == "":
+            select_state = "core_event.state_id, core_eventstate.label, "
+            join_state = "inner join core_eventstate on" \
+                         " core_event.state_id=core_eventstate.id"
+            query_filter = "and core_machinetype.id={}".format(machine_type)
+        else:
+            select_state = "core_core_machineworkflowstep.state_id," \
+                           " core_stepstate.label, "
+            join_state = "inner join core_stepstate on" \
+                         " core_machineworkflowstep.state_id=core_stepstate.id"
+            query_filter = ""
+
         branch_number = request.GET.get("branch", "")
         if branch_number == "":
             branch_number = 1
@@ -270,12 +283,20 @@ class EventsView(generics.ListAPIView):
 
         query = (
             "select core_event.id, core_event.start_datetime,"
-            " core_event.end_datetime, core_event.state_id,"
-            " core_eventstate.label from core_event"
-            " inner join core_eventstate on"
-            " core_event.state_id=core_eventstate.id"
-            " where core_event.branch_id={} and {}".format(branch_number,
-                                                           query_date)
+            " core_event.end_datetime, {} core_orderdetails.invoice_num,"
+            " core_orderdetails.client_name, core_machinetype.id"
+            " from core_event inner join core_orderdetails"
+            " on core_event.id=core_orderdetails.event_id"
+            " inner join core_machineworkflowstep"
+            " on core_orderdetails.id = core_machineworkflowstep.order_id"
+            " inner join core_machine"
+            " on core_machineworkflowstep.machine_id=core_machine.id"
+            " inner join core_machinetype"
+            " on core_machine.type_id=core_machinetype.id {}"
+            " where core_event.branch_id={} and {} {}".format(
+                select_state, join_state, branch_number,
+                query_date, query_filter
+            )
         )
 
         queryset = EventJoinEventState.objects.raw(query)
