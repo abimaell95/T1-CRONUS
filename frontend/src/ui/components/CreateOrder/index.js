@@ -82,6 +82,24 @@ const piecesRangeDummy = [
   },
 ];
 
+const servicesDummy = [
+  {
+    value: 'ocean1', label: 'Corte-abc123', id: 1, type: 'corte',
+  },
+  {
+    value: 'blue', label: 'Corte-cde456', id: 2, type: 'corte',
+  },
+  {
+    value: 'purple', label: 'Enchapado-efg789', id: 3, type: 'encapado',
+  },
+  {
+    value: 'red', label: 'Abisagrado-rty852', id: 4, type: 'abisagrado',
+  },
+  {
+    value: 'orange', label: 'Pegado-okl963', id: 5, type: 'pegado',
+  },
+];
+
 function CreateOrder({ setOpenCreateEvent }) {
   const [state, setState] = useState({
     isStartDateSelected: false,
@@ -101,6 +119,7 @@ function CreateOrder({ setOpenCreateEvent }) {
     workflowSelected: 1,
     timeSelected: 1,
     schedules: {},
+    servicesSeleted: [],
 
   });
 
@@ -125,6 +144,10 @@ function CreateOrder({ setOpenCreateEvent }) {
 
   function setWorkflowSelectedId(id) {
     setState({ ...state, workflowSelected: id });
+  }
+
+  function setServicesSelected(services) {
+    setState({ ...state, servicesSeleted: services });
   }
 
   function getPiecesRangeById(id) {
@@ -155,6 +178,30 @@ function CreateOrder({ setOpenCreateEvent }) {
     orderedData: OrderUtils.getWorkflowOrdered(workflowStepsDummy),
     isLoading: true,
   });
+
+  const [services, setServices] = useState({
+    data: [],
+    isLoading: true,
+  });
+
+  function getServices() {
+    CalendarService.getServices()
+      .then((response) => {
+        const servicesUpdated = getUpdatedState(services, {
+          isLoading: false,
+          data: [...response.data],
+        });
+        setServices(servicesUpdated);
+      })
+      .catch(() => {
+        const servicesUpdated = getUpdatedState(services, {
+          isLoading: false,
+          data: [...servicesDummy],
+          setErrorMsg: 'Ha ocurrido un problema cargando los horarios disponibles',
+        });
+        setServices(servicesUpdated);
+      });
+  }
 
   function getSchedules(date) {
     CalendarService.getAvailableHours(date, 1)
@@ -254,6 +301,7 @@ function CreateOrder({ setOpenCreateEvent }) {
       pieces_range_id: state.piecesSelected,
       plan_file: '',
       workflow: state.workflowSelected,
+      services: state.servicesSeleted.map((service) => service.id),
     })
       .then(() => {
         setOpenCreateEvent(false, true);
@@ -272,6 +320,7 @@ function CreateOrder({ setOpenCreateEvent }) {
 
   useEffect(() => {
     getWorkFlowSteps();
+    getServices();
     getPiecesRange();
   }, []);
 
@@ -387,7 +436,12 @@ function CreateOrder({ setOpenCreateEvent }) {
             </div>
             <div className="flex justify-between mb-2 items-center">
               <span className="font-bold">Servicios</span>
-              <SelectorCheckbox />
+              <SelectorCheckbox
+                setSelectedOptions={
+                  (_services) => setServicesSelected(_services)
+                }
+                options={services.data}
+              />
             </div>
             <div className="flex justify-between mb-2 items-center">
               <span className="font-bold">Flujo de trabajo</span>

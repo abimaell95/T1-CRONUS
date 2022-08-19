@@ -2,7 +2,8 @@
 import React, { useState, useCallback } from 'react';
 import ReactSelect, { components } from 'react-select';
 import PropTypes from 'prop-types';
-
+import './index.css';
+/*
 const colourOptions = [
   {
     value: 'ocean1', label: 'Corte-abc123', id: 1, type: 'corte',
@@ -20,7 +21,7 @@ const colourOptions = [
     value: 'orange', label: 'Pegado-okl963', id: 5, type: 'pegado',
   },
 ];
-
+*/
 function Option(props) {
   const { label, isSelected, value } = props;
   const checkboxClassName = `${isSelected ? ' ring-2 ring-gray-200 ' : ''}h-4 w-4 mr-2 text-gray-600 focus:ring-gray-500 border-gray-300 rounded`;
@@ -58,12 +59,14 @@ Option.defaultProps = {
   isSelected: false,
 };
 
-function SelectorCheckbox() {
+function SelectorCheckbox(props) {
+  const { setSelectedOptions, options } = props;
   const [state, setState] = useState({});
 
   const handleChange = useCallback((selected) => {
     const last = selected[selected.length - 1];
     const filter = selected.filter((option) => option.id === last.id || option.type !== last.type);
+    setSelectedOptions(filter);
     setState({ ...state, optionSelected: filter });
   }, [setState]);
 
@@ -76,13 +79,14 @@ function SelectorCheckbox() {
       <ReactSelect
         className="border-none"
         classNamePrefix="react-select"
-        options={colourOptions}
+        options={options}
         isMulti
         closeMenuOnSelect={false}
         hideSelectedOptions={false}
         components={{
           Option,
         }}
+        placeholder="Servicios"
         onChange={handleChange}
         allowSelectAll
         value={state.optionSelected}
@@ -99,5 +103,10 @@ function SelectorCheckbox() {
     </span>
   );
 }
+
+SelectorCheckbox.propTypes = {
+  setSelectedOptions: PropTypes.func.isRequired,
+  options: PropTypes.array.isRequired,
+};
 
 export default SelectorCheckbox;
