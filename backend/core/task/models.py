@@ -36,7 +36,7 @@ class OrderDetails(models.Model):
     client_name = models.CharField(max_length=60)
     invoice_num = models.CharField(max_length=30)
     file_url = models.CharField(max_length=300, null=True)
-    num_pieces = models.PositiveSmallIntegerField()
+    num_pieces = models.ForeignKey("PiecesRange", on_delete=models.CASCADE)
     current_step = models.ForeignKey("MachineWorkflowStep",
                                      on_delete=models.CASCADE)
     event = models.ForeignKey("Event", on_delete=models.CASCADE)
@@ -44,6 +44,14 @@ class OrderDetails(models.Model):
     def __str__(self):
         return str(self.id)
 
+class PiecesRange(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    duration = models.PositiveSmallIntegerField
+    range = models.CharField(max_length=10)
+
+    def __str__(self):
+        return str(self.id)
+    
 
 class MaintenancePeriod(models.Model):
     id = models.BigAutoField(primary_key=True)

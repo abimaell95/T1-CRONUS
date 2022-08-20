@@ -67,16 +67,24 @@ class OrderView(generics.ListCreateAPIView):
             start = "0" + str(jd["start_time"]) + ":00"
         else:
             start = str(jd["start_time"]) + ":00"
-
         if jd["end_time"] < 10:
             end = "0" + str(jd["end_time"]) + ":00"
         else:
             end = str(jd["end_time"]) + ":00"
+
+        start_datetime=jd["start_date"] + "-" + start
+        end_datetime=jd["end_date"] + "-" + end
+
+        start_date = start_date.strptime(start_datetime, "YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]")
+        end_date = end_date.strptime(end_datetime, "YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]")
+
         try:
             e = Event.objects.create(
                 description=jd["description"],
-                start_datetime=jd["start_date"] + "-" + start,
-                end_datetime=jd["end_date"] + "-" + end,
+                #start_datetime=jd["start_date"] + "-" + start,
+                start_datetime=start_date,
+                #end_datetime=jd["end_date"] + "-" + end,
+                end_datetime=end_date,
                 employee_id="0927643825",
                 state_id=1,
                 branch_id=1,

@@ -1,6 +1,6 @@
 from rest_framework.serializers import ModelSerializer
 from .models import EventType, EventState, Event, OrderDetails,\
-    MaintenanceDetails, MaintenancePeriod, Priority,\
+    MaintenanceDetails, MaintenancePeriod, PiecesRange, Priority,\
     EventJoinOrder, EventJoinOrders, EventJoinEventState
 
 
@@ -26,7 +26,7 @@ class EventSerializer(ModelSerializer):
             "end_datetime",
             "employee" "state",
             "branch",
-            "type",
+            "type"
         )
 
 
@@ -39,9 +39,18 @@ class OrderDetailsSerializer(ModelSerializer):
             "invoice_num",
             "file_url",
             "num_pieces",
-            "event_id",
+            "current_step",
+            "event_id"
         )
 
+class PiecesRangeSerializer(ModelSerializer):
+    class Meta:
+        model = PiecesRange
+        field = (
+            "id",
+            "duration",
+            "range"
+        )
 
 class MaintenanceDetailsSerializer(ModelSerializer):
     class Meta:

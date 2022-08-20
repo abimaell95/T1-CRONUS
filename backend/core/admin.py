@@ -2,7 +2,7 @@ from django.contrib import admin
 from .models import MachineState, BranchOffice,\
     Employee, MachineType, Machine
 from .task.models import EventType, EventState,\
-    Event, OrderDetails, MaintenancePeriod, MaintenanceDetails,\
+    Event, OrderDetails, MaintenancePeriod, MaintenanceDetails, PiecesRange,\
     Priority, ReparationDetails, EventJoinOrder, EventJoinEventState
 from .workflow.models import StepState, MachineWorkflowStep, Workflow,\
     WorkflowSteps, MachineWorkflowStepJoinMachine, WorkflowJoinWSteps
@@ -21,6 +21,7 @@ admin.site.register(BranchOffice)
 admin.site.register(Employee, EmployeeAdmin)
 admin.site.register(MachineType)
 admin.site.register(Machine)
+admin.site.register(PiecesRange)
 
 
 admin.site.register(EventType)
