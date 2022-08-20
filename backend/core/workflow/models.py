@@ -11,6 +11,7 @@ class StepState(models.Model):
 
 class MachineWorkflowStep(models.Model):
     id = models.BigAutoField(primary_key=True)
+    start_datetime = models.DateTimeField(null=True)
     end_datetime = models.DateTimeField(null=True)
     state = models.ForeignKey('StepState', on_delete=models.CASCADE)
     machine = models.ForeignKey('Machine', on_delete=models.CASCADE)
