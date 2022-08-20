@@ -1,8 +1,11 @@
+/* eslint-disable max-len */
 /* This example requires Tailwind CSS v2.0+ */
 import {
-  React, useState, useEffect,
-  useRef, Fragment,
+  React, useState, useEffect, useRef, Fragment,
 } from 'react';
+import {
+  ClockIcon,
+} from '@heroicons/react/outline';
 import PropTypes from 'prop-types';
 import OrderDetail from '../OrderDetail';
 import CreateOrder from '../CreateOrder';
@@ -10,7 +13,7 @@ import { DateUtils, CalendarUtils } from '../../utils';
 import { CalendarService } from '../../../services';
 
 function WeeklyView({
-  currentDate, selectedDate, flagEvents, openCreateEvent, setOpenCreateEvent,
+  currentDate, selectedDate, flagEvents, branchOffice, selectedService, openCreateEvent, setOpenCreateEvent,
 }) {
   const container = useRef(null);
   const containerNav = useRef(null);
@@ -25,7 +28,7 @@ function WeeklyView({
   );
 
   const setEvents = (date) => {
-    CalendarService.getEvents(date)
+    CalendarService.getEvents(date, selectedService, branchOffice)
       .then((response) => {
         const events = response.data.map((event) => {
           const start = event.start_datetime.slice(0, event.start_datetime.length - 1);
@@ -44,20 +47,26 @@ function WeeklyView({
               end_datetime: new Date('2022-06-30T08:00:00'),
               state_id: 1,
               label: 'No Iniciado',
+              client: 'Rosita Intriago',
+              invoice_number: '001-001-1000',
             },
             {
               id: 4,
               start_datetime: new Date('2022-06-30T08:00:00'),
               end_datetime: new Date('2022-06-30T09:00:00'),
-              state_id: 1,
-              label: 'No Iniciado',
+              state_id: 2,
+              label: 'En Curso',
+              client: 'Loid Forger',
+              invoice_number: '001-001-1001',
             },
             {
               id: 5,
               start_datetime: new Date('2022-06-30T06:00:00'),
               end_datetime: new Date('2022-07-02T07:00:00'),
-              state_id: 1,
-              label: 'No Iniciado',
+              state_id: 3,
+              label: 'Finalizado',
+              client: 'Anya Forger',
+              invoice_number: '001-001-1002',
             },
             {
               id: 9,
@@ -65,6 +74,8 @@ function WeeklyView({
               end_datetime: new Date('2022-06-28T08:00:00'),
               state_id: 1,
               label: 'No Iniciado',
+              client: 'Yor Forger',
+              invoice_number: '001-001-1003',
             },
           ],
         });
@@ -84,11 +95,11 @@ function WeeklyView({
     setState({ ...state, openDetails: false });
   };
 
-  const eventTypeMap = {
+  /* const eventTypeMap = {
     1: 'Pedido',
     2: 'Mantenimiento',
     3: 'Reparación',
-  };
+  }; */
 
   return (
     <div className="grid grid-cols-8">
@@ -98,11 +109,9 @@ function WeeklyView({
             <div style={{ width: '165%' }} className="flex max-w-full flex-none flex-col sm:max-w-none md:max-w-full">
               <div
                 ref={containerNav}
-                className="sticky top-0 z-30 flex-none bg-white shadow ring-1 ring-black ring-opacity-5 sm:pr-8"
+                className=" top-0 flex-none bg-white shadow ring-1 ring-black ring-opacity-5 sm:pr-8"
               >
-                { // eslint-disable-next-line max-len
-                /* WE CAN ADD HERE THE HEADER  AND ITERATE THE VALUES FROM SELECTED DATE TO CREATE AN ARRAY WITH MONTH - DAY */
-                }
+                {/* WE CAN ADD HERE THE HEADER  AND ITERATE THE VALUES FROM SELECTED DATE TO CREATE AN ARRAY WITH MONTH - DAY */}
                 <div className="-mr-px hidden grid-cols-7 divide-x divide-gray-100 border-r border-gray-100 text-sm leading-6 text-gray-500 sm:grid">
                   <div className="col-end-1 w-14" />
                   {DateUtils.generateDays(selectedDate).map((date, idx) => (
@@ -176,25 +185,38 @@ function WeeklyView({
                         and x is the hour of day of the event (en función del endTime-startTime)
                       */}
                     {state.events.map(({
-                      id, start_datetime, end_datetime, state_id, label,
+                      id, start_datetime, end_datetime, state_id, label, client, invoice_number,
                     }) => {
                       const row = CalendarUtils.getCalendarRow(start_datetime);
                       const span = CalendarUtils.getCalendarSpan(start_datetime, end_datetime);
                       if (row > -1 && span > -1) {
                         return (
-                          <li key={id} className={`relative mt-px flex col-start-${start_datetime.getDay()}`} style={{ gridRow: `${row} / span ${span}` }}>
+                          <li
+                            key={id}
+                            className={`relative mt-px flex col-start-${start_datetime.getDay()}`}
+                            data-bs-toggle="tooltip"
+                            title={label}
+                            style={{ gridRow: `${row} / span ${span}` }}
+                          >
                             <a
                               onClick={() => { setSelectedEvent(id); }}
                               className={`group absolute inset-1 flex flex-col overflow-y-auto rounded-lg p-2 text-xs leading-5 cursor-pointer ${CalendarUtils.getStateColor(state_id)}`}
                               href="#/"
                             >
-                              <p className="order-1 text-sm font-semibold">
-                                {`${eventTypeMap[1]} #${id}`}
+                              <p className="order-1 text-sm font-bold">
+                                {`No. ${invoice_number}`}
                                 {' '}
                               </p>
-                              <span className={`absolute text-xs font-medium px-2 py-1 rounded-md bottom-2 right-2 ${CalendarUtils.getStateColorBadgeMap(state_id)}`}>
-                                {label}
-                              </span>
+                              <p className="order-2 text-sm font-medium">
+                                {`${client}`}
+                                {' '}
+                              </p>
+                              <div className="absolute flex flex-wrap items-center text-sm font-medium px-2 py-1 bottom-2 right-2">
+                                <ClockIcon className="h-5 w-5" />
+                                <span className="pl-1">
+                                  {CalendarUtils.getTileDate(end_datetime)}
+                                </span>
+                              </div>
                             </a>
                           </li>
                         );
@@ -229,6 +251,8 @@ WeeklyView.propTypes = {
   currentDate: PropTypes.object.isRequired,
   selectedDate: PropTypes.object.isRequired,
   flagEvents: PropTypes.bool.isRequired,
+  branchOffice: PropTypes.number.isRequired,
+  selectedService: PropTypes.number.isRequired,
   openCreateEvent: PropTypes.bool.isRequired,
   setOpenCreateEvent: PropTypes.func.isRequired,
 };
