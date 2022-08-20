@@ -72,7 +72,7 @@ function SelectorCheckbox(props) {
 
   return (
     <span
-      className=" w-48 shadow-sm rounded-md text-left sm:text-sm"
+      className=" w-52 shadow-sm rounded-md text-left sm:text-sm"
       data-toggle="popover"
       data-content="Please selecet account(s)"
     >

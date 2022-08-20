@@ -21,44 +21,6 @@ const schedule = [
   },
 ];
 
-const workflowStepsDummy = [
-  {
-    id: 1,
-    label: 'Workflow 1',
-    step_id: 1,
-    step_order: 1,
-    type_label: 'corte',
-  },
-  {
-    id: 2,
-    label: 'Workflow 2',
-    step_id: 4,
-    step_order: 2,
-    type_label: 'abisagrado',
-  },
-  {
-    id: 2,
-    label: 'Workflow 2',
-    step_id: 3,
-    step_order: 1,
-    type_label: 'corte',
-  },
-  {
-    id: 1,
-    label: 'Workflow 1',
-    step_id: 2,
-    step_order: 2,
-    type_label: 'abisagrado',
-  },
-  {
-    id: 2,
-    label: 'Workflow 2',
-    step_id: 5,
-    step_order: 3,
-    type_label: 'enchapado',
-  },
-];
-
 const piecesRangeDummy = [
   {
     id: 1,
@@ -82,6 +44,7 @@ const piecesRangeDummy = [
   },
 ];
 
+/*
 const servicesDummy = [
   {
     value: 'ocean1', label: 'Corte-abc123', id: 1, type: 'corte',
@@ -97,6 +60,24 @@ const servicesDummy = [
   },
   {
     value: 'orange', label: 'Pegado-okl963', id: 5, type: 'pegado',
+  },
+];
+*/
+const servicesDummy = [
+  {
+    serial_number: 'abc123', label: 'Corte', type_id: 1,
+  },
+  {
+    serial_number: 'cde456', label: 'Corte', type_id: 1,
+  },
+  {
+    serial_number: 'efg789', label: 'Enchapado', type_id: 2,
+  },
+  {
+    serial_number: 'rty852', label: 'Abisagrado', type_id: 3,
+  },
+  {
+    serial_number: 'okl963', label: 'Pegado', type_id: 4,
   },
 ];
 
@@ -116,7 +97,6 @@ function CreateOrder({ setOpenCreateEvent }) {
     endDate: new Date(),
     file: null,
     isLoading: false,
-    workflowSelected: 1,
     timeSelected: 1,
     schedules: {},
     servicesSeleted: [],
@@ -140,10 +120,6 @@ function CreateOrder({ setOpenCreateEvent }) {
       ...state,
       [name]: value,
     });
-  }
-
-  function setWorkflowSelectedId(id) {
-    setState({ ...state, workflowSelected: id });
   }
 
   function setServicesSelected(services) {
@@ -173,12 +149,6 @@ function CreateOrder({ setOpenCreateEvent }) {
     setState({ ...state, timeSelected: id });
   }
 
-  const [workflowSteps, setWorkflowSteps] = useState({
-    data: workflowStepsDummy,
-    orderedData: OrderUtils.getWorkflowOrdered(workflowStepsDummy),
-    isLoading: true,
-  });
-
   const [services, setServices] = useState({
     data: [],
     isLoading: true,
@@ -189,14 +159,24 @@ function CreateOrder({ setOpenCreateEvent }) {
       .then((response) => {
         const servicesUpdated = getUpdatedState(services, {
           isLoading: false,
-          data: [...response.data],
+          data: response.data.map((service) => ({
+            id: service.serial_number,
+            value: service.serial_number,
+            label: service.label,
+            type: service.type_id,
+          })),
         });
         setServices(servicesUpdated);
       })
       .catch(() => {
         const servicesUpdated = getUpdatedState(services, {
           isLoading: false,
-          data: [...servicesDummy],
+          data: servicesDummy.map((service) => ({
+            id: service.serial_number,
+            value: service.serial_number,
+            label: `${service.label}-${service.serial_number}`,
+            type: service.type_id,
+          })),
           setErrorMsg: 'Ha ocurrido un problema cargando los horarios disponibles',
         });
         setServices(servicesUpdated);
@@ -235,27 +215,6 @@ function CreateOrder({ setOpenCreateEvent }) {
           },
         });
         setState(updatedState);
-      });
-  }
-
-  function getWorkFlowSteps() {
-    CalendarService.getWorkFlowSteps()
-      .then((response) => {
-        const workflowStepUpdated = getUpdatedState(workflowSteps, {
-          isLoading: false,
-          data: [...response.data],
-          orderedData: OrderUtils.getWorkflowOrdered(response.data),
-        });
-        setWorkflowSteps(workflowStepUpdated);
-      })
-      .catch(() => {
-        const workflowStepUpdated = getUpdatedState(workflowSteps, {
-          ...workflowSteps,
-          isLoading: false,
-          data: [...workflowStepsDummy],
-          setErrorMsg: 'Ha ocurrido un problema cargando los horarios disponibles',
-        });
-        setWorkflowSteps(workflowStepUpdated);
       });
   }
 
@@ -300,7 +259,6 @@ function CreateOrder({ setOpenCreateEvent }) {
       invoice_num: state.invoice_num,
       pieces_range_id: state.piecesSelected,
       plan_file: '',
-      workflow: state.workflowSelected,
       services: state.servicesSeleted.map((service) => service.id),
     })
       .then(() => {
@@ -319,7 +277,6 @@ function CreateOrder({ setOpenCreateEvent }) {
   }
 
   useEffect(() => {
-    getWorkFlowSteps();
     getServices();
     getPiecesRange();
   }, []);
@@ -392,7 +349,7 @@ function CreateOrder({ setOpenCreateEvent }) {
             type="text"
             name="invoice_num"
             id="invoice_num"
-            className="text-gray-500 mt-1 focus:ring-gray-500 focus:border-gray-500 block shadow-sm sm:text-sm border-gray-300 rounded-md w-48"
+            className="text-gray-500 mt-1 focus:ring-gray-500 focus:border-gray-500 block shadow-sm sm:text-sm border-gray-300 rounded-md w-52"
             onChange={(e) => setFormData(e.target.name, e.target.value)}
           />
         </div>
@@ -402,14 +359,14 @@ function CreateOrder({ setOpenCreateEvent }) {
             type="text"
             name="client_name"
             id="client_name"
-            className="text-gray-500 mt-1 focus:ring-gray-500 focus:border-gray-500 block shadow-sm sm:text-sm border-gray-300 rounded-md w-48"
+            className="text-gray-500 mt-1 focus:ring-gray-500 focus:border-gray-500 block shadow-sm sm:text-sm border-gray-300 rounded-md w-52"
             onChange={(e) => setFormData(e.target.name, e.target.value)}
           />
         </div>
         <div className="flex justify-between mb-2 items-center">
           <span className="font-bold">Fecha de agendamiento</span>
           <input
-            className="text-gray-500 mt-1 focus:ring-gray-500 focus:border-gray-500 block shadow-sm sm:text-sm border-gray-300 rounded-md w-48"
+            className="text-gray-500 mt-1 focus:ring-gray-500 focus:border-gray-500 block shadow-sm sm:text-sm border-gray-300 rounded-md w-52"
             type="date"
             name="startDate"
             onChange={(e) => {
@@ -443,39 +400,6 @@ function CreateOrder({ setOpenCreateEvent }) {
                 options={services.data}
               />
             </div>
-            <div className="flex justify-between mb-2 items-center">
-              <span className="font-bold">Flujo de trabajo</span>
-              <MyListbox
-                options={
-                      Object.keys(workflowSteps.orderedData).map((key) => ({
-                        id: key,
-                        label: workflowSteps.orderedData[key].label,
-                      }))
-                  }
-                setSelectedId={(id) => setWorkflowSelectedId(id)}
-              />
-            </div>
-            {
-                  state.workflowSelected
-                  && (
-                  <div className="flex justify-between mt-6 ml-4">
-                    {
-                          workflowSteps.orderedData[state.workflowSelected].steps.map(
-                            (step) => (
-                              <div className="relative h-9" key={step.order}>
-                                <span className="absolute -left-3 -top-3 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-gray-100 bg-gray-700 rounded-full">
-                                  {step.order}
-                                </span>
-                                <span className="border border-gray-300 text-gray-700 font-semibold mr-2 px-2.5 py-0.5 rounded self-center">
-                                  {step.activity}
-                                </span>
-                              </div>
-                            ),
-                          )
-                      }
-                  </div>
-                  )
-              }
             <div className="flex justify-center items-center mt-5">
               <span className=" bg-gray-200 rounded px-3 py-1 w-36">
                 <span className="text-gray-700 text-sm">Subir planificación</span>
