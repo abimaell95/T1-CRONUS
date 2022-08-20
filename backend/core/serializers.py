@@ -1,6 +1,6 @@
 from rest_framework.serializers import ModelSerializer
 from .models import MachineState, BranchOffice,\
-    Employee, MachineType, Machine
+    Employee, MachineType, Machine, MachineJoinType
 
 
 class MachineStateSerializer(ModelSerializer):
@@ -42,3 +42,8 @@ class MachineSerializer(ModelSerializer):
             "branch",
             "employee_id",
         )
+
+class MachineJoinTypeSerializer(ModelSerializer):
+    class Meta:
+        model = MachineJoinType
+        fields = "__all__"
