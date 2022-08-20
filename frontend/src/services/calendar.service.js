@@ -12,10 +12,17 @@ function handleResponse(response) {
 }
 
 async function createOrder(order) {
+  /*
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(order),
+  };
+  return fetch('/dev/api/order/', requestOptions).then(handleResponse);
+  */
+  const requestOptions = {
+    method: 'POST',
+    body: order,
   };
   return fetch('/dev/api/order/', requestOptions).then(handleResponse);
 }

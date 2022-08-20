@@ -229,7 +229,9 @@ function CreateOrder({ setOpenCreateEvent }) {
 
   function createEvent() {
     isLoading(true);
-    CalendarService.createOrder({
+    const formData = new FormData();
+    /*
+      {
       description: state.description,
       start_date: DateUtils.getFormatStringDate(state.startDate),
       end_date: DateUtils.getFormatStringDate(state.endDate),
@@ -242,6 +244,19 @@ function CreateOrder({ setOpenCreateEvent }) {
       plan_file: '',
       services: state.servicesSeleted.map((service) => service.id),
     })
+    */
+    formData.append('plan_file', state.file);
+    formData.append('description', state.description);
+    formData.append('start_date', DateUtils.getFormatStringDate(state.startDate));
+    formData.append('end_date', DateUtils.getFormatStringDate(state.endDate));
+    formData.append('start_time', state.schedules.data[state.timeSelected].start);
+    formData.append('end_time', state.schedules.data[state.timeSelected].end);
+    formData.append('type', 1);
+    formData.append('client_name', state.client_name);
+    formData.append('invoice_num', state.invoice_num);
+    formData.append('pieces_range_id', state.piecesSelected);
+    formData.append('services', state.servicesSeleted.map((service) => service.id));
+    CalendarService.createOrder(formData)
       .then(() => {
         setOpenCreateEvent(false, true);
       })
@@ -391,9 +406,12 @@ function CreateOrder({ setOpenCreateEvent }) {
                   name="file"
                   onChange={(e) => {
                     const { files } = e.target;
+                    /*
                     const formData = new FormData();
                     formData.append('planning', files[0]);
                     setFormData(e.target.name, formData);
+                    */
+                    setFormData(e.target.name, files[0]);
                   }}
                 />
               </label>
