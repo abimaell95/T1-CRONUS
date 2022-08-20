@@ -89,7 +89,7 @@ async function getPiecesRange() {
   return fetch('/dev/api/pieces-range/', requestOptions).then(handleResponse);
 }
 
-async function getServices() {
+async function getMachines() {
   const requestOptions = {
     method: 'GET',
   };
@@ -107,5 +107,5 @@ export const CalendarService = {
   getOrders,
   getWorkFlowSteps,
   getPiecesRange,
-  getServices,
+  getMachines,
 };

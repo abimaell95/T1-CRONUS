@@ -135,8 +135,8 @@ function CreateOrder({ setOpenCreateEvent }) {
     isLoading: true,
   });
 
-  function getServices() {
-    CalendarService.getServices()
+  function getMachines() {
+    CalendarService.getMachines()
       .then((response) => {
         const servicesUpdated = getUpdatedState(services, {
           isLoading: false,
@@ -258,7 +258,7 @@ function CreateOrder({ setOpenCreateEvent }) {
   }
 
   useEffect(() => {
-    getServices();
+    getMachines();
     getPiecesRange();
   }, []);
 
