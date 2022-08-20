@@ -76,7 +76,7 @@ async function getServices() {
   const requestOptions = {
     method: 'GET',
   };
-  return fetch('/dev/api/services/', requestOptions).then(handleResponse);
+  return fetch('/dev/api/machines/', requestOptions).then(handleResponse);
 }
 
 export const CalendarService = {
