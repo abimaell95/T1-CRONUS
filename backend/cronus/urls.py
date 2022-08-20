@@ -35,6 +35,7 @@ urlpatterns = [
     path("api/pieces_range", views.PiecesRangeView.as_view()),
     path("api/events/", eventviews.EventsView.as_view()),
     path("api/workflows/", workflowviews.WorkflowsView.as_view()),
+    path("api/services/", views.MachineTypeView.as_view()),
     path("api/machines/", views.MachinesView.as_view()),
     path("api/orders/", eventviews.OrdersView.as_view()),
     path("api/available_hours/", eventviews.available_hours),
