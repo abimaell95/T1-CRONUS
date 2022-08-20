@@ -44,25 +44,6 @@ const piecesRangeDummy = [
   },
 ];
 
-/*
-const servicesDummy = [
-  {
-    value: 'ocean1', label: 'Corte-abc123', id: 1, type: 'corte',
-  },
-  {
-    value: 'blue', label: 'Corte-cde456', id: 2, type: 'corte',
-  },
-  {
-    value: 'purple', label: 'Enchapado-efg789', id: 3, type: 'encapado',
-  },
-  {
-    value: 'red', label: 'Abisagrado-rty852', id: 4, type: 'abisagrado',
-  },
-  {
-    value: 'orange', label: 'Pegado-okl963', id: 5, type: 'pegado',
-  },
-];
-*/
 const servicesDummy = [
   {
     serial_number: 'abc123', label: 'Corte', type_id: 1,
