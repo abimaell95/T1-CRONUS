@@ -250,7 +250,7 @@ class EventsView(generics.ListAPIView):
         if day == "":
             day = datetime.datetime.now().day
 
-        machine_type = request.GET.get("machinetype", "")
+        machine_type = request.GET.get("service", "")
         if machine_type == "":
             select_state = "core_event.state_id, core_eventstate.label, "
             join_state = "inner join core_eventstate on" \
