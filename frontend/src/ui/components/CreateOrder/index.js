@@ -382,9 +382,10 @@ function CreateOrder({ setOpenCreateEvent }) {
               />
             </div>
             <div className="flex justify-center items-center mt-5">
-              <span className=" bg-gray-200 rounded px-3 py-1 w-36">
+              <label htmlFor="file" className=" bg-gray-200 rounded px-3 py-1 w-36">
                 <span className="text-gray-700 text-sm">Subir planificación</span>
                 <input
+                  id="file"
                   type="file"
                   className="invisible w-0"
                   name="file"
@@ -395,7 +396,7 @@ function CreateOrder({ setOpenCreateEvent }) {
                     setFormData(e.target.name, formData);
                   }}
                 />
-              </span>
+              </label>
             </div>
 
           </>
