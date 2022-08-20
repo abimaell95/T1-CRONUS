@@ -33,6 +33,9 @@ async function getEvents(date, service, branch = 1, period = 0) {
   const requestOptions = {
     method: 'GET',
   };
+  if (service === -1) {
+    return fetch(`/dev/api/events/?day=${day}&month=${month}&year=${year}&branch=${branch}&period=${period}`, requestOptions).then(handleResponse);
+  }
   return fetch(`/dev/api/events/?day=${day}&month=${month}&year=${year}&branch=${branch}&period=${period}&service=${service}`, requestOptions).then(handleResponse);
 }
 
@@ -40,7 +43,7 @@ async function getBranchOffices() {
   const requestOptions = {
     method: 'GET',
   };
-  return fetch('/dev/api/branches/', requestOptions).then(handleResponse);
+  return fetch('/dev/api/branchoffice/', requestOptions).then(handleResponse);
 }
 
 async function getServices() {
