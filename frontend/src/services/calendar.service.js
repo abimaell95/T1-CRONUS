@@ -28,12 +28,29 @@ async function getAvailableHours(date, branchId) {
   return fetch(`/dev/api/available_hours/?date=${dateString}&branch=${branchId}`, requestOptions).then(handleResponse);
 }
 
-async function getEvents(date, branch = 1, period = 0) {
+async function getEvents(date, service, branch = 1, period = 0) {
   const [year, month, day] = DateUtils.dateToString(date).split('-');
   const requestOptions = {
     method: 'GET',
   };
-  return fetch(`/dev/api/events/?day=${day}&month=${month}&year=${year}&branch=${branch}&period=${period}`, requestOptions).then(handleResponse);
+  if (service === -1) {
+    return fetch(`/dev/api/events/?day=${day}&month=${month}&year=${year}&branch=${branch}&period=${period}`, requestOptions).then(handleResponse);
+  }
+  return fetch(`/dev/api/events/?day=${day}&month=${month}&year=${year}&branch=${branch}&period=${period}&service=${service}`, requestOptions).then(handleResponse);
+}
+
+async function getBranchOffices() {
+  const requestOptions = {
+    method: 'GET',
+  };
+  return fetch('/dev/api/branchoffice/', requestOptions).then(handleResponse);
+}
+
+async function getServices() {
+  const requestOptions = {
+    method: 'GET',
+  };
+  return fetch('/dev/api/services/', requestOptions).then(handleResponse);
 }
 
 async function getOrderDetails(orderId) {
@@ -72,7 +89,7 @@ async function getPiecesRange() {
   return fetch('/dev/api/pieces-range/', requestOptions).then(handleResponse);
 }
 
-async function getServices() {
+async function getMachines() {
   const requestOptions = {
     method: 'GET',
   };
@@ -83,10 +100,12 @@ export const CalendarService = {
   createOrder,
   getAvailableHours,
   getEvents,
+  getBranchOffices,
+  getServices,
   getOrderDetails,
   getOrderWorkFlow,
   getOrders,
   getWorkFlowSteps,
   getPiecesRange,
-  getServices,
+  getMachines,
 };

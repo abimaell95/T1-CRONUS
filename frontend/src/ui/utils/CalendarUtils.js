@@ -100,6 +100,10 @@ function strDayOfWeek(date) {
   return `${dayMap[date.getDay()]}`;
 }
 
+function getTileDate(date) {
+  return `${monthMap[date.getMonth()]} ${date.getDate()}`;
+}
+
 /*
  @first_test : date - if out of range upper returns -1
  @second_test : date - if out of range lower returns -1
@@ -134,6 +138,7 @@ export const CalendarUtils = {
   getStateColorBadgeMap,
   getWeekLabel,
   strDayOfWeek,
+  getTileDate,
   getCalendarRow,
   getCalendarSpan,
 };

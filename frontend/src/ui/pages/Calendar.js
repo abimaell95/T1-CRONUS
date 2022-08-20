@@ -7,11 +7,22 @@ function Calendar() {
   const [state, setState] = useState(
     {
       selectedDate: DateUtils.getMonday(new Date()),
+      branchOffice: 1,
+      selectedService: -1,
       currentDate: new Date(),
       flagEvents: false,
       openCreationForm: false,
     },
   );
+
+  const setBranchOffice = (branchID) => {
+    setState({ ...state, branchOffice: branchID, flagEvents: !state.flagEvents });
+  };
+
+  const setSelectedService = (service) => {
+    setState({ ...state, selectedService: service, flagEvents: !state.flagEvents });
+  };
+
   const setSelectedDate = (date) => {
     setState({ ...state, selectedDate: date, flagEvents: !state.flagEvents });
   };
@@ -31,11 +42,15 @@ function Calendar() {
         selectedDate={state.selectedDate}
         setSelectedDate={setSelectedDate}
         setOpenCreateEvent={setOpenCreateEvent}
+        setBranchOffice={setBranchOffice}
+        setSelectedService={setSelectedService}
       />
       <WeeklyView
         currentDate={state.currentDate}
         selectedDate={state.selectedDate}
         flagEvents={state.flagEvents}
+        branchOffice={state.branchOffice}
+        selectedService={state.selectedService}
         openCreateEvent={state.openCreationForm}
         setOpenCreateEvent={setOpenCreateEvent}
       />
