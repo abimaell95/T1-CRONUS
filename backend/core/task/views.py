@@ -283,6 +283,7 @@ class EventsView(generics.ListAPIView):
                 query_date, query_filter
             )
         )
+
         queryset = EventJoinEventState.objects.raw(query)
 
         serializer = self.get_serializer(queryset, many=True)
