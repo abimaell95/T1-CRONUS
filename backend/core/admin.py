@@ -1,3 +1,4 @@
+from atexit import register
 from django.contrib import admin
 from .models import MachineState, BranchOffice,\
     Employee, MachineType, Machine, MachineJoinType
@@ -7,6 +8,8 @@ from .task.models import EventType, EventState,\
     EventJoinOrder, EventJoinOrders, EventJoinEventState
 from .workflow.models import StepState, MachineWorkflowStep, \
     MachineWorkflowStepJoinMachine
+from .reports.models import ProductivityReportModel, \
+    OrdersResumeModel
 
 
 class EmployeeAdmin(admin.ModelAdmin):
@@ -40,3 +43,6 @@ admin.site.register(EventJoinEventState)
 admin.site.register(StepState)
 admin.site.register(MachineWorkflowStep)
 admin.site.register(MachineWorkflowStepJoinMachine)
+
+admin.site.register(ProductivityReportModel)
+admin.site.register(OrdersResumeModel)

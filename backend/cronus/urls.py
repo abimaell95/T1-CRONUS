@@ -22,6 +22,7 @@ from rest_framework import routers
 from core import views
 from core.task import views as eventviews
 from core.workflow import views as workflowviews
+from core.reports import views as reportsviews
 
 router = routers.DefaultRouter()
 router.register(r"event_type", eventviews.EventTypeViewSet)
@@ -40,6 +41,8 @@ urlpatterns = [
     path("api/available_hours/", eventviews.available_hours),
     path("api/order/", eventviews.OrderView.as_view()),
     path("api/workflow/", workflowviews.MachineWorkflowStepView.as_view()),
+    path("api/productivity_report/", reportsviews.ProductivityReport.as_view()),
+    path("api/orders_resume/", reportsviews.OrdersResume.as_view()),
     path("accounts/login/", views.login_view, name="login"),
     path("logout/", logout, name="logout"),
     path("api-auth/", include("rest_framework.urls",
