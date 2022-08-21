@@ -270,20 +270,15 @@ class EventsView(generics.ListAPIView):
         query = (
             "select core_event.id, core_event.start_datetime,"
             " core_event.end_datetime, {}core_orderdetails.invoice_num,"
-            " core_orderdetails.client_name, core_machinetype.id"
+            " core_orderdetails.client_name"
             " from core_event inner join core_orderdetails"
-            " on core_event.id=core_orderdetails.event_id"
-            " inner join core_machineworkflowstep"
-            " on core_orderdetails.id = core_machineworkflowstep.order_id"
-            " inner join core_machine"
-            " on core_machineworkflowstep.machine_id=core_machine.serial_number"
-            " inner join core_machinetype"
-            " on core_machine.type_id=core_machinetype.id {}"
+            " on core_event.id=core_orderdetails.event_id {}"
             " where core_event.branch_id={} and {} {}".format(
                 select_state, join_state, branch_number,
                 query_date, query_filter
             )
         )
+
         queryset = EventJoinEventState.objects.raw(query)
 
         serializer = self.get_serializer(queryset, many=True)
