@@ -5,9 +5,11 @@ backports.zoneinfo==0.2.1
 boto3==1.24.22
 botocore==1.27.22
 certifi==2022.6.15
+cffi==1.15.1
 cfn-flip==1.3.0
 charset-normalizer==2.1.0
 click==8.1.3
+cryptography==37.0.4
 Django==3.2.13
 django-cors-headers==3.13.0
 django-s3-storage==0.13.6
@@ -25,10 +27,13 @@ kappa==0.6.0
 MarkupSafe==2.1.1
 mccabe==0.6.1
 mysqlclient==2.1.1
+numpy==1.23.2
 placebo==0.9.0
 pycodestyle==2.8.0
+pycparser==2.21
 pyflakes==2.4.0
 Pygments==2.12.0
+PyMySQL==1.0.2
 python-dateutil==2.8.2
 python-slugify==6.1.2
 pytz==2022.1
@@ -47,5 +52,3 @@ Werkzeug==2.1.2
 whitenoise==6.2.0
 wsgi-request-logger==0.4.6
 zappa==0.54.1
-numpy==1.23.2
-cryptography==37.0.4

@@ -36,8 +36,8 @@ class OrderView(generics.ListCreateAPIView):
         id = request.GET.get("id", "")
         queryset = EventJoinOrder.objects.raw(
             "select core_orderdetails.id, core_event.state_id"
-            " as state, core_eventstate.label,"
-            " core_event.description, core_orderdetails.num_pieces,"
+            " as state, core_eventstate.label, core_event.description,"
+            " core_orderdetails.num_pieces_id as num_pieces,"
             " core_employee.name, core_employee.surname,"
             " core_event.end_datetime, core_orderdetails.client_name,"
             " core_orderdetails.invoice_num, core_orderdetails.file_url"
@@ -72,8 +72,8 @@ class OrderView(generics.ListCreateAPIView):
         else:
             end = str(jd["end_time"]) + ":00"
 
-        start_datetime=jd["start_date"] + "-" + start
-        end_datetime=jd["end_date"] + "-" + end
+        start_datetime = jd["start_date"] + "-" + start
+        end_datetime = jd["end_date"] + "-" + end
 
         start_date = start_date.strptime(start_datetime, "YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]")
         end_date = end_date.strptime(end_datetime, "YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]")
@@ -81,9 +81,9 @@ class OrderView(generics.ListCreateAPIView):
         try:
             e = Event.objects.create(
                 description=jd["description"],
-                #start_datetime=jd["start_date"] + "-" + start,
+                # start_datetime=jd["start_date"] + "-" + start,
                 start_datetime=start_date,
-                #end_datetime=jd["end_date"] + "-" + end,
+                # end_datetime=jd["end_date"] + "-" + end,
                 end_datetime=end_date,
                 employee_id="0927643825",
                 state_id=1,
@@ -137,7 +137,7 @@ class OrderView(generics.ListCreateAPIView):
             workflowlist = workflowModels.WorkflowSteps.objects.filter(
                 workflow__id=int(jd["workflow"])
             )
-            print(workflowlist)
+
             c = 1
             wList = []
             for step in workflowlist:
@@ -202,7 +202,7 @@ class OrdersView(generics.ListAPIView):
             " inner join core_eventstate on"
             " core_event.state_id = core_eventstate.id"
             " inner join core_machineworkflowstep on"
-            " core_orderdetails.current_step_id = core_machineworkflowstep.id"
+            " core_orderdetails.current_step = core_machineworkflowstep.id"
             " inner join core_machine on core_machine.serial_number = "
             " core_machineworkflowstep.machine_id inner join"
             " core_machinetype on core_machinetype.id=core_machine.type_id"
@@ -230,18 +230,24 @@ class EventsView(generics.ListAPIView):
         year = request.GET.get("year", datetime.datetime.now().year)
         month = request.GET.get("month", datetime.datetime.now().month)
         day = request.GET.get("day", datetime.datetime.now().day)
-        
+
         machine_type = request.GET.get("service", "")
         if machine_type == "":
             select_state = "core_event.state_id, core_eventstate.label, "
             join_state = "inner join core_eventstate on" \
                          " core_event.state_id=core_eventstate.id"
             query_filter = ""
-            
+
         else:
             select_state = "core_machineworkflowstep.state_id," \
                            " core_stepstate.label, "
-            join_state = "inner join core_stepstate on" \
+            join_state = " inner join core_machineworkflowstep" \
+                         " on core_orderdetails.id = core_machine" \
+                         "workflowstep.order_id inner join core_machine" \
+                         " on core_machineworkflowstep.machine_id=core_" \
+                         "machine.serial_number inner join core_machinetype" \
+                         " on core_machine.type_id=core_machinetype.id" \
+                         " inner join core_stepstate on" \
                          " core_machineworkflowstep.state_id=core_stepstate.id"
             query_filter = "and core_machinetype.id={}".format(machine_type)
 
@@ -264,20 +270,15 @@ class EventsView(generics.ListAPIView):
         query = (
             "select core_event.id, core_event.start_datetime,"
             " core_event.end_datetime, {}core_orderdetails.invoice_num,"
-            " core_orderdetails.client_name, core_machinetype.id"
+            " core_orderdetails.client_name"
             " from core_event inner join core_orderdetails"
-            " on core_event.id=core_orderdetails.event_id"
-            " inner join core_machineworkflowstep"
-            " on core_orderdetails.id = core_machineworkflowstep.order_id"
-            " inner join core_machine"
-            " on core_machineworkflowstep.machine_id=core_machine.serial_number"
-            " inner join core_machinetype"
-            " on core_machine.type_id=core_machinetype.id {}"
+            " on core_event.id=core_orderdetails.event_id {}"
             " where core_event.branch_id={} and {} {}".format(
                 select_state, join_state, branch_number,
                 query_date, query_filter
             )
         )
+
         queryset = EventJoinEventState.objects.raw(query)
 
         serializer = self.get_serializer(queryset, many=True)

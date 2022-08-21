@@ -21,7 +21,7 @@ class MachineWorkflowStepSerializer(ModelSerializer):
         )
 
 
-## JOIN TABLES SERIALIZERS
+# JOIN TABLES SERIALIZERS
 class MachineWorkflowStepJoinMachineSerializer(ModelSerializer):
     class Meta:
         model = MachineWorkflowStepJoinMachine

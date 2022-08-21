@@ -3,8 +3,9 @@ import numpy as np
 from .task.serializers import PiecesRangeSerializer
 from .task.models import PiecesRange
 
-from .serializers import BranchOfficeSerializer, MachineJoinTypeSerializer, MachineTypeSerializer
-from .models import BranchOffice, Machine, MachineType
+from .serializers import BranchOfficeSerializer, \
+    MachineJoinTypeSerializer, MachineTypeSerializer
+from .models import BranchOffice, MachineJoinType, MachineType
 
 from rest_framework import status
 from rest_framework import viewsets, generics
@@ -30,20 +31,21 @@ class MachinesView(generics.ListAPIView):
         query = (
             "select core_machine.serial_number, core_machine.model,"
             " core_machine.brand, core_machinetype.label,"
-            " core_machine.type_id, core_machine.branch_id"
+            " core_machine.step_order, core_machine.type_id,"
+            " core_machine.branch_id"
             " from core_machine inner join core_machinetype"
             " on core_machine.type_id=core_machinetype.id"
             " where core_machine.branch_id = {}".format(
                 branch_number
             )
         )
-        queryset = Machine.objects.raw(query)
+        queryset = MachineJoinType.objects.raw(query)
         serializer = self.get_serializer(queryset, many=True)
-        # probar
+
         data = np.array(serializer.data)
         orders = []
         for i in serializer.data:
-            orders.append(int(i.step_order))
+            orders.append(int(i["step_order"]))
         orders = np.array(orders)
         data = data[np.argsort(orders)]
 
@@ -61,9 +63,11 @@ class MachineTypeView(viewsets.ModelViewSet):
     queryset = MachineType.objects.all().order_by("id")
     serializer_class = MachineTypeSerializer
 
+
 class PiecesRangeView(viewsets.ModelViewSet):
     queryset = PiecesRange.objects.all().order_by("id")
     serializer_class = PiecesRangeSerializer
+
 
 @csrf_exempt
 def login_view(request):

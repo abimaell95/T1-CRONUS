@@ -17,6 +17,7 @@ class EventAdmin(admin.ModelAdmin):
     list_display = ('id', 'description', 'start_datetime', 'end_datetime')
 
 
+admin.site.register(Machine)
 admin.site.register(MachineState)
 admin.site.register(BranchOffice)
 admin.site.register(Employee, EmployeeAdmin)

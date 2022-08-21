@@ -13,7 +13,8 @@ class MachineWorkflowStepView(generics.ListAPIView):
         queryset = MachineWorkflowStepJoinMachine.objects.raw(
             "select core_machineworkflowstep.id,"
             " core_machineworkflowstep.order_id,"
-            " core_machineworkflowstep.step_order,"
+            " core_machine.step_order,"
+            " core_machineworkflowstep.start_datetime,"
             " core_machineworkflowstep.end_datetime,"
             " core_machineworkflowstep.state_id,"
             " core_machinetype.label as step_activity"
@@ -26,7 +27,7 @@ class MachineWorkflowStepView(generics.ListAPIView):
             " where core_machineworkflowstep.order_id = {}".format(id)
         )
         serializer = self.get_serializer(queryset, many=True)
-        print(serializer.data)
+
         if len(serializer.data):
             return Response({
                 'data': serializer.data,

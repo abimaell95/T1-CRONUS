@@ -20,7 +20,8 @@ class MachineWorkflowStep(models.Model):
     def __str__(self):
         return str(self.id)
 
-## JOIN TABLES MODELS
+
+# JOIN TABLES MODELS
 class MachineWorkflowStepJoinMachine(models.Model):
     id = models.IntegerField(primary_key=True)
     order_id = models.IntegerField()
@@ -28,4 +29,3 @@ class MachineWorkflowStepJoinMachine(models.Model):
     end_datetime = models.DateTimeField()
     state_id = models.IntegerField()
     step_activity = models.CharField(max_length=20)
-
