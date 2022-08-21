@@ -1,0 +1,49 @@
+name: 'ci backend CRONUS'
+
+on: 
+  push:
+    branches:
+      - '**'
+    paths:
+      - backend/**
+
+jobs:
+  ci:
+    name: 'ci backend CRONUS'
+    runs-on: ubuntu-latest
+    env:
+      MYSQL_USER: ${{ secrets.MYSQL_USER }
+      MYSQL_PASS: ${{ secrets.MYSQL_PASS }
+      MYSQL_DATABASE: cronus
+    steps:
+      - name: 'Set up MySQL'
+        run: |
+          sudo /etc/init.d/mysql start
+          mysql -e 'CREATE DATABASE ${{ env.MYSQL_DATABASE }};' -u${{ env.MYSQL_USER }} -p${{ env.MYSQL_PASSWORD }}
+      - name: 'Checkout'
+        uses: actions/checkout@v3
+      
+      - name: 'Set up Python version'
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9.7'
+
+      - name: 'Install dependencies'
+        working-directory: ./backend
+        run: pip install -r requirements.txt      
+      
+      - name: 'Lint with flake8'
+        working-directory: ./backend
+        run: flake8 --ignore ./core/migrations/*
+
+      - name: 'Runing test'
+        working-directory: ./backend
+        env: 
+          MYSQL_USER: ${{ secrets.MYSQL_USER }
+          MYSQL_PASS: ${{ secrets.MYSQL_PASS }
+        run: |
+          python manage.py makemigrations
+          python manage.py test core/task/
+          python manage.py test core/workflow/
+          python manage.py test core/
+        
