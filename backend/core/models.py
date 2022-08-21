@@ -1,4 +1,6 @@
 from django.db import models
+from django.contrib.auth.models import User
+
 
 
 class MachineState(models.Model):
@@ -26,6 +28,9 @@ class Employee(models.Model):
     address = models.CharField(max_length=30)
     email = models.CharField(max_length=30)
     branch = models.ForeignKey("BranchOffice", on_delete=models.CASCADE)
+    permiso = models.CharField(max_length=1)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+
 
     def __str__(self):
         return f'{self.name} {self.surname} : {self.id}'

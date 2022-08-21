@@ -1,5 +1,5 @@
 from rest_framework.serializers import ModelSerializer
-from .models import MachineState, BranchOffice,\
+from .models import MachineState, BranchOffice, \
     Employee, MachineType, Machine
 
 
@@ -18,8 +18,13 @@ class BranchOfficeSerializer(ModelSerializer):
 class EmployeeSerializer(ModelSerializer):
     class Meta:
         model = Employee
-        fields = ("employee_id", "name", "surname",
-                  "address", "email", "branch")
+        fields = ("id", "name", "surname",
+                  "address", "email", "branch", "permiso", "user_id")
+
+class EmployeeRolSerializer(ModelSerializer):
+    class Meta:
+        model = Employee
+        fields = ("id", "permiso")
 
 
 class MachineTypeSerializer(ModelSerializer):

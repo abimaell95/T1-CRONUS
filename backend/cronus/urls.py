@@ -40,6 +40,7 @@ urlpatterns = [
     path("api/order/", eventviews.OrderView.as_view()),
     path("api/workflow/", workflowviews.MachineWorkflowStepView.as_view()),
     path("accounts/login/", views.login_view, name="login"),
+    path("api/obtenerRol/", views.RolEmployeeView.as_view(), name="rolEmpleado"),
     path("logout/", logout, name="logout"),
     path("api-auth/", include("rest_framework.urls",
                               namespace="rest_framework")),

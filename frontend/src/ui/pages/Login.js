@@ -16,16 +16,22 @@ function Login({ setUser }) {
     });
   }
 
+  const [mensajeError, setMensajeError] = useState(false);
+
   function login() {
-    fetch('/accounts/login/', {
+    fetch('http://127.0.0.1:8000/accounts/login/', {
       method: 'POST',
       body: JSON.stringify(state),
       headers: { 'Content-Type': 'application/json' },
     })
       .then((response) => response.json())
-      .then(() => {
-        setUser(state);
-        navigate('/tasks');
+      .then((data) => {
+        if (!data.error) {
+          setUser(state);
+          navigate('/tasks');
+        } else {
+          setMensajeError(true);
+        }
       })
       .catch(() => {
       });
@@ -76,6 +82,7 @@ function Login({ setUser }) {
                 className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
               />
             </div>
+            {mensajeError && <span className="error red-text">Usuario o contraseña incorrecta</span>}
           </div>
 
           <div>
