@@ -33,7 +33,7 @@ class EventSerializer(ModelSerializer):
 class OrderDetailsSerializer(ModelSerializer):
     class Meta:
         model = OrderDetails
-        field = (
+        fields = (
             "order_id",
             "client_name",
             "invoice_num",
@@ -43,14 +43,12 @@ class OrderDetailsSerializer(ModelSerializer):
             "event_id"
         )
 
+
 class PiecesRangeSerializer(ModelSerializer):
     class Meta:
         model = PiecesRange
-        field = (
-            "id",
-            "duration",
-            "range"
-        )
+        fields = ("id", "duration", "range")
+
 
 class MaintenanceDetailsSerializer(ModelSerializer):
     class Meta:
@@ -81,20 +79,6 @@ class EventJoinOrderSerializer(ModelSerializer):
         # 'client_name', 'invoice_num', 'file_url'
 
 
-"""{
-    id_order: id,
-    state_id: state,
-    state_label: state_label,
-    description: description,
-    pieces: pieces,
-    employee: employee,
-    end_date: end_date, yyyy-mm-dd
-    client_name: client_name,
-    invoice_num: invoice_num,
-    file_url: file_url
-}"""
-
-
 class EventJoinOrdersSerializer(ModelSerializer):
     class Meta:
         model = EventJoinOrders
@@ -102,19 +86,6 @@ class EventJoinOrdersSerializer(ModelSerializer):
         # 'id_order', 'invoice_id', 'client_name',
         # 'start_date', 'end_date', 'state_id',
         # 'state_label', 'employee', 'current_step'
-
-
-"""
-{
-    invoice_id:"001-001-0000000011",
-    client_name: "Juanito Pereza",
-    start_date : "13 de Junio del 2022",
-    end_date : "Entregado",
-    state_id: 4,
-    state_label: "Finalizado",
-    scheduler : "Juanito Perez",
-    current_step : "Finalizado",
-}"""
 
 
 class EventJoinEventStateSerializer(ModelSerializer):

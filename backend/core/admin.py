@@ -1,11 +1,12 @@
 from django.contrib import admin
 from .models import MachineState, BranchOffice,\
-    Employee, MachineType, Machine
+    Employee, MachineType, Machine, MachineJoinType
 from .task.models import EventType, EventState,\
-    Event, OrderDetails, MaintenancePeriod, MaintenanceDetails, PiecesRange,\
-    Priority, ReparationDetails, EventJoinOrder, EventJoinEventState
-from .workflow.models import StepState, MachineWorkflowStep, Workflow,\
-    WorkflowSteps, MachineWorkflowStepJoinMachine, WorkflowJoinWSteps
+    Event, OrderDetails, PiecesRange, MaintenancePeriod, \
+    MaintenanceDetails, Priority, ReparationDetails, \
+    EventJoinOrder, EventJoinOrders, EventJoinEventState
+from .workflow.models import StepState, MachineWorkflowStep, \
+    MachineWorkflowStepJoinMachine
 
 
 class EmployeeAdmin(admin.ModelAdmin):
@@ -16,28 +17,26 @@ class EventAdmin(admin.ModelAdmin):
     list_display = ('id', 'description', 'start_datetime', 'end_datetime')
 
 
+admin.site.register(Machine)
 admin.site.register(MachineState)
 admin.site.register(BranchOffice)
 admin.site.register(Employee, EmployeeAdmin)
 admin.site.register(MachineType)
-admin.site.register(Machine)
-admin.site.register(PiecesRange)
-
+admin.site.register(MachineJoinType)
 
 admin.site.register(EventType)
 admin.site.register(EventState)
 admin.site.register(Event, EventAdmin)
 admin.site.register(OrderDetails)
+admin.site.register(PiecesRange)
 admin.site.register(MaintenancePeriod)
 admin.site.register(MaintenanceDetails)
 admin.site.register(Priority)
 admin.site.register(ReparationDetails)
 admin.site.register(EventJoinOrder)
+admin.site.register(EventJoinOrders)
 admin.site.register(EventJoinEventState)
 
 admin.site.register(StepState)
 admin.site.register(MachineWorkflowStep)
-admin.site.register(Workflow)
-admin.site.register(WorkflowSteps)
 admin.site.register(MachineWorkflowStepJoinMachine)
-admin.site.register(WorkflowJoinWSteps)

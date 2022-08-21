@@ -2,8 +2,7 @@ import sys
 import logging
 import MySQLdb
 
-from django.core.management.base import BaseCommand, CommandError
-from django.conf import settings
+from django.core.management.base import BaseCommand
 
 rds_host = 'mynewcluster.cluster-cb42naljehp6.us-west-2.rds.amazonaws.com'
 db_name = 'cronus'

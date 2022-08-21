@@ -43,6 +43,7 @@ class MachineSerializer(ModelSerializer):
             "employee_id",
         )
 
+
 class MachineJoinTypeSerializer(ModelSerializer):
     class Meta:
         model = MachineJoinType
