@@ -25,9 +25,7 @@ class MachinesView(generics.ListAPIView):
     serializer_class = MachineJoinTypeSerializer
 
     def list(self, request, *args, **kwargs):
-        branch_number = request.GET.get("branch", "")
-        if branch_number == "":
-            branch_number = 1
+        branch_number = request.GET.get("branch", 1)
 
         query = (
             "select core_machine.serial_number, core_machine.model,"
@@ -59,11 +57,11 @@ class MachinesView(generics.ListAPIView):
         }, status=status.HTTP_204_NO_CONTENT)
 
 
-class MachineTypeView(generics.ListAPIView):
+class MachineTypeView(viewsets.ModelViewSet):
     queryset = MachineType.objects.all().order_by("id")
     serializer_class = MachineTypeSerializer
 
-class PiecesRangeView(generics.ListAPIView):
+class PiecesRangeView(viewsets.ModelViewSet):
     queryset = PiecesRange.objects.all().order_by("id")
     serializer_class = PiecesRangeSerializer
 
