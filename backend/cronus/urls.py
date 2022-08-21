@@ -31,6 +31,9 @@ router.register(r"reparation_priorities", eventviews.PriorityViewSet)
 router.register(r"branch_office", views.BranchOfficeViewSet)
 router.register(r"pieces_range", views.PiecesRangeView)
 router.register(r"services", views.MachineTypeView)
+router.register(r"step_state", workflowviews.StepStateViewSet)
+router.register(r"event_state", eventviews.EventStateViewSet)
+
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -43,6 +46,7 @@ urlpatterns = [
     path("api/workflow/", workflowviews.MachineWorkflowStepView.as_view()),
     path("api/productivity_report/", reportsviews.ProductivityReport.as_view()),
     path("api/orders_resume/", reportsviews.OrdersResume.as_view()),
+    path("api/machine_orders/", eventviews.MachineOrdersView.as_view()),
     path("accounts/login/", views.login_view, name="login"),
     path("logout/", logout, name="logout"),
     path("api-auth/", include("rest_framework.urls",

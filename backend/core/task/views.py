@@ -2,10 +2,12 @@ from rest_framework import status
 from rest_framework import viewsets, generics
 from rest_framework.response import Response
 from .serializers import EventTypeSerializer, MaintenancePeriodSerializer,\
- PrioritySerializer, EventJoinOrderSerializer,\
- EventJoinOrdersSerializer, EventJoinEventStateSerializer
+    PrioritySerializer, EventJoinOrderSerializer,\
+    EventJoinOrdersSerializer, EventJoinEventStateSerializer,\
+    EventStateSerializer, MachineOrdersSerializer
 from .models import EventType, MaintenancePeriod, Priority, EventJoinOrder,\
-    Event, OrderDetails, EventJoinOrders, EventJoinEventState
+    Event, OrderDetails, EventJoinOrders, EventJoinEventState, EventState,\
+    MachineOrdersModel
 from django.db import transaction
 from django.http import JsonResponse
 import json
@@ -16,6 +18,11 @@ import datetime
 class EventTypeViewSet(viewsets.ModelViewSet):
     queryset = EventType.objects.all().order_by("id")
     serializer_class = EventTypeSerializer
+
+
+class EventStateViewSet(viewsets.ModelViewSet):
+    queryset = EventState.objects.all().order_by("id")
+    serializer_class = EventStateSerializer
 
 
 class MaintenancePeriodViewSet(viewsets.ModelViewSet):
@@ -197,8 +204,6 @@ class OrdersView(generics.ListAPIView):
             " core_machinetype.label as type_label from"
             " core_event inner join core_orderdetails"
             " on core_event.id=core_orderdetails.event_id"
-            " and core_event.branch_id = {} and core_event.start_datetime"
-            " between '{}-{}-{} 00:00:00' and '{}-{}-{} 00:00:00'"
             " inner join core_eventstate on"
             " core_event.state_id = core_eventstate.id"
             " inner join core_machineworkflowstep on"
@@ -338,3 +343,48 @@ def available_hours(request):
         return JsonResponse({
                     "data": availablesList},
                     status=status.HTTP_200_OK)
+
+
+class MachineOrdersView(generics.ListAPIView):
+    serializer_class = MachineOrdersSerializer
+
+    def list(self, request, *args, **kwargs):
+        start_date = request.GET.get(
+                "start_date",
+                datetime.datetime.now().date()
+            )
+        end_date = request.GET.get(
+                "end_date",
+                datetime.datetime.now().date()
+            )
+        machine_number = request.GET.get("machine", "")
+
+        query = (
+            "select"
+            " core_orderdetails.id,"
+            " core_orderdetails.invoice_num,"
+            " core_orderdetails.client_name,"
+            " core_machineworkflowstep.machine_id as serial_number,"
+            " core_machineworkflowstep.state_id as step_state,"
+            " core_event.start_datetime as schedule_date"
+            " from core_orderdetails inner join core_event"
+            " on core_orderdetails.event_id = core_event.id"
+            " inner join core_machineworkflowstep"
+            " on core_orderdetails.id=core_machineworkflowstep.order_id"
+            " where core_event.start_datetime between '{} 00:00:00' and"
+            " '{} 23:59:59' and core_machineworkflowstep.machine_id = {}"
+            " and core_machineworkflowstep.state_id <> 4;".format(
+                start_date, end_date, machine_number
+            )
+        )
+
+        queryset = MachineOrdersModel.objects.raw(query)
+        serializer = self.get_serializer(queryset, many=True)
+        if len(serializer.data):
+            return Response({
+                'data': serializer.data
+            }, status=status.HTTP_200_OK)
+        return Response({
+            "data": [],
+            "message": "No content."
+        }, status=status.HTTP_204_NO_CONTENT)
