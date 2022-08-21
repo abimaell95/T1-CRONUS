@@ -27,15 +27,14 @@ router = routers.DefaultRouter()
 router.register(r"event_type", eventviews.EventTypeViewSet)
 router.register(r"maintenance_period", eventviews.MaintenancePeriodViewSet)
 router.register(r"reparation_priorities", eventviews.PriorityViewSet)
-router.register(r"branchoffice", views.BranchOfficeViewSet)
+router.register(r"branch_office", views.BranchOfficeViewSet)
+router.register(r"pieces_range", views.PiecesRangeView)
+router.register(r"services", views.MachineTypeView)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include(router.urls)),
-    path("api/pieces_range", views.PiecesRangeView.as_view()),
     path("api/events/", eventviews.EventsView.as_view()),
-    path("api/workflows/", workflowviews.WorkflowsView.as_view()),
-    path("api/services/", views.MachineTypeView.as_view()),
     path("api/machines/", views.MachinesView.as_view()),
     path("api/orders/", eventviews.OrdersView.as_view()),
     path("api/available_hours/", eventviews.available_hours),

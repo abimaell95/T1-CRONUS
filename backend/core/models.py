@@ -52,3 +52,13 @@ class Machine(models.Model):
 
     def __str__(self):
         return self.serial_number
+
+
+class MachineJoinType(models.Model):
+    serial_number = models.IntegerField(primary_key=True)
+    model = models.CharField(max_length=20)
+    brand = models.CharField(max_length=20)
+    label = models.CharField(max_length=20)
+    step_order = models.PositiveSmallIntegerField()
+    type_id = models.IntegerField()
+    branch_id = models.IntegerField()

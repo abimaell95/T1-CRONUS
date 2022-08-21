@@ -37,21 +37,21 @@ class OrderDetails(models.Model):
     invoice_num = models.CharField(max_length=30)
     file_url = models.CharField(max_length=300, null=True)
     num_pieces = models.ForeignKey("PiecesRange", on_delete=models.CASCADE)
-    current_step = models.ForeignKey("MachineWorkflowStep",
-                                     on_delete=models.CASCADE)
+    current_step = models.IntegerField(null=True)
     event = models.ForeignKey("Event", on_delete=models.CASCADE)
 
     def __str__(self):
         return str(self.id)
 
+
 class PiecesRange(models.Model):
     id = models.BigAutoField(primary_key=True)
-    duration = models.PositiveSmallIntegerField
+    duration = models.PositiveSmallIntegerField()
     range = models.CharField(max_length=10)
 
     def __str__(self):
         return str(self.id)
-    
+
 
 class MaintenancePeriod(models.Model):
     id = models.BigAutoField(primary_key=True)
@@ -95,14 +95,14 @@ class EventJoinOrder(models.Model):
     id = models.IntegerField(primary_key=True)
     state = models.IntegerField()
     label = models.CharField(max_length=20)
-    description = models.CharField(max_length=300, default="Descripcion")
+    description = models.CharField(max_length=300)
     num_pieces = models.PositiveSmallIntegerField(default=10)
-    name = models.CharField(max_length=15, default='name')
-    surname = models.CharField(max_length=15, default='surname')
+    name = models.CharField(max_length=15)
+    surname = models.CharField(max_length=15)
     end_datetime = models.DateTimeField()
-    client_name = models.CharField(max_length=60, default="Cliente")
-    invoice_num = models.CharField(max_length=30, default="0001")
-    file_url = models.CharField(max_length=300, default="archivo")
+    client_name = models.CharField(max_length=60)
+    invoice_num = models.CharField(max_length=30)
+    file_url = models.CharField(max_length=300)
 
 
 class EventJoinOrders(models.Model):
@@ -113,8 +113,8 @@ class EventJoinOrders(models.Model):
     end_datetime = models.DateTimeField()
     state = models.IntegerField()
     state_label = models.CharField(max_length=20)
-    name = models.CharField(max_length=15, default='name')
-    surname = models.CharField(max_length=15, default='surname')
+    name = models.CharField(max_length=15)
+    surname = models.CharField(max_length=15)
     branch_id = models.IntegerField()
     type_label = models.CharField(max_length=20)
 
