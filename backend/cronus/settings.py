@@ -14,6 +14,12 @@ from pathlib import Path
 
 import os
 
+from dotenv import load_dotenv, find_dotenv
+
+ENV_FILE = find_dotenv()
+if ENV_FILE:
+    load_dotenv(ENV_FILE)
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -162,6 +168,14 @@ LOGOUT_REDIRECT_URL = reverse_lazy('login')
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
+STATIC_URL = 'static/'
+
+# Default primary key field type
+# https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
+
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
@@ -177,10 +191,13 @@ STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 doctests = True
 
 
-S3_BUCKET = "zappa-inl6r1y0j"
 
-STATICFILES_STORAGE = "django_s3_storage.storage.StaticS3Storage"
-
-AWS_S3_BUCKET_NAME_STATIC = S3_BUCKET
-
-STATIC_URL = "https://%s.s3.amazonaws.com/" % S3_BUCKET
+#
+#S3_BUCKET = "zappa-inl6r1y0j"
+#
+#STATICFILES_STORAGE = "django_s3_storage.storage.StaticS3Storage"
+#
+#AWS_S3_BUCKET_NAME_STATIC = S3_BUCKET
+#
+#STATIC_URL = "https://%s.s3.amazonaws.com/" % S3_BUCKET
+#

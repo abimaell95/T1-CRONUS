@@ -1,3 +1,4 @@
+from ..models import Machine, MachineState
 from rest_framework import status
 from rest_framework import viewsets, generics
 from rest_framework.response import Response
@@ -5,12 +6,16 @@ from .serializers import EventTypeSerializer, MaintenancePeriodSerializer,\
  PrioritySerializer, EventJoinOrderSerializer,\
  EventJoinOrdersSerializer, EventJoinEventStateSerializer
 from .models import EventType, MaintenancePeriod, Priority, EventJoinOrder,\
-    Event, OrderDetails, EventJoinOrders, EventJoinEventState
+    Event, OrderDetails, EventJoinOrders, EventJoinEventState, PiecesRange
 from django.db import transaction
 from django.http import JsonResponse
 import json
 from ..workflow import models as workflowModels
-import datetime
+
+from datetime import datetime
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+from django.conf import settings
 
 
 class EventTypeViewSet(viewsets.ModelViewSet):
@@ -61,117 +66,134 @@ class OrderView(generics.ListCreateAPIView):
 
     @transaction.atomic
     def post(self, request):
-        jd = json.loads(request.body)
-
-        if jd["start_time"] < 10:
-            start = "0" + str(jd["start_time"]) + ":00"
-        else:
-            start = str(jd["start_time"]) + ":00"
-        if jd["end_time"] < 10:
-            end = "0" + str(jd["end_time"]) + ":00"
-        else:
-            end = str(jd["end_time"]) + ":00"
-
-        start_datetime = jd["start_date"] + "-" + start
-        end_datetime = jd["end_date"] + "-" + end
-
-        start_date = start_date.strptime(start_datetime, "YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]")
-        end_date = end_date.strptime(end_datetime, "YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]")
 
         try:
-            e = Event.objects.create(
-                description=jd["description"],
-                # start_datetime=jd["start_date"] + "-" + start,
-                start_datetime=start_date,
-                # end_datetime=jd["end_date"] + "-" + end,
-                end_datetime=end_date,
-                employee_id="0927643825",
-                state_id=1,
-                branch_id=1,
-                type_id=jd["type"],
-            )
-            e.save()
-            eJson = {
-                'id': e.id,
-                'description': e.description,
-                'start_datetime': e.start_datetime,
-                'end_datetime': e.end_datetime,
-                'employee_id': e.employee_id,
-                'state_id': e.state_id,
-                'branch_id': e.branch_id,
-                'type_id': e.type_id
-            }
+            #Start Date and Time config
+            start_date= request.POST.get('start_date')
+            start_time= request.POST.get('start_time')
+            if int(start_time) < 10:
+                str_start = "0" + str(start_time) + ":00"
+            else:
+                str_start = str(start_time) + ":00"
+            start_datetime = start_date + " " + str_start
+            
+            #End Date and Time config
+            end_date = request.POST.get('end_date')
+            end_time= request.POST.get('end_time')
+            if int(end_time) < 10:
+                str_end = "0" + str(end_time) + ":00"
+            else:
+                str_end = str(end_time) + ":00"
+            end_datetime = end_date + " " + str_end
+
+            #Other Data
+            description = request.POST.get('description')
+            type_id = request.POST.get('type')
+            client_name= request.POST.get('client_name')
+            invoice_num= request.POST.get('invoice_number')
+            pieces_range_id= request.POST.get('pieces_range_id')
+            print(pieces_range_id)
+            machine_list= request.POST.get('services')
+
+            #Constants
+            firstStep = 1 #Paso 1
+            firstState = 1 #No Iniciado
+            
+            #Session Data
+            employee_id="0123968574"
+            branch_id=2
+
+            #File Data
+            file= request.FILES.get('plan_file')
+            plan_file_url = default_storage.save('tmp/especificaciones-'+str(invoice_num)+'.pdf', ContentFile(file.read()))
+            
+            try:
+                e = Event.objects.create(
+                    description=description,
+                    start_datetime=start_datetime,
+                    end_datetime=end_datetime,
+                    employee_id=employee_id,
+                    state_id=firstState,
+                    branch_id=branch_id,
+                    type_id=type_id,
+                )
+                e.save()
+                eJson = {
+                    'id': e.id,
+                    'description': e.description,
+                    'start_datetime': e.start_datetime,
+                    'end_datetime': e.end_datetime,
+                    'employee_id': e.employee_id,
+                    'state_id': e.state_id,
+                    'branch_id': e.branch_id,
+                    'type_id': e.type_id
+                }
+            except Exception as ex:
+                return Response({
+                            "data": [],
+                            "message": "Error while creating the event record."
+                                    + str(ex)
+                        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            try:
+                o = OrderDetails.objects.create(
+                    client_name=client_name,
+                    invoice_num=invoice_num,
+                    file_url=plan_file_url,
+                    current_step_id=firstStep,
+                    num_pieces=pieces_range_id,
+                    event=e,
+                )
+                o.save()
+                oJson = {
+                    'id': o.id,
+                    'invoice_num': o.invoice_num,
+                    'file_url': o.file_url,
+                    'current_step_id': o.current_step_id,
+                    'num_pieces': o.num_pieces,
+                    'event_id': e.id
+                }
+            except Exception as ex:
+                return Response({
+                            "data": [],
+                            "message": "Error while creating the order record."
+                                    + str(ex)
+                        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+            try:
+                machines= Machine.objects.filter(id__in=machine_list)
+                workflowList = []
+                for machine in machines:
+                    w = workflowModels.MachineWorkflowStep.objects.create(
+                        state = firstState,
+                        machine = machine.id,
+                        order = o)
+                    w.save()
+                    wJson = {
+                        'id': w.id,
+                        'state_id': w.state_id,
+                        'machine_id': w.machine_id,
+                        'order_id': o.id
+                    }
+                    workflowList.append(wJson)
+            except Exception as ex:
+                return Response({
+                            "data": [],
+                            "message": "Error while creating the MWStep record."
+                                    + str(ex)
+                        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+            return Response({
+                            "data": {"event": eJson, "order": oJson,
+                                    "WorflowMachineSteps": workflowList},
+                            "message": "Ok"
+                            }, status=status.HTTP_201_CREATED)
+
         except Exception as ex:
             return Response({
                         "data": [],
                         "message": "Error while creating the event record."
                                    + str(ex)
                     }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        try:
-            o = OrderDetails.objects.create(
-                client_name=jd["client_name"],
-                invoice_num=jd["invoice_num"],
-                file_url=jd["plan_file"],
-                current_step_id=1,
-                num_pieces=jd["pieces_number"],
-                event=e,
-            )
-            o.save()
-            oJson = {
-                'id': o.id,
-                'invoice_num': o.invoice_num,
-                'file_url': o.file_url,
-                'current_step_id': o.current_step_id,
-                'num_pieces': o.num_pieces,
-                'event_id': e.id
-            }
-        except Exception as ex:
-            return Response({
-                        "data": [],
-                        "message": "Error while creating the order record."
-                                   + str(ex)
-                    }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        try:
-            workflowlist = workflowModels.WorkflowSteps.objects.filter(
-                workflow__id=int(jd["workflow"])
-            )
-
-            c = 1
-            wList = []
-            for step in workflowlist:
-                w = workflowModels.MachineWorkflowStep.objects.create(
-                    step_order=step.step_order,
-                    state_id=1,
-                    end_datetime=datetime.datetime(2019, 1, 1, 0, 0, 0),
-                    machine_id=step.machine_id,
-                    order=o)
-                w.save()
-                wJson = {
-                    'id': w.id,
-                    'step_order': w.step_order,
-                    'state_id': w.state_id,
-                    'end_datetime': w.end_datetime,
-                    'machine_id': w.machine_id,
-                    'order_id': o.id
-                }
-                wList.append(wJson)
-                c += 1
-
-        except Exception as ex:
-            return Response({
-                        "data": [],
-                        "message": "Error while creating the MWStep record."
-                                   + str(ex)
-                    }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        return Response({
-                        "data": {"event": eJson, "order": oJson,
-                                 "WorflowMachineSteps": wList},
-                        "message": "Ok"
-                        }, status=status.HTTP_201_CREATED)
-
 
 class OrdersView(generics.ListAPIView):
     serializer_class = EventJoinOrdersSerializer
