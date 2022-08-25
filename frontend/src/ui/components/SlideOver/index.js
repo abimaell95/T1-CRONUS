@@ -4,7 +4,9 @@ import { Dialog, Transition } from '@headlessui/react';
 import SideBar from './SideBar';
 
 function SlideOver(props) {
-  const { open, setOpen } = props;
+  const {
+    open, setOpen, sidebarNavigation, setSidebarNavigation,
+  } = props;
   return (
     <Transition.Root show={open} as={Fragment}>
       <Dialog as="div" className="relative z-20" onClose={setOpen} onClick={() => setOpen(false)}>
@@ -33,7 +35,12 @@ function SlideOver(props) {
                 leaveTo="-translate-x-full opacity-0"
               >
                 <Dialog.Panel className="pointer-events-auto w-screen">
-                  <SideBar className="absolute inset-0 px-4 sm:px-6" setOpen={setOpen} />
+                  <SideBar
+                    className="absolute inset-0 px-4 sm:px-6"
+                    setOpen={setOpen}
+                    sidebarNavigation={sidebarNavigation}
+                    setSidebarNavigation={setSidebarNavigation}
+                  />
                 </Dialog.Panel>
               </Transition.Child>
             </div>
@@ -46,6 +53,8 @@ function SlideOver(props) {
 SlideOver.propTypes = {
   setOpen: PropTypes.func.isRequired,
   open: PropTypes.bool.isRequired,
+  sidebarNavigation: PropTypes.array.isRequired,
+  setSidebarNavigation: PropTypes.func.isRequired,
 };
 
 export default SlideOver;

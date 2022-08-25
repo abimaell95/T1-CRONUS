@@ -1,35 +1,18 @@
-import { React, useState } from 'react';
+import { React } from 'react';
 import PropTypes from 'prop-types';
-import {
-  CalendarIcon,
-  DocumentReportIcon,
-  DatabaseIcon,
-} from '@heroicons/react/solid';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
 }
 
 function SideBar(props) {
-  const { setOpen } = props;
-  const [sidebarNavigation, setSidebarNavigation] = useState([
-    {
-      name: 'Agenda', href: '/tasks', icon: CalendarIcon, current: false,
-    },
-    {
-      name: 'Reportes', href: '#', icon: DocumentReportIcon, current: false,
-    },
-    {
-      name: 'Administrador', href: '#', icon: DatabaseIcon, current: false,
-    },
-  ]);
+  const { setOpen, sidebarNavigation, setSidebarNavigation } = props;
 
   function updateCurrent(idx) {
     const sidebarNavigationUpt = sidebarNavigation.map((option, _idx) => ({
       ...option,
       current: idx === _idx,
     }));
-    console.log(sidebarNavigationUpt);
     setOpen(false);
     setSidebarNavigation(sidebarNavigationUpt);
   }
@@ -72,6 +55,8 @@ function SideBar(props) {
 
 SideBar.propTypes = {
   setOpen: PropTypes.func.isRequired,
+  sidebarNavigation: PropTypes.array.isRequired,
+  setSidebarNavigation: PropTypes.func.isRequired,
 };
 
 export default SideBar;

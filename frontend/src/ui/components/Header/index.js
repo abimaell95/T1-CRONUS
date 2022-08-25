@@ -1,9 +1,28 @@
 import { React, useState, useCallback } from 'react';
-import { MenuIcon } from '@heroicons/react/solid';
+import {
+  MenuIcon,
+  CalendarIcon,
+  DocumentReportIcon,
+  DatabaseIcon,
+} from '@heroicons/react/solid';
 import SlideOver from '../SlideOver';
+
+const sideBarPages = [
+  {
+    name: 'Agenda', href: '/tasks', icon: CalendarIcon, current: true,
+  },
+  {
+    name: 'Reportes', href: '#', icon: DocumentReportIcon, current: false,
+  },
+  {
+    name: 'Administrador', href: '/dev/admin', icon: DatabaseIcon, current: false,
+  },
+];
 
 function Header() {
   const [openSlide, setOpenSlide] = useState(false);
+  const [sidebarNavigation, setSidebarNavigation] = useState([...sideBarPages]);
+
   const setOpen = useCallback(() => {
     setOpenSlide(true);
   }, [setOpenSlide]);
@@ -18,7 +37,12 @@ function Header() {
           </div>
         </div>
       </div>
-      <SlideOver open={openSlide} setOpen={setOpenSlide} />
+      <SlideOver
+        open={openSlide}
+        setOpen={setOpenSlide}
+        sidebarNavigation={sidebarNavigation}
+        setSidebarNavigation={setSidebarNavigation}
+      />
     </div>
 
   );
