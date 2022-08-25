@@ -1,4 +1,5 @@
 import { React, useState } from 'react';
+import PropTypes from 'prop-types';
 import {
   CalendarIcon,
   DocumentReportIcon,
@@ -9,7 +10,8 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
 }
 
-function SideBar() {
+function SideBar(props) {
+  const { setOpen } = props;
   const [sidebarNavigation, setSidebarNavigation] = useState([
     {
       name: 'Agenda', href: '/tasks', icon: CalendarIcon, current: false,
@@ -27,18 +29,27 @@ function SideBar() {
       ...option,
       current: idx === _idx,
     }));
+    setOpen(false);
     setSidebarNavigation(sidebarNavigationUpt);
   }
 
   return (
     <div className="hidden w-28 bg-gray-700 overflow-y-auto md:block h-screen">
       <div className="w-full py-6 flex flex-col items-center">
+        {/*
         <div className="flex-shrink-0 flex items-center">
           <img
             className="h-8 w-auto"
             src="https://tailwindui.com/img/logos/workflow-mark.svg?color=white"
             alt="Workflow"
           />
+        </div>
+        */
+        }
+        <div className="flex justify-between items-center py-2 md:justify-start md:space-x-10">
+          <div className="mt-2 flex items-center text-sm">
+            <div className="text-xl font-bold leading-7 text-gray-200">CRONUS</div>
+          </div>
         </div>
         <div className="flex-1 mt-6 w-full px-2 space-y-1">
           {sidebarNavigation.map((item, idx) => (
@@ -67,5 +78,9 @@ function SideBar() {
     </div>
   );
 }
+
+SideBar.propTypes = {
+  setOpen: PropTypes.func.isRequired,
+};
 
 export default SideBar;
