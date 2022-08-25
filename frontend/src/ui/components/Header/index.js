@@ -10,11 +10,11 @@ function Header() {
 
   return (
     <div className="relative bg-white shadow">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="flex justify-between items-center py-6 md:justify-start md:space-x-10">
-          <div className="mt-2 flex items-center text-sm">
-            <MenuIcon className="h-8 w-auto sm:h-10 flex-shrink-0 mr-1.5 text-gray-800" onClick={setOpen} />
-            <div className="text-4xl font-bold leading-7 text-gray-800">CRONUS</div>
+      <div className="max-w-7xl px-8">
+        <div className="flex justify-between items-center py-3 md:justify-start md:space-x-10">
+          <div className="flex items-center text-sm">
+            <MenuIcon className="relative z-10 h-10 w-auto flex-shrink-0 mr-1.5 text-gray-800 cursor-pointer" onClick={setOpen} />
+            <div className="relative z-0 flex-1 px-2 flex items-center justify-center sm:absolute sm:inset-0 text-3xl font-bold leading-7 text-gray-800">CRONUS</div>
           </div>
         </div>
       </div>
