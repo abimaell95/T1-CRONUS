@@ -99,8 +99,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'cronus',
-        'USER': 'cronuser',  # master username
-        'PASSWORD': 'password',  # master password
+        'USER': os.getenv('MYSQL_USER'),  # master username
+        'PASSWORD': os.getenv('MYSQL_PASS'),  # master password
         'HOST': 'localhost',  # Endpoint
         'PORT': '3306'
     },
