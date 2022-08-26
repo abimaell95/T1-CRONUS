@@ -11,7 +11,8 @@ class ProductivityReportModel(models.Model):
     end_datetime = models.DateTimeField()
     step_start = models.DateTimeField()
     step_end = models.DateTimeField()
-    step_label = models.CharField(max_length=20)
+    state_label = models.CharField(max_length=20)
+    state_id = models.IntegerField()
     branch_id = models.IntegerField()
 
 
