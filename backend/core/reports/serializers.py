@@ -8,6 +8,7 @@ class ProductivityReportSerializer(ModelSerializer):
         model = ProductivityReportModel
         fields = "__all__"
 
+
 class OrdersResumeSerializer(ModelSerializer):
     class Meta:
         model = OrdersResumeModel

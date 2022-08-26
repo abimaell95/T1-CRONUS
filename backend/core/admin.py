@@ -42,5 +42,6 @@ admin.site.register(EventJoinEventState)
 admin.site.register(StepState)
 admin.site.register(MachineWorkflowStep)
 admin.site.register(MachineWorkflowStepJoinMachine)
+
 admin.site.register(ProductivityReportModel)
 admin.site.register(OrdersResumeModel)
