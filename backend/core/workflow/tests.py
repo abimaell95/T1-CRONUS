@@ -2,7 +2,8 @@ from rest_framework import status
 from django.test import TestCase
 from core.models import Machine, MachineType,\
     MachineState, Employee, BranchOffice
-from core.task.models import Event, OrderDetails, EventState, EventType, PiecesRange
+from core.task.models import Event, OrderDetails,\
+    EventState, EventType, PiecesRange
 from core.workflow.models import MachineWorkflowStep, StepState
 
 

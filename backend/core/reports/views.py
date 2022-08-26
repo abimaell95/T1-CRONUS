@@ -95,7 +95,7 @@ class OrdersResume(generics.ListCreateAPIView):
         for r in serializer.data:
             if data.get(r["branch_id"], -1) == -1:
                 data[r["branch_id"]] = {
-                    'branch_name' : r["name"],
+                    'branch_name': r["name"],
                     'completed': 1 if r["state_id"] == 3 else 0,
                     'delayed': 1 if r["state_id"] == 6 else 0,
                     'no_completed': 1 if r["state_id"] == 1 or 2 else 0
