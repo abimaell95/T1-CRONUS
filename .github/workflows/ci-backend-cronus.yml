@@ -12,8 +12,8 @@ jobs:
     name: 'ci backend CRONUS'
     runs-on: ubuntu-latest
     env:
-      MYSQL_USER: ${{ secrets.MYSQL_USER }
-      MYSQL_PASS: ${{ secrets.MYSQL_PASS }
+      MYSQL_USER: ${{ secrets.MYSQL_USER }}
+      MYSQL_PASS: ${{ secrets.MYSQL_PASS }}
       MYSQL_DATABASE: cronus
     steps:
       - name: 'Set up MySQL'
