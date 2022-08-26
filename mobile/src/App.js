@@ -265,6 +265,7 @@ function Main(){
             Octubre 22
           </p>
         </div>
+        <DateSelector/>
         <OrdersTable orders={mainState.orders}/>
       </div>
     </div>
