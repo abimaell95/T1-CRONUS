@@ -24,7 +24,7 @@ const colourOptions = [
 */
 function Option(props) {
   const { label, isSelected, value } = props;
-  const checkboxClassName = `${isSelected ? ' ring-2 ring-gray-200 ' : ''}h-4 w-4 mr-2 text-gray-600 focus:ring-gray-500 border-gray-300 rounded`;
+  const checkboxClassName = `${isSelected ? ' ring-2 ring-gray-200 ' : ''} h-4 w-4 mr-2 text-gray-600 focus:ring-gray-500 border-gray-300 rounded`;
   return (
     <div>
       {/* eslint-disable-next-line react/jsx-props-no-spreading */ }
@@ -74,7 +74,7 @@ function SelectorCheckbox(props) {
     <span
       className=" w-52 shadow-sm rounded-md text-left sm:text-sm"
       data-toggle="popover"
-      data-content="Please selecet account(s)"
+      data-content="Please select option"
     >
       <ReactSelect
         className="border-none"
@@ -86,7 +86,7 @@ function SelectorCheckbox(props) {
         components={{
           Option,
         }}
-        placeholder="Servicios"
+        placeholder="--Seleccionar--"
         onChange={handleChange}
         allowSelectAll
         value={state.optionSelected}
