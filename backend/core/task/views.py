@@ -1,4 +1,4 @@
-from ..models import Machine, MachineState
+from ..models import Machine
 from rest_framework import status
 from rest_framework import viewsets, generics
 from rest_framework.response import Response
@@ -11,13 +11,11 @@ from .models import EventType, MaintenancePeriod, Priority, EventJoinOrder,\
     MachineOrdersModel
 from django.db import transaction
 from django.http import JsonResponse
-import json
 from ..workflow import models as workflowModels
 
 from datetime import datetime
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
-from django.conf import settings
 
 
 class EventTypeViewSet(viewsets.ModelViewSet):
@@ -75,46 +73,48 @@ class OrderView(generics.ListCreateAPIView):
     def post(self, request):
 
         try:
-            #Start Date and Time config
-            start_date= request.POST.get('start_date')
-            start_time= request.POST.get('start_time')
+            #   Start Date and Time config
+            start_date = request.POST.get('start_date')
+            start_time = request.POST.get('start_time')
             if int(start_time) < 10:
                 str_start = "0" + str(start_time) + ":00"
             else:
                 str_start = str(start_time) + ":00"
             start_datetime = start_date + " " + str_start
-            
-            #End Date and Time config
+
+            # End Date and Time config
             end_date = request.POST.get('end_date')
-            end_time= request.POST.get('end_time')
+            end_time = request.POST.get('end_time')
             if int(end_time) < 10:
                 str_end = "0" + str(end_time) + ":00"
             else:
                 str_end = str(end_time) + ":00"
             end_datetime = end_date + " " + str_end
 
-            #Other Data
+            # Other Data
             description = request.POST.get('description')
             type_id = request.POST.get('type')
-            client_name= request.POST.get('client_name')
-            invoice_num= request.POST.get('invoice_number')
-            pieces_range_id= request.POST.get('pieces_range_id')
-            services= request.POST.get('services')
+            client_name = request.POST.get('client_name')
+            invoice_num = request.POST.get('invoice_number')
+            pieces_range_id = request.POST.get('pieces_range_id')
+            services = request.POST.get('services')
             services = services.strip("[]")
             machine_list = services.split(",")
 
-            #Constants
-            firstStep = 1 #Paso 1
-            firstState = 1 #No Iniciado
-            
-            #Session Data
-            employee_id="0123968574"
-            branch_id=2
+            # Constants
+            firstStep = 1  # Paso 1
+            firstState = 1  # No Iniciado
 
-            #File Data
-            file= request.FILES.get('plan_file')
-            plan_file_url = default_storage.save('tmp/especificaciones-'+str(invoice_num)+'.pdf', ContentFile(file.read()))
-            
+            # Session Data
+            employee_id = "0123968574"
+            branch_id = 2
+
+            # File Data
+            file = request.FILES.get('plan_file')
+            plan_file_url = default_storage.save(
+                        'tmp/especificaciones-' + str(invoice_num) +
+                        '.pdf', ContentFile(file.read()))
+
             try:
                 e = Event.objects.create(
                     description=description,
@@ -140,7 +140,7 @@ class OrderView(generics.ListCreateAPIView):
                 return Response({
                             "data": [],
                             "message": "Error while creating the event record."
-                                    + str(ex)
+                            + str(ex)
                         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             try:
                 o = OrderDetails.objects.create(
@@ -164,21 +164,23 @@ class OrderView(generics.ListCreateAPIView):
                 return Response({
                             "data": [],
                             "message": "Error while creating the order record."
-                                    + str(ex)
+                            + str(ex)
                         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
             try:
                 print(machine_list)
                 print(type(machine_list))
-                machines= Machine.objects.filter(serial_number__in=machine_list)
+                machines = Machine.objects.filter(
+                    serial_number__in=machine_list
+                    )
                 print(machines)
                 workflowList = []
                 for machine in machines:
                     print(machine.serial_number)
                     w = workflowModels.MachineWorkflowStep.objects.create(
-                        state_id = firstState,
-                        machine_id = machine.serial_number,
-                        order = o)
+                        state_id=firstState,
+                        machine_id=machine.serial_number,
+                        order=o)
                     w.save()
                     wJson = {
                         'id': w.id,
@@ -190,15 +192,16 @@ class OrderView(generics.ListCreateAPIView):
             except Exception as ex:
                 return Response({
                             "data": [],
-                            "message": "Error while creating the MWStep record."
-                                    + str(ex)
+                            "message": "Error while creating"
+                            " the MWStep record." + str(ex)
                         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-            
             return Response({
-                            "data": {"event": eJson, "order": oJson,
-                                    "WorflowMachineSteps": workflowList},
-                            "message": "Ok"
-                            }, status=status.HTTP_201_CREATED)
+                "data": {
+                    "event": eJson, "order": oJson,
+                    "WorflowMachineSteps": workflowList
+                    },
+                "message": "Ok"
+            }, status=status.HTTP_201_CREATED)
 
         except Exception as ex:
             return Response({
@@ -207,13 +210,14 @@ class OrderView(generics.ListCreateAPIView):
                                    + str(ex)
                     }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
 class OrdersView(generics.ListAPIView):
     serializer_class = EventJoinOrdersSerializer
 
     def list(self, request, *args, **kwargs):
-        year = request.GET.get("year", datetime.datetime.now().year)
-        month = request.GET.get("month", datetime.datetime.now().month)
-        day = request.GET.get("day", datetime.datetime.now().day)
+        year = request.GET.get("year", datetime.now().year)
+        month = request.GET.get("month", datetime.now().month)
+        day = request.GET.get("day", datetime.now().day)
         branch_number = request.GET.get("branch", 1)
 
         if int(day) < 4:
@@ -261,9 +265,9 @@ class EventsView(generics.ListAPIView):
     serializer_class = EventJoinEventStateSerializer
 
     def list(self, request, *args, **kwargs):
-        year = request.GET.get("year", datetime.datetime.now().year)
-        month = request.GET.get("month", datetime.datetime.now().month)
-        day = request.GET.get("day", datetime.datetime.now().day)
+        year = request.GET.get("year", datetime.now().year)
+        month = request.GET.get("month", datetime.now().month)
+        day = request.GET.get("day", datetime.now().day)
 
         machine_type = request.GET.get("service", "")
         if machine_type == "":
@@ -316,8 +320,6 @@ class EventsView(generics.ListAPIView):
         queryset = EventJoinEventState.objects.raw(query)
 
         serializer = self.get_serializer(queryset, many=True)
-        print(query)
-        print(serializer.data)
         if len(serializer.data):
             return Response({
                 'data': serializer.data
@@ -382,11 +384,11 @@ class MachineOrdersView(generics.ListAPIView):
     def list(self, request, *args, **kwargs):
         start_date = request.GET.get(
                 "start_date",
-                datetime.datetime.now().date()
+                datetime.now().date()
             )
         end_date = request.GET.get(
                 "end_date",
-                datetime.datetime.now().date()
+                datetime.now().date()
             )
         machine_number = request.GET.get("machine", "")
 

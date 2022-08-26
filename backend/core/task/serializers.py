@@ -48,9 +48,10 @@ class OrderDetailsSerializer(ModelSerializer):
 class PiecesRangeSerializer(ModelSerializer):
     class Meta:
         model = PiecesRange
-        fields = ("id",
-         "duration",
-          "range"
+        fields = (
+            "id",
+            "duration",
+            "range"
         )
 
 

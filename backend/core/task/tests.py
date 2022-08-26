@@ -4,15 +4,16 @@ from django.test import TestCase
 import datetime
 from core.models import Machine, MachineType,\
     MachineState, Employee, BranchOffice
-from core.task.models import Event, OrderDetails, EventState, EventType, PiecesRange
+from core.task.models import Event, OrderDetails,\
+    EventState, EventType, PiecesRange
 from core.workflow.models import MachineWorkflowStep, StepState
 
 
 class EventJoinStateTestSetUp(TestCase):
 
     def setUp(self) -> None:
-        EventState.objects.create(id=1,label='No iniciado')
-        EventType.objects.create(id=1,label='Corte')
+        EventState.objects.create(id=1, label='No iniciado')
+        EventType.objects.create(id=1, label='Corte')
         PiecesRange.objects.create(id=1, duration="0", range='0-99')
         BranchOffice.objects.create(
             id=1,
@@ -286,7 +287,6 @@ class AllOrderTest(TestCase):
         get_str = '/api/orders/?year={}&month={}&day={}&branch={}'.format(
             self.year, self.month, self.day, self.branch2)
         response = self.client.get(get_str)
-        print(get_str)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         branch = response.data["data"][0]["branch_id"]
         self.assertEqual(branch, self.branch2)
@@ -346,26 +346,28 @@ class AllOrderTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_orderPost(self):
-            data = {'description': 'ewew',
-                    'start_date': '2022-06-17',
-                    'end_date': '2022-06-17',
-                    'start_time': 7,
-                    'end_time': 8,
-                    'type': 1,
-                    'client_name': 'h',
-                    'invoice_num': 'fg',
-                    'pieces_number': 0,
-                    'plan_file': 'null',
-                    'workflow': 1}
-            response = self.client.post('/api/order/',
-                                        json.dumps(data),
-                                        content_type="application/json")
-            self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-            data = response.data.get('data')
-            event = data.get('event')
-            order = data.get('order')
+        data = {
+            'description': 'ewew',
+            'start_date': '2022-06-17',
+            'end_date': '2022-06-17',
+            'start_time': 7,
+            'end_time': 8,
+            'type': 1,
+            'client_name': 'h',
+            'invoice_num': 'fg',
+            'pieces_number': 0,
+            'plan_file': 'null',
+            'workflow': 1
+        }
+        response = self.client.post('/api/order/',
+                                    json.dumps(data),
+                                    content_type="application/json")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        data = response.data.get('data')
+        event = data.get('event')
+        order = data.get('order')
 
-            c_event = Event.objects.get(id=event.get('id'))
-            self.assertEqual(str(c_event), event.get('description'))
-            c_order = OrderDetails.objects.get(id=order.get('id'))
-            self.assertEqual(str(c_order), str(order.get('id')))
+        c_event = Event.objects.get(id=event.get('id'))
+        self.assertEqual(str(c_event), event.get('description'))
+        c_order = OrderDetails.objects.get(id=order.get('id'))
+        self.assertEqual(str(c_order), str(order.get('id')))
