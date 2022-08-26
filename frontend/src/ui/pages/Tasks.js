@@ -1,5 +1,6 @@
 import { React, useEffect, useState } from 'react';
 import { TasksHeader, TaskList } from '../components/TaskList';
+import Header from '../components/Header';
 import { DateUtils } from '../utils/DateUtils';
 import { CalendarService } from '../../services/calendar.service';
 
@@ -60,6 +61,7 @@ function Tasks() {
 
   return (
     <div className="h-screen">
+      <Header />
       <TasksHeader
         selectedView={0}
         selectedDate={state.selectedDate}

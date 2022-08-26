@@ -62,12 +62,15 @@ const servicesDummy = [
   },
 ];
 
+const defaultBranch = 1;
+const defaultActivity = 1;
+
 function CreateOrder({ setOpenCreateEvent }) {
   const [state, setState] = useState({
     isStartDateSelected: false,
-    activityId: 1,
+    activityId: defaultActivity,
     description: '',
-    piecesSelected: 1,
+    piecesSelected: 0,
     client_name: '',
     invoice_num: '',
     startDate: new Date(),
@@ -78,7 +81,7 @@ function CreateOrder({ setOpenCreateEvent }) {
     endDate: new Date(),
     file: null,
     isLoading: false,
-    timeSelected: 1,
+    timeSelected: 0,
     schedules: {},
     servicesSeleted: [],
 
@@ -165,7 +168,7 @@ function CreateOrder({ setOpenCreateEvent }) {
   }
 
   function getSchedules(date) {
-    CalendarService.getAvailableHours(date, 1)
+    CalendarService.getAvailableHours(date, defaultBranch)
       .then((response) => {
         const pieceRangeSelected = getPiecesRangeById(state.piecesSelected);
         const updatedState = getUpdatedState(
@@ -237,7 +240,7 @@ function CreateOrder({ setOpenCreateEvent }) {
       end_date: DateUtils.getFormatStringDate(state.endDate),
       start_time: state.schedules.data[state.timeSelected].start,
       end_time: state.schedules.data[state.timeSelected].end,
-      type: 1,
+      type: defaultActivity,
       client_name: state.client_name,
       invoice_num: state.invoice_num,
       pieces_range_id: state.piecesSelected,

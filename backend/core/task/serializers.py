@@ -1,7 +1,8 @@
 from rest_framework.serializers import ModelSerializer
 from .models import EventType, EventState, Event, OrderDetails,\
     MaintenanceDetails, MaintenancePeriod, PiecesRange, Priority,\
-    EventJoinOrder, EventJoinOrders, EventJoinEventState
+    EventJoinOrder, EventJoinOrders, EventJoinEventState,\
+    MachineOrdersModel
 
 
 class EventTypeSerializer(ModelSerializer):
@@ -77,23 +78,21 @@ class EventJoinOrderSerializer(ModelSerializer):
     class Meta:
         model = EventJoinOrder
         fields = "__all__"
-        # 'id_order', 'state_id', 'state_label', 'description',
-        # 'pieces', 'employee', 'end_date',
-        # 'client_name', 'invoice_num', 'file_url'
 
 
 class EventJoinOrdersSerializer(ModelSerializer):
     class Meta:
         model = EventJoinOrders
         fields = "__all__"
-        # 'id_order', 'invoice_id', 'client_name',
-        # 'start_date', 'end_date', 'state_id',
-        # 'state_label', 'employee', 'current_step'
 
 
 class EventJoinEventStateSerializer(ModelSerializer):
     class Meta:
         model = EventJoinEventState
         fields = "__all__"
-        # 'order_id', 'start_datetime', 'end_datetime',
-        # 'state_id', 'state_label'
+
+
+class MachineOrdersSerializer(ModelSerializer):
+    class Meta:
+        model = MachineOrdersModel
+        fields = "__all__"

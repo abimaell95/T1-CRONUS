@@ -115,6 +115,7 @@ class EventJoinOrders(models.Model):
     state_label = models.CharField(max_length=20)
     name = models.CharField(max_length=15)
     surname = models.CharField(max_length=15)
+    serial_numer = models.CharField(max_length=20)
     branch_id = models.IntegerField()
     type_label = models.CharField(max_length=20)
 
@@ -125,3 +126,12 @@ class EventJoinEventState(models.Model):
     end_datetime = models.DateTimeField()
     state_id = models.IntegerField()
     label = models.CharField(max_length=20)
+
+
+class MachineOrdersModel(models.Model):
+    id = models.IntegerField(primary_key=True)
+    serial_number = models.CharField(max_length=20)
+    invoice_num = models.CharField(max_length=30)
+    client_name = models.CharField(max_length=60)
+    step_state = models.IntegerField()
+    schedule_date = models.DateTimeField()

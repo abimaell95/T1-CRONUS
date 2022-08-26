@@ -1,8 +1,15 @@
 from rest_framework import status
-from rest_framework import generics
+from rest_framework import generics, viewsets
 from rest_framework.response import Response
-from .serializers import MachineWorkflowStepJoinMachineSerializer
-from .models import MachineWorkflowStepJoinMachine
+from .serializers import MachineWorkflowStepJoinMachineSerializer,\
+    StepStateSerializer
+from .models import MachineWorkflowStepJoinMachine,\
+    StepState
+
+
+class StepStateViewSet(viewsets.ModelViewSet):
+    queryset = StepState.objects.all().order_by("id")
+    serializer_class = StepStateSerializer
 
 
 class MachineWorkflowStepView(generics.ListAPIView):
