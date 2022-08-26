@@ -1,6 +1,7 @@
 import { React, useState } from 'react';
 import { WeeklyView } from '../components/Calendar';
 import { TasksHeader } from '../components/TaskList';
+import Header from '../components/Header';
 import { DateUtils } from '../utils';
 
 function Calendar() {
@@ -37,6 +38,7 @@ function Calendar() {
 
   return (
     <div className="">
+      <Header />
       <TasksHeader
         selectedView={1}
         selectedDate={state.selectedDate}

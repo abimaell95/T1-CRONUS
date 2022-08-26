@@ -1,10 +1,10 @@
 /* eslint-disable no-unused-vars */
 import { React } from 'react';
-import { WeeklyView } from '../components/Calendar/WeeklyView';
+import Header from '../components/Header';
 
 function Home() {
   return (
-    <div className="" />
+    <Header />
   );
 }
 
