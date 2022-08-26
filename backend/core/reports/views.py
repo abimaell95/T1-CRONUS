@@ -77,15 +77,17 @@ class OrdersResume(generics.ListCreateAPIView):
             )
         branch_number = request.GET.get("branch", 1)
         query = (
-            "select core_event.id, core_event.state_id, core_event.branch_id"
-            " from core_event where core_event.branch_id in ({})"
+            "select core_event.id, core_event.state_id,"
+            " core_event.branch_id, core_branchoffice.name"
+            " from core_event inner join core_branchoffice"
+            " on core_event.branch_id=core_branchoffice.id"
+            " where core_event.branch_id in ({})"
             " and core_event.start_datetime between"
             " '{} 00:00:00' and '{} 23:59:59'".format(
                 branch_number, start_date, end_date
                 )
         )
 
-        print(query)
         queryset = OrdersResumeModel.objects.raw(query)
         serializer = self.get_serializer(queryset, many=True)
         data = {}
@@ -93,6 +95,7 @@ class OrdersResume(generics.ListCreateAPIView):
         for r in serializer.data:
             if data.get(r["branch_id"], -1) == -1:
                 data[r["branch_id"]] = {
+                    'branch_name' : r["name"],
                     'completed': 1 if r["state_id"] == 3 else 0,
                     'delayed': 1 if r["state_id"] == 6 else 0,
                     'no_completed': 1 if r["state_id"] == 1 or 2 else 0

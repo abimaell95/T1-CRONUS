@@ -18,5 +18,6 @@ class ProductivityReportModel(models.Model):
 
 class OrdersResumeModel(models.Model):
     id = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=20)
     state_id = models.IntegerField()
     branch_id = models.IntegerField()
