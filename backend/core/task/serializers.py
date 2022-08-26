@@ -39,7 +39,7 @@ class OrderDetailsSerializer(ModelSerializer):
             "client_name",
             "invoice_num",
             "file_url",
-            "num_pieces",
+            "num_pieces_id",
             "current_step",
             "event_id"
         )
@@ -48,7 +48,10 @@ class OrderDetailsSerializer(ModelSerializer):
 class PiecesRangeSerializer(ModelSerializer):
     class Meta:
         model = PiecesRange
-        fields = ("id", "duration", "range")
+        fields = ("id",
+         "duration",
+          "range"
+        )
 
 
 class MaintenanceDetailsSerializer(ModelSerializer):
