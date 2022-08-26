@@ -37,7 +37,7 @@ class OrderDetails(models.Model):
     invoice_num = models.CharField(max_length=30)
     file_url = models.CharField(max_length=300, null=True)
     num_pieces = models.ForeignKey("PiecesRange", on_delete=models.CASCADE)
-    current_step_id = models.IntegerField(null=True)
+    current_step= models.IntegerField(null=True)
     event = models.ForeignKey("Event", on_delete=models.CASCADE)
 
     def __str__(self):

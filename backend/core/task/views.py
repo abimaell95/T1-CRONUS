@@ -92,8 +92,9 @@ class OrderView(generics.ListCreateAPIView):
             client_name= request.POST.get('client_name')
             invoice_num= request.POST.get('invoice_number')
             pieces_range_id= request.POST.get('pieces_range_id')
-            print(pieces_range_id)
-            machine_list= request.POST.get('services')
+            services= request.POST.get('services')
+            services = services.strip("[]")
+            machine_list = services.split(",")
 
             #Constants
             firstStep = 1 #Paso 1
@@ -138,9 +139,9 @@ class OrderView(generics.ListCreateAPIView):
                 o = OrderDetails.objects.create(
                     client_name=client_name,
                     invoice_num=invoice_num,
-                    file_url=plan_file_url,
-                    current_step_id=firstStep,
-                    num_pieces=pieces_range_id,
+                    file_url=str(plan_file_url),
+                    current_step=firstStep,
+                    num_pieces_id=pieces_range_id,
                     event=e,
                 )
                 o.save()
@@ -148,8 +149,8 @@ class OrderView(generics.ListCreateAPIView):
                     'id': o.id,
                     'invoice_num': o.invoice_num,
                     'file_url': o.file_url,
-                    'current_step_id': o.current_step_id,
-                    'num_pieces': o.num_pieces,
+                    'current_step': o.current_step,
+                    'num_pieces_id': o.num_pieces_id,
                     'event_id': e.id
                 }
             except Exception as ex:
@@ -160,12 +161,16 @@ class OrderView(generics.ListCreateAPIView):
                         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
             try:
-                machines= Machine.objects.filter(id__in=machine_list)
+                print(machine_list)
+                print(type(machine_list))
+                machines= Machine.objects.filter(serial_number__in=machine_list)
+                print(machines)
                 workflowList = []
                 for machine in machines:
+                    print(machine.serial_number)
                     w = workflowModels.MachineWorkflowStep.objects.create(
-                        state = firstState,
-                        machine = machine.id,
+                        state_id = firstState,
+                        machine_id = machine.serial_number,
                         order = o)
                     w.save()
                     wJson = {
