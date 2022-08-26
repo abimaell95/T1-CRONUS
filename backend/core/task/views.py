@@ -204,6 +204,8 @@ class OrdersView(generics.ListAPIView):
             " core_machinetype.label as type_label from"
             " core_event inner join core_orderdetails"
             " on core_event.id=core_orderdetails.event_id"
+            " and core_event.branch_id = {} and core_event.start_datetime"
+            " between '{}-{}-{} 00:00:00' and '{}-{}-{} 00:00:00'"
             " inner join core_eventstate on"
             " core_event.state_id = core_eventstate.id"
             " inner join core_machineworkflowstep on"
@@ -287,6 +289,8 @@ class EventsView(generics.ListAPIView):
         queryset = EventJoinEventState.objects.raw(query)
 
         serializer = self.get_serializer(queryset, many=True)
+        print(query)
+        print(serializer.data)
         if len(serializer.data):
             return Response({
                 'data': serializer.data

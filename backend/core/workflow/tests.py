@@ -2,7 +2,7 @@ from rest_framework import status
 from django.test import TestCase
 from core.models import Machine, MachineType,\
     MachineState, Employee, BranchOffice
-from core.task.models import Event, OrderDetails, EventState, EventType
+from core.task.models import Event, OrderDetails, EventState, EventType, PiecesRange
 from core.workflow.models import MachineWorkflowStep, StepState
 
 
@@ -10,6 +10,7 @@ class WorkflowIdTest(TestCase):
     id = 1
 
     def setUp(self) -> None:
+        PiecesRange.objects.create(id=1, duration="0", range='0-99')
         StepState.objects.create(id=1, label="No Iniciado")
         EventState.objects.create(id=1, label="No Iniciado")
         EventType.objects.create(id=1, label="Orden")
@@ -33,6 +34,7 @@ class WorkflowIdTest(TestCase):
             serial_number="123456",
             model="A50",
             brand="Samsung",
+            step_order=1,
             purchase_date="2010-01-01",
             branch_id=1,
             employee_id="0927643825",
@@ -54,14 +56,12 @@ class WorkflowIdTest(TestCase):
             client_name="Carmen Pinto",
             invoice_num="10001-20",
             file_url="Archivo.jpg",
-            num_pieces=100,
-            current_step_id=1,
+            num_pieces_id=1,
+            current_step=1,
             event_id=1
         )
         MachineWorkflowStep.objects.create(
             id=1,
-            step_order=1,
-            end_datetime="2019-01-01 00:00:00",
             machine_id="123456",
             order_id=self.id,
             state_id=1
