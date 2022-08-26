@@ -2,9 +2,14 @@ import { React, useEffect, useState } from 'react';
 import { TasksHeader, TaskList } from '../components/TaskList';
 import { DateUtils } from '../utils/DateUtils';
 import { CalendarService } from '../../services/calendar.service';
+import useUser from '../components/Hooks/useUser';
+import {useNavigate } from 'react-router';
 
 function Tasks() {
+  const navigate = useNavigate();
+  const { isLogged} = useUser();
   // get days of current week
+
   const [state, setState] = useState({
     loadingData: true,
     orders: {},

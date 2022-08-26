@@ -1,3 +1,4 @@
+
 from rest_framework.serializers import ModelSerializer
 from .models import MachineState, BranchOffice, \
     Employee, MachineType, Machine

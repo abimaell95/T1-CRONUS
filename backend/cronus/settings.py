@@ -9,12 +9,15 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
+from datetime import timedelta
+
 from django.urls import reverse_lazy
 from pathlib import Path
 
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
@@ -47,8 +50,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'core',
     'rest_framework',
+    'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
-    'django_s3_storage'
+    'django_s3_storage',
+    'authentication'
 ]
 
 MIDDLEWARE = [
@@ -98,9 +103,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'cronus', # dbname
-        'USER': 'cronusadmin', # master username
-        'PASSWORD': 'cronus2022', # master password
-        'HOST': 'mynewcluster.cluster-cb42naljehp6.us-west-2.rds.amazonaws.com', # Endpoint
+        'USER': 'root', # master username
+        'PASSWORD': '1710', # master password
+        'HOST': 'localhost', # Endpoint
         'PORT': '3306',
     }
 }
@@ -108,35 +113,68 @@ DATABASES = {
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
 
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.'
-                'UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.'
-                'MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.'
-                'CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.'
-                'NumericPasswordValidator',
-    },
-]
+# AUTH_PASSWORD_VALIDATORS = [
+#     {
+#         'NAME': 'django.contrib.authentication.password_validation.'
+#                 'UserAttributeSimilarityValidator',
+#     },
+#     {
+#         'NAME': 'django.contrib.authentication.password_validation.'
+#                 'MinimumLengthValidator',
+#     },
+#     {
+#         'NAME': 'django.contrib.authentication.password_validation.'
+#                 'CommonPasswordValidator',
+#     },
+#     {
+#         'NAME': 'django.contrib.authentication.password_validation.'
+#                 'NumericPasswordValidator',
+#     },
+# ]
 
 REST_FRAMEWORK = {
-    # Use Django's standard `django.contrib.auth` permissions,
+    # Use Django's standard `django.contrib.authentication` permissions,
     # or allow read-only access for unauthenticated users.
-    'DEFAULT_AUTHENTICATION_CLASSES': [],
-    'DEFAULT_PERMISSION_CLASSES': [],
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication'
+    ),
+    # 'DEFAULT_PERMISSION_CLASSES': [],
     # 'DEFAULT_PERMISSION_CLASSES': [
     #    'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     # ]
 }
 
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=50),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'UPDATE_LAST_LOGIN': False,
+
+    'ALGORITHM': 'HS256',
+
+    'VERIFYING_KEY': None,
+    'AUDIENCE': None,
+    'ISSUER': None,
+    'JWK_URL': None,
+    'LEEWAY': 0,
+
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
+    'USER_AUTHENTICATION_RULE': 'rest_framework_simplejwt.authentication.default_user_authentication_rule',
+
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    'TOKEN_TYPE_CLAIM': 'token_type',
+    'TOKEN_USER_CLASS': 'rest_framework_simplejwt.models.TokenUser',
+
+    'JTI_CLAIM': 'jti',
+
+    'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
+    'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
+    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
@@ -172,10 +210,20 @@ STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 doctests = True
 
 
-S3_BUCKET = "zappa-inl6r1y0j"
+# S3_BUCKET = "zappa-inl6r1y0j"
+#
+# STATICFILES_STORAGE = "django_s3_storage.storage.StaticS3Storage"
+#
+# AWS_S3_BUCKET_NAME_STATIC = S3_BUCKET
+#
+# STATIC_URL = "https://%s.s3.amazonaws.com/" % S3_BUCKET
 
-STATICFILES_STORAGE = "django_s3_storage.storage.StaticS3Storage"
+STATIC_URL = 'static/'
+STATICFILES_DIRS = [
+  # Tell Django where to look for React's static files (css, js)
+  os.path.join(BASE_DIR, "build/static"),
+]
 
-AWS_S3_BUCKET_NAME_STATIC = S3_BUCKET
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-STATIC_URL = "https://%s.s3.amazonaws.com/" % S3_BUCKET
+# AUTH_USER_MODEL= "core.User"

@@ -1,6 +1,4 @@
 import json
-import jwt, datetime
-from rest_framework.views import APIView
 
 from .serializers import BranchOfficeSerializer, MachineSerializer, EmployeeRolSerializer
 from .models import BranchOffice, Machine, Employee
@@ -9,9 +7,9 @@ from rest_framework import viewsets, generics
 from rest_framework.response import Response
 from django.contrib.auth import authenticate, login
 from django.http import JsonResponse
-from django.utils.decorators import method_decorator
-from django.views import View
+
 from django.views.decorators.csrf import csrf_exempt
+
 
 
 
@@ -88,12 +86,3 @@ def login_view(request):
     else:
         return JsonResponse({"error": True, "status": 200,
                              "message": "Invalid method"})
-
-
-# class RegisterView(APIView):
-#     def post(self, request):
-#         serializer= UserSerializer(data=request.data)
-#         serializer.is_valid(raise_exception=True)
-#         serializer.save()
-#         return Response(serializer.data)
-

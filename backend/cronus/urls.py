@@ -19,6 +19,9 @@ from django.urls import path, include
 from django.contrib.auth import logout
 from django.views.generic import TemplateView
 from rest_framework import routers
+from rest_framework_simplejwt.views import TokenRefreshView
+
+from authentication import views as authviews
 from core import views
 from core.task import views as eventviews
 from core.workflow import views as workflowviews
@@ -42,8 +45,9 @@ urlpatterns = [
     path("accounts/login/", views.login_view, name="login"),
     path("api/obtenerRol/", views.RolEmployeeView.as_view(), name="rolEmpleado"),
     path("logout/", logout, name="logout"),
-    path("api-auth/", include("rest_framework.urls",
-                              namespace="rest_framework")),
+    path("api-auth/token/", authviews.MyTokenObtainPairView.as_view()),
+    path("api-auth/token/refresh", TokenRefreshView.as_view()),
+    path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     path('', TemplateView.as_view(template_name="index.html"), {'resource': ''}),
     path('<path:resource>', TemplateView.as_view(template_name="index.html"))
 ]

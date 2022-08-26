@@ -1,8 +1,9 @@
 import {
-  React, TableIcon, CalendarIcon, ChevronLeftIcon, ChevronRightIcon,
+  React, TableIcon, CalendarIcon, ChevronLeftIcon, ChevronRightIcon, LogoutIcon,
 } from '@heroicons/react/solid';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import useUser from '../Hooks/useUser';
 
 const getNextMonday = (date) => new Date(date.getFullYear(), date.getMonth(), date.getDate() + 7);
 
@@ -39,6 +40,8 @@ const getWeekLabel = (date) => {
 function TasksHeader({
   selectedView, selectedDate, setSelectedDate, setOpenCreateEvent,
 }) {
+
+  const {logout} = useUser();
   return (
     <>
       <header className="">
@@ -52,6 +55,9 @@ function TasksHeader({
               <CalendarIcon className={selectedView === 1 ? 'text-gray-500 -ml-0.5 mr-2 h-5 w-5' : 'text-gray-400 group-hover:text-gray-500 -ml-0.5 mr-2 h-5 w-5'} />
               <span>Calendario</span>
             </Link>
+            <div className='button' onClick={()=>logout()}>
+              <LogoutIcon className={selectedView === 0 ? 'text-gray-500 -ml-0.5 mr-2 h-5 w-5' : 'text-gray-400 group-hover:text-gray-500 -ml-0.5 mr-2 h-5 w-5'} />
+            </div>
           </nav>
 
         </div>

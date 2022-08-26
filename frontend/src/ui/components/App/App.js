@@ -9,6 +9,8 @@ import {
   Calendar,
   Login,
 } from '../../pages';
+import { UserContextProvider } from '../Context/AuthContext';
+import { LayoutApp } from '../Layouts/layout';
 
 function App() {
   const [state, setState] = useState({
@@ -23,13 +25,15 @@ function App() {
   }
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="tasks" element={<Tasks />} />
-        <Route path="calendar" element={<Calendar />} />
-        <Route path="*" element={<Login setUser={() => setUser()} />} />
-      </Routes>
-    </BrowserRouter>
+    <UserContextProvider>
+      <BrowserRouter>
+        <Routes>
+            <Route path="*" element={<Login setUser={() => setUser()} />} />
+            <Route path="tasks" element={<Tasks />} />
+            <Route path="calendar" element={<Calendar />} />
+        </Routes>
+      </BrowserRouter>
+    </UserContextProvider>
   );
 }
 
