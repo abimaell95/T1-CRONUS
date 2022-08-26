@@ -32,7 +32,7 @@ function WeeklyView({
       .then((response) => {
         const events = response.data.map((event) => {
           const start = event.start_datetime.slice(0, event.start_datetime.length - 1);
-          const end = event.end_datetime.slice(0, event.start_datetime.length - 1);
+          const end = event.end_datetime.slice(0, event.end_datetime.length - 1);
           return { ...event, start_datetime: new Date(start), end_datetime: new Date(end) };
         });
         setState({ ...state, events });

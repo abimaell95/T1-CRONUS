@@ -8,6 +8,7 @@ import {
   Tasks,
   Calendar,
   Login,
+  Reports,
 } from '../../pages';
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
       <Routes>
         <Route path="tasks" element={<Tasks />} />
         <Route path="calendar" element={<Calendar />} />
+        <Route path="reports" element={<Reports />} />
         <Route path="*" element={<Login setUser={() => setUser()} />} />
       </Routes>
     </BrowserRouter>
