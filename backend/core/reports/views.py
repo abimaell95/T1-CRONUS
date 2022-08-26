@@ -43,7 +43,7 @@ class ProductivityReport(generics.ListCreateAPIView):
             " = core_machineworkflowstep.machine_id"
             " inner join core_machinetype on core_machinetype.id"
             " = core_machine.type_id"
-            " where core_event.state_id in (1,3,6) and"
+            " where core_event.state_id in (3,6) and"
             " core_event.branch_id in ({}) and core_event.start_datetime"
             " between '{} 00:00:00' and '{} 23:59:59'".format(
                 branch_number, start_date, end_date
