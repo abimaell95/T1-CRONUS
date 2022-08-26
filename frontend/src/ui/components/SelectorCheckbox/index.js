@@ -2,6 +2,7 @@
 import React, { useState, useCallback } from 'react';
 import ReactSelect, { components } from 'react-select';
 import PropTypes from 'prop-types';
+import themeConstants from './Constants';
 import './index.css';
 /*
 const colourOptions = [
@@ -92,11 +93,11 @@ function SelectorCheckbox(props) {
         value={state.optionSelected}
         theme={(theme) => ({
           ...theme,
-          borderRadius: '0.375rem',
+          borderRadius: themeConstants.borderRadious,
           colors: {
             ...theme.colors,
-            primary25: '#e2e8f0',
-            primary: '#475569',
+            primary25: themeConstants.colorPrimary25,
+            primary: themeConstants.colorPrimary,
           },
         })}
       />
